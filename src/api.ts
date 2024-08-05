@@ -4,7 +4,7 @@ export const app = express();
 
 app.use(express.json());
 
-if (process.env.NODE_ENV !== "Test") {
+if (process.env.NODE_ENV !== "test") {
   app.use((req, res, next) => {
     console.log(req.method, req.url);
     next();

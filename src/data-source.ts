@@ -1,7 +1,8 @@
 import "reflect-metadata";
-import dotenv from "dotenv-flow"
-dotenv.config()
+import dotenv from "dotenv-flow";
+dotenv.config();
 import { DataSource } from "typeorm";
+import { UserEntitiy } from "./modules/user/entity/user.entity";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -9,10 +10,11 @@ export const AppDataSource = new DataSource({
   port: 3306,
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASS,
-  database: process.env.DB_DATABASE,
+  database: process.env.DB_NAME,
   synchronize: true,
   logging: false,
-  entities: [],
+  entities: [UserEntitiy],
   migrations: [],
   subscribers: [],
+  dropSchema: process.env.NODE_ENV === "test",
 });

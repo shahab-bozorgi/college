@@ -9,3 +9,10 @@ export interface User {
   email: string;
   is_private: boolean;
 }
+
+export interface CreateUser{
+  username:string;
+  email: string;
+  password: string;
+}
+

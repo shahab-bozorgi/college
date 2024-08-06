@@ -7,7 +7,7 @@ import {
 } from "typeorm";
 
 @Entity("users")
-export class UserEntitiy {
+export class UserEntity {
   @PrimaryColumn("uuid")
   id!: string;
 
@@ -34,6 +34,9 @@ export class UserEntitiy {
 
   @CreateDateColumn()
   createdAt!: Date;
+
+  @Column()
+  avatar_url!: string;
 
   @UpdateDateColumn()
   updatedAt!: Date;

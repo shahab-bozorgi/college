@@ -5,31 +5,35 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from "typeorm";
+import { UUID } from "../../../data/uuid";
+import { Email } from "../../../data/email";
+import { Username } from "../model/user-username";
+import { Password } from "../model/user-password";
 
 @Entity("users")
 export class UserEntity {
   @PrimaryColumn("uuid")
-  id!: string;
+  id!: UUID;
 
-  @Column()
+  @Column({ nullable: true })
   first_name!: string;
 
-  @Column()
+  @Column({ nullable: true })
   last_name!: string;
 
   @Column({ unique: true })
-  email!: string;
+  email!: Email;
 
   @Column({ unique: true })
-  username!: string;
+  username!: Username;
 
   @Column()
-  password!: string;
+  password!: Password;
 
-  @Column()
+  @Column({ nullable: true })
   bio!: string;
 
-  @Column()
+  @Column({ default: false })
   is_private!: boolean;
 
   @CreateDateColumn()

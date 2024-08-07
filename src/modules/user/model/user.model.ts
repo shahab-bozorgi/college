@@ -1,23 +1,21 @@
 import { Email } from "../../../data/email";
-import { UUID } from "../../../data/uuid";
-import { Password } from "./user-password";
+import { UserId } from "./user-user-id";
 import { Username } from "./user-username";
 
 export interface User {
-  id: UUID;
-  first_name: string;
-  last_name: string;
-  avatar_url: string;
-  bio: string;
+  id: UserId;
+  first_name?: string;
+  last_name?: string;
+  avatar_url?: string;
+  bio?: string;
   username: Username;
-  password: Password;
+  password: string;
   email: Email;
-  is_private: boolean;
+  is_private?: boolean;
 }
 
-export interface CreateUser{
-  username:Username;
+export interface CreateUser {
+  username: Username;
   email: Email;
-  password: Password;
+  password: string;
 }
-

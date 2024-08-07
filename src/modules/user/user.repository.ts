@@ -1,4 +1,4 @@
-import { DataSource, Equal, Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import { User } from "../user/model/user.model";
 import { CreateUser } from "../user/model/user.model";
 import { UserEntity } from "./entity/user.entity";
@@ -6,9 +6,9 @@ import { Username } from "./model/user-username";
 import { Email } from "../../data/email";
 
 export interface IUserRepository {
-  create(user: CreateUser): Promise<User | null>;
-  findByUsername(username: string): Promise<User | null>;
-  findByEmail(email: string): Promise<User | null>;
+  create(user: CreateUser): Promise<User>;
+  findByUsername(username: Username): Promise<User | null>;
+  findByEmail(email: Email): Promise<User | null>;
 }
 
 export class UserRepository implements IUserRepository {
@@ -18,16 +18,15 @@ export class UserRepository implements IUserRepository {
     this.repo = dataSource.getRepository(UserEntity);
   }
 
-  async create(user: CreateUser): Promise<User | null> {
+  async create(user: CreateUser): Promise<User> {
     return await this.repo.save(user);
   }
 
   async findByUsername(username: Username): Promise<User | null> {
-    return await this.repo.findOne({where: { username: Equal(username) }});
-    }
+    return await this.repo.findOne({ where: { username } });
+  }
 
   async findByEmail(email: Email): Promise<User | null> {
-    return await this.repo.findOne({ where: { email: Equal(email) } });
+    return await this.repo.findOne({ where: { email } });
   }
 }
-

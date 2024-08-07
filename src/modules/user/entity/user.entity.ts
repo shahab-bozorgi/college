@@ -5,21 +5,24 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { UUID } from "../../../data/uuid";
 import { Email } from "../../../data/email";
 import { Username } from "../model/user-username";
 import { Password } from "../model/user-password";
+import { UserId } from "../model/user-user-id";
 
 @Entity("users")
 export class UserEntity {
   @PrimaryColumn("uuid")
-  id!: UUID;
+  id!: UserId;
 
   @Column({ nullable: true })
   first_name!: string;
 
   @Column({ nullable: true })
   last_name!: string;
+
+  @Column()
+  avatar_url!: string;
 
   @Column({ unique: true })
   email!: Email;
@@ -38,9 +41,6 @@ export class UserEntity {
 
   @CreateDateColumn()
   createdAt!: Date;
-
-  @Column()
-  avatar_url!: string;
 
   @UpdateDateColumn()
   updatedAt!: Date;

@@ -7,7 +7,7 @@
     "start": "cross-env NODE_ENV=production ts-node src/app.ts",
     "start:develop": "cross-env NODE_ENV=development ts-node src/app.ts",
     "test": "cross-env NODE_ENV=test jest --testMatch **/src/tests/**/*.spec.ts",
-    "test:e2e": "cross-env NODE_ENV=test jest --testMatch **/src/e2e/**/*.spec.ts"
+    "test:e2e": "cross-env NODE_ENV=test jest --testMatch **/src/tests/e2e/**/*.spec.ts"
   },
   "keywords": [],
   "author": "",
@@ -15,15 +15,20 @@
   "devDependencies": {
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.12",
+    "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^22.1.0",
     "@types/supertest": "^6.0.2",
     "@types/typescript": "^2.0.0",
     "@types/uuid": "^10.0.0",
     "jest": "^29.7.0",
+    "jsonwebtoken": "^9.0.2",
     "supertest": "^7.0.0",
+    "ts-jest": "^29.2.4",
     "ts-node": "^10.9.2"
   },
   "dependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "bcryptjs": "^2.4.3",
     "cross-env": "^7.0.3",
     "dotenv-flow": "^4.1.0",
     "express": "^4.19.2",

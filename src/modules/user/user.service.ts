@@ -5,6 +5,7 @@ import { User } from "./model/user.model";
 import { IUserRepository } from "./user.repository";
 import { LoginUserDto } from "./dto/login-user.dto";
 import jwt from "jsonwebtoken";
+import { Username } from "./model/user-username";
 
 export class UserService {
   constructor(private repo: IUserRepository) {}
@@ -23,6 +24,10 @@ export class UserService {
       password: await hash(dto.password, 12),
       email: dto.email,
     });
+  }
+
+  async findByUsername(username: Username): Promise<User | null> {
+    return await this.repo.findByUsername(username);
   }
 
   async login({ username, password }: LoginUserDto) {

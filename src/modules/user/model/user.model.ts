@@ -19,3 +19,5 @@ export interface CreateUser {
   email: Email;
   password: string;
 }
+
+export interface UpdateUser extends Partial<Omit<User, "id">> {}

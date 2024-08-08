@@ -1,12 +1,15 @@
 import { DataSource, Repository } from "typeorm";
-import { User } from "../user/model/user.model";
+import { UpdateUser, User } from "../user/model/user.model";
 import { CreateUser } from "../user/model/user.model";
 import { UserEntity } from "./entity/user.entity";
 import { Username } from "./model/user-username";
 import { Email } from "../../data/email";
+import { UserId } from "./model/user-user-id";
+import { v4 } from "uuid";
 
 export interface IUserRepository {
   create(user: CreateUser): Promise<User>;
+  update(id: UserId, user: UpdateUser): Promise<boolean>;
   findByUsername(username: Username): Promise<User | null>;
   findByEmail(email: Email): Promise<User | null>;
 }
@@ -19,7 +22,12 @@ export class UserRepository implements IUserRepository {
   }
 
   async create(user: CreateUser): Promise<User> {
-    return await this.repo.save(user);
+    return await this.repo.save({ ...user, id: v4() });
+  }
+
+  async update(id: UserId, user: UpdateUser): Promise<boolean> {
+    const result = await this.repo.update({ id }, user);
+    return Boolean(result.affected);
   }
 
   async findByUsername(username: Username): Promise<User | null> {

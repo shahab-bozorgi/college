@@ -6,8 +6,8 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production ts-node src/app.ts",
     "start:develop": "cross-env NODE_ENV=development ts-node src/app.ts",
-    "test": "cross-env NODE_ENV=test jest --testMatch **/src/tests/**/*.spec.ts",
-    "test:e2e": "cross-env NODE_ENV=test jest --testMatch **/src/tests/e2e/**/*.spec.ts"
+    "test": "cross-env NODE_ENV=test jest --testMatch='**/src/tests/unit/**/*.spec.ts'",
+    "test:e2e": "cross-env NODE_ENV=test jest --testMatch='**/src/tests/e2e/**/*.spec.ts'"
   },
   "keywords": [],
   "author": "",

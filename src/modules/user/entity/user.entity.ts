@@ -21,7 +21,7 @@ export class UserEntity {
   @Column({ nullable: true })
   last_name!: string;
 
-  @Column()
+  @Column({ nullable: true })
   avatar_url!: string;
 
   @Column({ unique: true })

@@ -2,7 +2,7 @@ import request from "supertest";
 import { Express } from "express";
 import { makeApp } from "../../api";
 import { TestDataSource } from "../../data-source";
-import { seedUser } from "../../seed";
+import { seedUser } from "../seed";
 
 describe("User test suite", () => {
   let app: Express;
@@ -22,7 +22,7 @@ describe("User test suite", () => {
         .post("/login")
         .send({
           username: "ali",
-          password: "ali1234"
+          password: "ali1234",
         })
         .expect(200);
     });

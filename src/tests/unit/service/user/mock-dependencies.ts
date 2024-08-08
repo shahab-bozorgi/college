@@ -1,12 +1,9 @@
 import { v4 } from "uuid";
-import {
-  CreateUser,
-  User,
-} from "../../../../src/modules/user/model/user.model";
-import { IUserRepository } from "../../../../src/modules/user/user.repository";
-import { UserId } from "../../../../src/modules/user/model/user-user-id";
-import { Username } from "../../../../src/modules/user/model/user-username";
-import { Email } from "../../../../src/data/email";
+import { CreateUser, User } from "../../../../modules/user/model/user.model";
+import { IUserRepository } from "../../../../modules/user/user.repository";
+import { UserId } from "../../../../modules/user/model/user-user-id";
+import { Username } from "../../../../modules/user/model/user-username";
+import { Email } from "../../../../data/email";
 
 export class MockUserRepository implements IUserRepository {
   private users: User[] = [];

@@ -1,9 +1,9 @@
 import { compare } from "bcrypt";
-import { Email } from "../../../../src/data/email";
-import { Password } from "../../../../src/modules/user/model/user-password";
-import { Username } from "../../../../src/modules/user/model/user-username";
-import { UserService } from "../../../../src/modules/user/user.service";
-import { BadRequest } from "../../../../src/utilities/httpError";
+import { Email } from "../../../../data/email";
+import { Password } from "../../../../modules/user/model/user-password";
+import { Username } from "../../../../modules/user/model/user-username";
+import { UserService } from "../../../../modules/user/user.service";
+import { BadRequest } from "../../../../utilities/httpError";
 import { MockUserRepository } from "./mock-dependencies";
 
 let userService: UserService;

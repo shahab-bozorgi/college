@@ -4,7 +4,7 @@ import { Brand } from "../../../utilities/brand";
 export type Username = Brand<string, "Username">;
 
 export const isUsername = (value: string): value is Username => {
-  const usernamePattern = /^[A-Za-z0-9]{3, 30}$/;
+  const usernamePattern = /^[A-Za-z0-9]{3,30}$/;
   return usernamePattern.test(value);
 };
 
@@ -15,4 +15,6 @@ export const toUsername = (value: string): Username => {
   return value as Username;
 };
 
-export const zodUsername = z.string().refine(isUsername);
+export const zodUsername = z.string().refine(isUsername, {
+  message: "نام کاربری میتونه فقط شامل حروف انگلیسی بزرگ، کوچک و اعداد باشه!",
+});

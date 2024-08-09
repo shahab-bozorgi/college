@@ -1,16 +1,19 @@
 import { Response } from "express";
-import { HttpError } from "./http-error";
+import { HttpError } from "./httpError";
 
 export const handleExpress = async <T>(res: Response, cb: () => Promise<T>) => {
   try {
     const data = await cb();
-    res.status(200).send(data);
+    res.status(200).json({ ok: true, data });
   } catch (error) {
     if (error instanceof HttpError) {
-      res.status(error.status).send(error.message);
+      res.status(error.code).json({
+        ok: false,
+        message: [error.message],
+      });
       return;
     }
 
-    res.status(500).send();
+    res.status(500).json({ ok: false, message: ["Internal server error!"] });
   }
 };

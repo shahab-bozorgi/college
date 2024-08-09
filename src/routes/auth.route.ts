@@ -6,7 +6,7 @@ import { SignUpSchema } from "../modules/user/dto/create-user.dto";
 
 export const makeAuthRouter = (userService: UserService) => {
   const app = Router();
-  
+
   app.post("/sign-up", (req, res) => {
     const dto = SignUpSchema.parse(req.body);
     handleExpress(res, () => userService.create(dto));

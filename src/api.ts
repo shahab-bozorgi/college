@@ -20,10 +20,10 @@ export const makeApp = (dataSource: DataSource) => {
   };
   app.use(express.json());
   app.use(cors(corsOptions));
-  
+
   const swaggerDocs = swaggerjsdoc(swaggerOptions);
   app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-  
+
   if (process.env.NODE_ENV !== "test") {
     app.use((req, res, next) => {
       console.log(req.method, req.url);

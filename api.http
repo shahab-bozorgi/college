@@ -1,0 +1,14 @@
+GET http://localhost:3000/expenses/paid-by/1
+
+
+###
+POST http://localhost:3000/add-person
+Content-type: application/json
+
+{
+  "type": "user",
+  "vote": 1,
+  "name": "Faranak",
+  "age": 25,
+  "password": "65465466646"
+}

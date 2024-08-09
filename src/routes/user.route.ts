@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { UserService } from "../modules/user/user.service";
 import { toUsername, Username } from "../modules/user/model/user-username";
+import { UpdateUserSchema } from "../modules/user/dto/update-user.dto";
 
 export const makeUserRouter = (userService: UserService) => {
   const app = Router();

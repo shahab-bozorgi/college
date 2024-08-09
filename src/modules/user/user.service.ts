@@ -1,5 +1,9 @@
 import { compare, hash } from "bcrypt";
-import { BadRequest, UnAuthorized } from "../../utilities/httpError";
+import {
+  BadRequest,
+  HttpError,
+  UnAuthorized,
+} from "../../utilities/http-error";
 import { SignUpDto } from "./dto/create-user.dto";
 import { User } from "./model/user.model";
 import { IUserRepository } from "./user.repository";
@@ -49,5 +53,12 @@ export class UserService {
     });
 
     return token;
+  }
+
+  async authenticateByUsername(username: Username): Promise<User | null> {
+    const user = await this.userRepo.findByUsername(username);
+    if (!user) throw new HttpError(401, "not authorized");
+
+    return user;
   }
 }

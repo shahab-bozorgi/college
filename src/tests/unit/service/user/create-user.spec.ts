@@ -3,7 +3,7 @@ import { Email } from "../../../../data/email";
 import { Password } from "../../../../modules/user/model/user-password";
 import { Username } from "../../../../modules/user/model/user-username";
 import { UserService } from "../../../../modules/user/user.service";
-import { BadRequest } from "../../../../utilities/httpError";
+import { BadRequest } from "../../../../utilities/http-error";
 import { MockUserRepository } from "./mock-dependencies";
 
 let userService: UserService;

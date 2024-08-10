@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { HttpError } from "./httpError";
+import { HttpError } from "./http-error";
 
 export const handleExpress = async <T>(res: Response, cb: () => Promise<T>) => {
   try {

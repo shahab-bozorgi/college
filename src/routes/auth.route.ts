@@ -6,6 +6,50 @@ import { SignUpSchema } from "../modules/user/dto/create-user.dto";
 
 export const makeAuthRouter = (userService: UserService) => {
   const app = Router();
+
+  /**
+   * @swagger
+   * /v1/sign-up:
+   *   post:
+   *     summary: Sign-up user.
+   *     description: Post sign-up data.
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               username:
+   *                 type: string
+   *                 description: Username of the user
+   *                 example: johndoe
+   *               email:
+   *                 type: string
+   *                 description: Email address of the user
+   *                 example: johndoe@example.com
+   *               password:
+   *                 type: string
+   *                 description: Password for the user
+   *                 example: P@ssw0rd
+   *               confirmPassword:
+   *                 type: string
+   *                 description: Confirm password for the user
+   *                 example: P@ssw0rd
+   *             required:
+   *               - username
+   *               - email
+   *               - password
+   *               - confirmPassword
+   *     responses:
+   *       '200':
+   *         description: A successful response
+   *       '400':
+   *         description: Bad request, possibly missing or incorrect data
+   *       '500':
+   *         description: Internal server error
+   */
+
   app.post("/sign-up", (req, res) => {
     const dto = SignUpSchema.parse(req.body);
     handleExpress(res, () => userService.create(dto));

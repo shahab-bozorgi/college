@@ -7,6 +7,9 @@ import { ZodError } from "zod";
 import { authMiddleware } from "./middleware/authenticate.middleware";
 import { makeAuthRouter } from "./routes/auth.route";
 import cors from "cors";
+import { swaggerOptions } from "./swagger";
+import swaggerjsdoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
 
 export const makeApp = (dataSource: DataSource) => {
   const app = express();
@@ -17,7 +20,10 @@ export const makeApp = (dataSource: DataSource) => {
   };
   app.use(express.json());
   app.use(cors(corsOptions));
-
+  
+  const swaggerDocs = swaggerjsdoc(swaggerOptions);
+  app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+  
   if (process.env.NODE_ENV !== "test") {
     app.use((req, res, next) => {
       console.log(req.method, req.url);

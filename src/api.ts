@@ -6,11 +6,17 @@ import { DataSource } from "typeorm";
 import { ZodError } from "zod";
 import { authMiddleware } from "./middleware/authenticate.middleware";
 import { makeAuthRouter } from "./routes/auth.route";
+import cors from "cors";
 
 export const makeApp = (dataSource: DataSource) => {
   const app = express();
-
+  const corsOptions = {
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  };
   app.use(express.json());
+  app.use(cors(corsOptions));
 
   if (process.env.NODE_ENV !== "test") {
     app.use((req, res, next) => {

@@ -1,5 +1,3 @@
-import dotenv from "dotenv-flow";
-dotenv.config();
 import { makeApp } from "./api";
 import { AppDataSource } from "./data-source";
 import { User } from "./modules/user/model/user.model";

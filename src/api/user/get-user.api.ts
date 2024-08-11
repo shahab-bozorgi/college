@@ -1,6 +1,6 @@
 /**
  * @swagger
- * /user/{username}:
+ * /users/{username}:
  *   get:
  *     tags:
  *       - User

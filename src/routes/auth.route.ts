@@ -14,7 +14,6 @@ export const makeAuthRouter = (userService: UserService) => {
 
   app.post("/login", (req, res) => {
     const dto = loginUserDto.parse(req.body);
-    console.log("here");
     handleExpress(res, () => userService.login(dto));
   });
 

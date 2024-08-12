@@ -52,7 +52,7 @@ export class UserService {
       expiresIn: "1h",
     });
 
-    return token;
+    return { token: token };
   }
 
   async authenticateByUsername(username: Username): Promise<User | null> {

@@ -10,6 +10,7 @@ import { v4 } from "uuid";
 export interface IUserRepository {
   create(user: CreateUser): Promise<User>;
   update(id: UserId, user: UpdateUser): Promise<boolean>;
+  findById(id: UserId): Promise<User | null>;
   findByUsername(username: Username): Promise<User | null>;
   findByEmail(email: Email): Promise<User | null>;
 }
@@ -28,6 +29,10 @@ export class UserRepository implements IUserRepository {
   async update(id: UserId, user: UpdateUser): Promise<boolean> {
     const result = await this.repo.update({ id }, user);
     return Boolean(result.affected);
+  }
+
+  async findById(id: UserId): Promise<User | null> {
+    return await this.repo.findOneBy({ id });
   }
 
   async findByUsername(username: Username): Promise<User | null> {

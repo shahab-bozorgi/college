@@ -21,3 +21,8 @@ export interface CreateUser {
 }
 
 export interface UpdateUser extends Partial<Omit<User, "id">> {}
+
+export interface LoginMiddleware {
+  id: UserId;
+  username: Username;
+}

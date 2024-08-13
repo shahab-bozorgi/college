@@ -1,9 +1,15 @@
-import dotenv from "dotenv-flow";
-dotenv.config();
 import { makeApp } from "./api";
 import { AppDataSource } from "./data-source";
+import { LoginMiddleware } from "./modules/user/model/user.model";
 
-const PORT = 3000;
+declare global {
+  namespace Express {
+    interface Request {
+      user: LoginMiddleware;
+    }
+  }
+}
+const PORT = process.env.PORT ?? 3000;
 AppDataSource.initialize()
   .then((dataSource) => makeApp(dataSource))
   .then((app) => {

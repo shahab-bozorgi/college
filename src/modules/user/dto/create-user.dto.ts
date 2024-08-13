@@ -8,7 +8,7 @@ import { isSpecificLengthString } from "../../../data/specific-length-string";
 export const SignUpSchema = z
   .object({
     username: z
-      .string()
+      .string({ required_error: "نام کاربری برای ثبت نام لازمه!" })
       .refine(isNoneEmptyString, {
         message: "نام کاربری برای ثبت نام لازمه!",
       })
@@ -22,7 +22,7 @@ export const SignUpSchema = z
       .transform((value: unknown) => value as Username),
 
     email: z
-      .string()
+      .string({ required_error: "ایمیل برای ثبت نام لازمه!" })
       .refine(isNoneEmptyString, {
         message: "ایمیل برای ثبت نام لازمه!",
       })
@@ -30,12 +30,12 @@ export const SignUpSchema = z
         message: "طول ایمیل وارد شده نباید بیش از 255 کارکتر باشه!",
       })
       .refine(isEmail, {
-        message: "ایمیل نادرست وارد شده!",
+        message: "فرمت ایمیل نادرست وارد شده!",
       })
       .transform((value: unknown) => value as Email),
 
     password: z
-      .string()
+      .string({ required_error: "رمز عبور برای ثبت نام لازمه!" })
       .refine(isNoneEmptyString, {
         message: "رمز عبور برای ثبت نام لازمه!",
       })
@@ -49,7 +49,7 @@ export const SignUpSchema = z
       .transform((value: unknown) => value as Password),
 
     confirmPassword: z
-      .string()
+      .string({ required_error: "لطفا تکرار رمز عبور رو وارد کن!" })
       .refine(isNoneEmptyString, {
         message: "لطفا تکرار رمز عبور رو وارد کن!",
       })

@@ -17,17 +17,22 @@ describe("User test suite", () => {
     await AppDataSource.destroy();
   });
 
-  describe("siginup", () => {
-    it("should create user if username & emial is unique", async () => {
+  describe("Sign-up", () => {
+    it("should sign up user if username & emial is unique", async () => {
       await request(app)
-        .post("/user/signup")
+        .post("/auth/sign-up")
         .send({
           username: "shahab",
           email: "a@gmail.com",
           password: "Password1",
           confirmPassword: "Password1",
         })
-        .expect(200);
+        .set("Accept", "application/json")
+        .expect("Content-Type", /json/)
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.data).toHaveProperty("id");
+        })
     });
   });
 

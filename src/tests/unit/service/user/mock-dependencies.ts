@@ -10,16 +10,15 @@ import { Username } from "../../../../modules/user/model/user-username";
 import { Email } from "../../../../data/email";
 
 export class MockUserRepository implements IUserRepository {
+  update(id: UserId, fields: UpdateUser): Promise<User | null> {
+    throw new Error("Method not implemented.");
+  }
   private users: User[] = [];
 
   async create(user: CreateUser): Promise<User> {
     const newUser = { ...user, id: v4() as UserId };
     this.users.push(newUser);
     return newUser;
-  }
-
-  async update(userId: UserId, updatedUser: UpdateUser): Promise<boolean> {
-    throw Error("Implement This whenever needed");
   }
 
   async findById(id: UserId): Promise<User | null> {

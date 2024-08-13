@@ -9,7 +9,7 @@ declare global {
     }
   }
 }
-const PORT = 3000;
+const PORT = process.env.PORT ?? 3000;
 AppDataSource.initialize()
   .then((dataSource) => makeApp(dataSource))
   .then((app) => {

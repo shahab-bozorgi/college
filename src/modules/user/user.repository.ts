@@ -31,8 +31,8 @@ export class UserRepository implements IUserRepository {
     return Boolean(result.affected);
   }
 
-  async findById(id: UserId) {
-    return await this.repo.findOne({ where: { id } });
+  async findById(id: UserId): Promise<User | null> {
+    return await this.repo.findOneBy({ id });
   }
 
   async findByUsername(username: Username): Promise<User | null> {

@@ -18,18 +18,3 @@ export const AppDataSource = new DataSource({
   subscribers: [],
   dropSchema: process.env.NODE_ENV === "test",
 });
-
-export const TestDataSource = new DataSource({
-  type: "mysql",
-  host: "127.0.0.1",
-  port: 3306,
-  username: process.env.TEST_DB_USERNAME,
-  password: process.env.TEST_DB_PASS,
-  database: process.env.TEST_DB_NAME,
-  synchronize: true,
-  logging: false,
-  entities: [UserEntity],
-  migrations: [],
-  subscribers: [],
-  dropSchema: process.env.NODE_ENV === "test",
-});

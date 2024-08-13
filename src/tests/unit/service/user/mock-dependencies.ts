@@ -22,6 +22,10 @@ export class MockUserRepository implements IUserRepository {
     throw Error("Implement This whenever needed");
   }
 
+  async findById(id: UserId): Promise<User | null> {
+    return this.users.find((user) => user.id === id) ?? null;
+  }
+
   async findByUsername(username: Username): Promise<User | null> {
     return this.users.find((user) => user.username === username) ?? null;
   }

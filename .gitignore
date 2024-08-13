@@ -36,3 +36,6 @@ build/
 
 # Other system files
 Thumbs.db
+
+#Rest Client
+*.http

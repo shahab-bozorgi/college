@@ -21,3 +21,25 @@ export interface CreateUser {
 }
 
 export interface UpdateUser extends Partial<Omit<User, "id">> {}
+
+export interface LoginMiddleware {
+  id: UserId;
+  username: Username;
+}
+
+export interface ResetPassword {
+  userId: UserId;
+  resetToken: string;
+  dateTime: Date;
+}
+
+export interface UserProfile {
+  userId: UserId;
+  avatar_url?: string;
+  username: Username;
+  first_name?: string;
+  following: number;
+  follower: number;
+  posts: number;
+  bio?: string;
+}

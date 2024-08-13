@@ -1,6 +1,7 @@
 import { Email } from "../../../data/email";
 import { UserId } from "./user-user-id";
 import { Username } from "./user-username";
+import { UUID } from "../../../data/uuid";
 
 export interface User {
   id: UserId;
@@ -20,7 +21,15 @@ export interface CreateUser {
   password: string;
 }
 
-export interface UpdateUser extends Partial<Omit<User, "id">> {}
+export interface UpdateUser {
+  first_name?: string;
+  last_name?: string;
+  avatar_id?: UUID;
+  bio?: string;
+  password?: string;
+  email?: Email;
+  is_private?: boolean;
+}
 
 export interface LoginMiddleware {
   id: UserId;

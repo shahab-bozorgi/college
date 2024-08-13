@@ -98,6 +98,8 @@ export class UserService {
       return undefined;
     }
 
+    const { username, first_name, bio, avatar_url } = user;
+
     return {
       username: user.username,
       first_name: user.first_name,

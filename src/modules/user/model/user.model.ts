@@ -31,11 +31,6 @@ export interface UpdateUser {
   is_private?: boolean;
 }
 
-export interface LoginMiddleware {
-  id: UserId;
-  username: Username;
-}
-
 export interface ResetPassword {
   userId: UserId;
   resetToken: string;

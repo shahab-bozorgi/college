@@ -1,11 +1,11 @@
 import { makeApp } from "./api";
 import { AppDataSource } from "./data-source";
-import { LoginMiddleware } from "./modules/user/model/user.model";
+import { User } from "./modules/user/model/user.model";
 
 declare global {
   namespace Express {
     interface Request {
-      user: LoginMiddleware;
+      user: User;
     }
   }
 }

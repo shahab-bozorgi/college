@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { UserService } from "../modules/user/user.service";
 import { toUsername, Username } from "../modules/user/model/user-username";
-import { EditProfileDto } from "../modules/user/dto/edit-peofile.dto";
+import { EditProfileDto } from "../modules/user/dto/edit-profile.dto";
 import { handleExpress } from "../utilities/handle-express";
 
 export const makeUserRouter = (userService: UserService) => {

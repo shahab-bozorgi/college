@@ -8,7 +8,7 @@ import { SignUpDto } from "./dto/create-user.dto";
 import { UpdateUser, User, UserProfile } from "./model/user.model";
 import { IUserRepository } from "./user.repository";
 import { LoginUserDto } from "./dto/login-user.dto";
-import { EditProfileDto } from "./dto/edit-peofile.dto";
+import { EditProfileDto } from "./dto/edit-profile.dto";
 import jwt from "jsonwebtoken";
 import { Username } from "./model/user-username";
 import { UserId } from "./model/user-user-id";

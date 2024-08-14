@@ -34,6 +34,11 @@ export interface IFollowRepository {
   ): Promise<FollowEntity | null>;
 }
 
+export interface IFollowRepository {
+  findFollowers(user: UserEntity): Promise<FollowEntity[]>;
+  findFollowing(user: UserEntity): Promise<FollowEntity[]>;
+}
+
 export class UserRepository implements IUserRepository {
   private repo: Repository<UserEntity>;
 
@@ -144,5 +149,27 @@ export class FollowRepository implements IFollowRepository {
 
   async delete(id: string): Promise<void> {
     await this.flwrepo.delete(id);
+  }
+}
+
+export class FollowRepository implements IFollowRepository {
+  private flwrepo: Repository<FollowEntity>;
+
+  constructor(dataSource: DataSource) {
+    this.flwrepo = dataSource.getRepository(FollowEntity);
+  }
+
+  async findFollowers(user: UserEntity): Promise<FollowEntity[]> {
+    return this.flwrepo.find({
+      where: { following: user },
+      relations: ["follower"],
+    });
+  }
+
+  async findFollowing(user: UserEntity): Promise<FollowEntity[]> {
+    return this.flwrepo.find({
+      where: { follower: user },
+      relations: ["following"],
+    });
   }
 }

@@ -22,6 +22,7 @@ import { UserEntity } from "./entity/user.entity";
 
 export class UserService {
   constructor(
+    
     private userRepo: IUserRepository,
     private flwRepo: IFollowRepository
   ) {}

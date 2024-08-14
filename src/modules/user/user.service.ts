@@ -19,7 +19,8 @@ import { PasswordResetDto } from "../password-reset/dto/password-reset.dto";
 import { Media } from "../media/media.model";
 
 export class UserService {
-  constructor(private userRepo: IUserRepository) {}
+  constructor(
+    private userRepo: IUserRepository) {}
 
   async create(dto: SignUpDto): Promise<User> {
     if (await this.userRepo.findByUsername(dto.username)) {

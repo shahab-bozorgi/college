@@ -6,6 +6,7 @@ import { Username } from "./model/user-username";
 import { Email } from "../../data/email";
 import { UserId } from "./model/user-user-id";
 import { v4 } from "uuid";
+import { FollowEntity } from "./entity/follow.entity";
 
 export interface IUserRepository {
   create(user: CreateUser): Promise<User>;
@@ -14,6 +15,11 @@ export interface IUserRepository {
   findByUsername(username: Username): Promise<User | null>;
   findByEmail(email: Email): Promise<User | null>;
   whereUsernameIn(usernames: Username[]): Promise<User[]>;
+}
+
+export interface IFollowRepository {
+  findFollowers(user: UserEntity): Promise<FollowEntity[]>;
+  findFollowing(user: UserEntity): Promise<FollowEntity[]>;
 }
 
 export class UserRepository implements IUserRepository {
@@ -45,5 +51,27 @@ export class UserRepository implements IUserRepository {
 
   async whereUsernameIn(usernames: Username[]): Promise<User[]> {
     return await this.repo.findBy({ username: In(usernames) });
+  }
+}
+
+export class FollowRepository implements IFollowRepository {
+  private flwrepo: Repository<FollowEntity>;
+
+  constructor(dataSource: DataSource) {
+    this.flwrepo = dataSource.getRepository(FollowEntity);
+  }
+
+  async findFollowers(user: UserEntity): Promise<FollowEntity[]> {
+    return this.flwrepo.find({
+      where: { following: user },
+      relations: ["follower"],
+    });
+  }
+
+  async findFollowing(user: UserEntity): Promise<FollowEntity[]> {
+    return this.flwrepo.find({
+      where: { follower: user },
+      relations: ["following"],
+    });
   }
 }

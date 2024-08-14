@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   JoinColumn,
   OneToMany,
   OneToOne,
@@ -12,6 +13,7 @@ import { Email } from "../../../data/email";
 import { Username } from "../model/user-username";
 import { Password } from "../model/user-password";
 import { UserId } from "../model/user-user-id";
+import { FollowEntity } from "./follow.entity";
 import { MediaEntity } from "../../media/media.entity";
 import { PostEntity } from "../../post/post.entity";
 
@@ -53,4 +55,10 @@ export class UserEntity {
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
+  @OneToMany(() => FollowEntity, (follow) => follow.follower)
+  following!: FollowEntity[];
+
+  @OneToMany(() => FollowEntity, (follow) => follow.following)
+  followers!: FollowEntity[];
 }

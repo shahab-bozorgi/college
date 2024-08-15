@@ -20,6 +20,14 @@ export interface IUserRepository {
 export interface IFollowRepository {
   findFollowers(user: UserEntity): Promise<FollowEntity[]>;
   findFollowing(user: UserEntity): Promise<FollowEntity[]>;
+  countFollowing(user: UserEntity): Promise<number>;
+  countFollowers(user: UserEntity): Promise<number>;
+  delete(id: string): Promise<void>;
+  create(follow: Partial<FollowEntity>): Promise<FollowEntity>;
+  findByFollowerAndFollowing(
+    follower: UserEntity,
+    following: UserEntity
+  ): Promise<FollowEntity | null>;
 }
 
 export class UserRepository implements IUserRepository {
@@ -73,5 +81,35 @@ export class FollowRepository implements IFollowRepository {
       where: { follower: user },
       relations: ["following"],
     });
+  }
+
+  async countFollowers(user: UserEntity): Promise<number> {
+    return this.flwrepo.count({
+      where: { follower: user },
+    });
+  }
+
+  async countFollowing(user: UserEntity): Promise<number> {
+    return this.flwrepo.count({
+      where: { following: user },
+    });
+  }
+
+  async findByFollowerAndFollowing(
+    follower: UserEntity,
+    following: UserEntity
+  ): Promise<FollowEntity | null> {
+    return this.flwrepo.findOne({
+      where: { follower, following },
+    });
+  }
+
+  async create(follow: Partial<FollowEntity>): Promise<FollowEntity> {
+    const newFollow = this.flwrepo.create(follow);
+    return this.flwrepo.save(newFollow);
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.flwrepo.delete(id);
   }
 }

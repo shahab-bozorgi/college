@@ -1,8 +1,9 @@
-import "reflect-metadata";
-import { UserEntity } from "./modules/user/entity/user.entity";
 import dotenv from "dotenv-flow";
 dotenv.config();
+import "reflect-metadata";
+import { UserEntity } from "./modules/user/entity/user.entity";
 import { DataSource } from "typeorm";
+import { PasswordResetEntity } from "./modules/password-reset/password-reset.entity";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -13,7 +14,7 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME,
   synchronize: true,
   logging: false,
-  entities: [UserEntity],
+  entities: [UserEntity, PasswordResetEntity],
   migrations: [],
   subscribers: [],
   dropSchema: process.env.NODE_ENV === "test",

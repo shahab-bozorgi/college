@@ -17,3 +17,15 @@ export class UnAuthorized extends HttpError {
     super(401, msg);
   }
 }
+
+export class Forbidden extends HttpError {
+  constructor(msg: string) {
+    super(403, msg);
+  }
+}
+
+export class NotFound extends HttpError {
+  constructor(msg: string) {
+    super(404, msg);
+  }
+}

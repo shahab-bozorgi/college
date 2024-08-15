@@ -1,6 +1,7 @@
 import { compare, hash } from "bcrypt";
 import {
   BadRequest,
+  Forbidden,
   HttpError,
   UnAuthorized,
 } from "../../utilities/http-error";
@@ -12,7 +13,9 @@ import { EditProfileDto } from "./dto/edit-profile.dto";
 import jwt from "jsonwebtoken";
 import { Username } from "./model/user-username";
 import { UserId } from "./model/user-user-id";
-import { isEmail } from "../../data/email";
+import { Email, isEmail } from "../../data/email";
+import { PasswordResetService } from "../password-reset/password-reset.service";
+import { PasswordResetDto } from "../password-reset/dto/password-reset.dto";
 
 export class UserService {
   constructor(private userRepo: IUserRepository) {}
@@ -96,5 +99,36 @@ export class UserService {
       bio: user.bio,
       avatar_url: user.avatar_url,
     };
+  }
+
+  async getUserBy(field: Email | Username): Promise<User | null> {
+    let user;
+    if (isEmail(field)) {
+      user = await this.userRepo.findByEmail(field);
+    } else {
+      user = await this.userRepo.findByUsername(field);
+    }
+
+    return user;
+  }
+
+  async passwordReset(
+    dto: PasswordResetDto,
+    passwordResetService: PasswordResetService
+  ): Promise<void | never> {
+    const passwordReset = await passwordResetService.findToken(dto.token);
+
+    if (!passwordReset) throw new Forbidden("Access forbidden");
+
+    await passwordResetService.deleteToken(dto.token);
+    if (passwordReset.expireAt < new Date())
+      throw new BadRequest("Token expired");
+
+    if (
+      !(await this.userRepo.update(passwordReset.user.id, {
+        password: await hash(dto.password, 12),
+      }))
+    )
+      throw new HttpError(500, "Something went wrong");
   }
 }

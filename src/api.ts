@@ -1,4 +1,6 @@
 import express, { ErrorRequestHandler } from "express";
+import dotenv from "dotenv-flow";
+dotenv.config();
 import { UserRepository } from "./modules/user/user.repository";
 import { UserService } from "./modules/user/user.service";
 import { makeUserRouter } from "./routes/user.route";
@@ -10,6 +12,9 @@ import cors from "cors";
 import { swaggerOptions } from "./swagger";
 import swaggerjsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
+import { PasswordResetRepository } from "./modules/password-reset/password-reset.repository";
+import { PasswordResetService } from "./modules/password-reset/password-reset.service";
+import { HttpError } from "./utilities/http-error";
 
 export const makeApp = (dataSource: DataSource) => {
   const app = express();
@@ -31,10 +36,14 @@ export const makeApp = (dataSource: DataSource) => {
     });
   }
 
+  const passwordResetRepository = new PasswordResetRepository(dataSource);
+  const passwordResetService = new PasswordResetService(
+    passwordResetRepository
+  );
   const userRepository = new UserRepository(dataSource);
   const userService = new UserService(userRepository);
 
-  app.use("/auth", makeAuthRouter(userService));
+  app.use("/auth", makeAuthRouter(userService, passwordResetService));
   app.use("/users", authMiddleware(userService), makeUserRouter(userService));
 
   app.use((req, res) => {
@@ -46,6 +55,13 @@ export const makeApp = (dataSource: DataSource) => {
       res
         .status(400)
         .json({ ok: false, message: err.errors.map((err) => err.message) });
+      return;
+    }
+    if (err instanceof HttpError) {
+      res.status(err.code).json({
+        ok: false,
+        message: [err.message],
+      });
       return;
     }
 

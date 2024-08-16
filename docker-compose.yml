@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_USER=college_admin
+      - DB_PASS=eAA<4v|15iX
+      - DB_NAME=collegegram_dev
+      - DB_POST=3307
+      - SECRET_KEY=fBB>5w&26jY
+      - PORT=5000
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  db:
+    image: hub.hamdocker.ir/mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: oxe6y3sGTQQjXPP
+      MYSQL_DATABASE: collegegram_dev
+      MYSQL_USER: college_admin
+      MYSQL_PASSWORD: eAA<4v|15iX
+    ports:
+      - "3307:3307"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:

@@ -118,6 +118,23 @@ export class UserService {
       following,
     });
   }
+
+  async unfollowUser(followerId: UserId, followingId: UserId): Promise<void>{
+    const follower = await this.userRepo.findById(followerId) as UserEntity;
+    const following = await this.userRepo.findById(followingId) as UserEntity
+
+    if (!follower || !following){
+      throw new BadRequest("کاربر یافت نشد!");
+    }
+
+    const followEntity = await this.flwRepo.findByFollowerAndFollowing(
+      follower,
+      following
+    );
+    if (!followEntity) {
+      throw new BadRequest("شما این کاربر را فالو نکرده‌اید!");
+    }
+  }
   
   async userProfile(userId: UserId): Promise<Partial<UserProfile> | undefined> {
     const user = await this.userRepo.findById(userId) as UserEntity;

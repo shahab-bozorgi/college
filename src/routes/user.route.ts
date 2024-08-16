@@ -48,16 +48,32 @@ export const makeUserRouter = (
     res.status(200).json({ ok: true, data: req.user });
   });
 
-  app.get("/:username",(req, res) => {
+  app.get("/:username", (req, res) => {
     const username: Username = toUsername(req.params.username);
     const user = userService.findByUsername(username);
     res.status(200).send(user);
   });
 
-  app.get(":id/profile", (req, res) => {
+  app.get("/:id/profile", async (req, res) => {
     const userId = req.params.id as UserId;
-    const userProfile = userService.userProfile(userId);
-    res.status(200).send(userProfile)
+    const userProfile = await userService.userProfile(userId);
+    res.status(200).send(userProfile);
+  });
+
+  app.get("/username/:id/following", async (req, res) => {
+    const userId = req.params.id as UserId;
+    const { following } = (await userService.userProfile(userId)) ?? {
+      following: [],
+    };
+    res.status(200).json({ following });
+  });
+
+  app.get("/username/:id/followers", async (req, res) => {
+    const userId = req.params.id as UserId;
+    const { followers } = (await userService.userProfile(userId)) ?? {
+      followers: [],
+    };
+    res.status(200).json({ followers });
   });
 
   return app;

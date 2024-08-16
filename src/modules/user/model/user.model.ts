@@ -42,6 +42,8 @@ export interface UserProfile {
   avatar_url?: string;
   username: Username;
   first_name?: string;
+  following: Username[];
+  followers: Username[];
   followingCount: number;
   followersCount: number;
   posts: number;

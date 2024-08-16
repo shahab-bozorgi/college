@@ -1,14 +1,28 @@
-GET http://localhost:3000/expenses/paid-by/1
+POST http://localhost:3000/auth/sign-up
+Content-Type: application/json
+
+{
+  "username": "shahab13",
+  "email": "shahab13@example.com",
+  "password": "P@ssw0rd123",
+  "confirmPassword": "P@ssw0rd123"
+}
+###
+
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "username": "shahab12",
+  "password": "P@ssw0rd123"
+}
+
+###
+GET  http://localhost:3000/users/5247577e-9a8d-4616-8d05-dcc980f0a897
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoic2hhaGFiMSIsImlhdCI6MTcyMzgzNjQ4OSwiZXhwIjoxNzIzODQwMDg5fQ.Vm3_s35mXhbddaKrt8oOgUo0TgkzytHTOpcCCKzikMw
 
 
 ###
-POST http://localhost:3000/add-person
-Content-type: application/json
-
-{
-  "type": "user",
-  "vote": 1,
-  "name": "Faranak",
-  "age": 25,
-  "password": "65465466646"
-}
+POST http://localhost:3000/58defe2f-5a5b-47a8-adc9-4306acae9c75/follow/e46722bc-4b18-4a1c-ab53-5754a32115b7
+Content-Type: application/json
+Authorization: Bearer your-jwt-token

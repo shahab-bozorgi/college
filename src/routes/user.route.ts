@@ -60,6 +60,28 @@ export const makeUserRouter = (
     res.status(200).send(userProfile);
   });
 
+  app.post("/:followerId/follow/:followingId", async (req, res) => {
+    const followerId: UserId = req.params.followerId as UserId;
+    const followingId: UserId = req.params.followingId as UserId;
+
+    const followEntity = await userService.followUser(followerId, followingId);
+
+    res.status(200).json({
+      message: "کاربر با موفقیت فالو شد!",
+      followEntity,
+    });
+  });
+
+  app.delete("/:followerId/unfollow/:followingId", (req, res, next) => {
+    const followerId = req.params.followerId as UserId;
+    const followingId = req.params.followingId as UserId;
+    userService.unfollowUser(followerId, followingId).then(() => {
+      res.status(200).json({
+        message: "کاربر با موفقیت آنفالو شد!",
+      });
+    });
+  });
+
   app.get("/username/:id/following", async (req, res) => {
     const userId = req.params.id as UserId;
     const { following } = (await userService.userProfile(userId)) ?? {

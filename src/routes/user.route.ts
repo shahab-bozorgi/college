@@ -7,6 +7,8 @@ import { PositiveInt } from "../data/int";
 import { MediaService } from "../modules/media/media.service";
 import { NoneEmptyString } from "../data/non-empty-string";
 import { imageMIMEs, MIME } from "../modules/media/field-types/mime";
+import { handleExpress } from "../utilities/handle-express";
+import { UserId } from "../modules/user/model/user-user-id";
 
 export const makeUserRouter = (
   userService: UserService,
@@ -46,10 +48,16 @@ export const makeUserRouter = (
     res.status(200).json({ ok: true, data: req.user });
   });
 
-  app.get("/:username", async (req, res) => {
+  app.get("/:username",(req, res) => {
     const username: Username = toUsername(req.params.username);
-    const user = await userService.findByUsername(username);
+    const user = userService.findByUsername(username);
     res.status(200).send(user);
+  });
+
+  app.get(":id/profile", (req, res) => {
+    const userId = req.params.id as UserId;
+    const userProfile = userService.userProfile(userId);
+    res.status(200).send(userProfile)
   });
 
   return app;

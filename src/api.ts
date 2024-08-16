@@ -1,7 +1,7 @@
 import express, { ErrorRequestHandler } from "express";
 import dotenv from "dotenv-flow";
 dotenv.config();
-import { UserRepository } from "./modules/user/user.repository";
+import { FollowRepository, UserRepository } from "./modules/user/user.repository";
 import { UserService } from "./modules/user/user.service";
 import { makeUserRouter } from "./routes/user.route";
 import { DataSource } from "typeorm";
@@ -49,7 +49,8 @@ export const makeApp = (dataSource: DataSource) => {
     passwordResetRepository
   );
   const userRepository = new UserRepository(dataSource);
-  const userService = new UserService(userRepository);
+  const followRepository = new FollowRepository(dataSource)
+  const userService = new UserService(userRepository, followRepository);
   const postRepository = new PostRepository(dataSource);
   const postService = new PostService(postRepository, mediaService);
 

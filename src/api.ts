@@ -48,7 +48,11 @@ export const makeApp = (dataSource: DataSource) => {
   const userService = new UserService(userRepository);
 
   app.use("/auth", makeAuthRouter(userService, passwordResetService));
-  app.use("/users", authMiddleware(userService), makeUserRouter(userService));
+  app.use(
+    "/users",
+    authMiddleware(userService),
+    makeUserRouter(userService, mediaService)
+  );
 
   app.use((req, res) => {
     res.status(404).send({ message: "Not Found!" });

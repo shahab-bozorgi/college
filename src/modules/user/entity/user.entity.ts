@@ -2,6 +2,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  OneToOne,
   PrimaryColumn,
   UpdateDateColumn,
 } from "typeorm";
@@ -9,6 +11,7 @@ import { Email } from "../../../data/email";
 import { Username } from "../model/user-username";
 import { Password } from "../model/user-password";
 import { UserId } from "../model/user-user-id";
+import { MediaEntity } from "../../media/media.entity";
 
 @Entity("users")
 export class UserEntity {
@@ -20,9 +23,6 @@ export class UserEntity {
 
   @Column({ nullable: true })
   last_name!: string;
-
-  @Column({ nullable: true })
-  avatar_url!: string;
 
   @Column({ unique: true })
   email!: Email;
@@ -38,6 +38,10 @@ export class UserEntity {
 
   @Column({ default: false })
   is_private!: boolean;
+
+  @OneToOne(() => MediaEntity)
+  @JoinColumn()
+  avatar!: MediaEntity;
 
   @CreateDateColumn()
   createdAt!: Date;

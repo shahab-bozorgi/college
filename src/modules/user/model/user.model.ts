@@ -1,13 +1,13 @@
 import { Email } from "../../../data/email";
 import { UserId } from "./user-user-id";
 import { Username } from "./user-username";
-import { UUID } from "../../../data/uuid";
+import { Media } from "../../media/media.model";
 
 export interface User {
   id: UserId;
   first_name?: string;
   last_name?: string;
-  avatar_url?: string;
+  avatar: Media;
   bio?: string;
   username: Username;
   password: string;
@@ -24,11 +24,11 @@ export interface CreateUser {
 export interface UpdateUser {
   first_name?: string;
   last_name?: string;
-  avatar_id?: UUID;
   bio?: string;
   password?: string;
   email?: Email;
   is_private?: boolean;
+  avatar?: Media;
 }
 
 export interface ResetPassword {

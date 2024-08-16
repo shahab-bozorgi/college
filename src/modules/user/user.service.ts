@@ -16,6 +16,7 @@ import { UserId } from "./model/user-user-id";
 import { Email, isEmail } from "../../data/email";
 import { PasswordResetService } from "../password-reset/password-reset.service";
 import { PasswordResetDto } from "../password-reset/dto/password-reset.dto";
+import { Media } from "../media/media.model";
 
 export class UserService {
   constructor(private userRepo: IUserRepository) {}
@@ -82,6 +83,10 @@ export class UserService {
     }
 
     return await this.userRepo.update(user.id, fields);
+  }
+
+  async updateAvatar(user: User, avatar: Media): Promise<void> {
+    this.userRepo.update(user.id, { avatar });
   }
 
   async userProfile(

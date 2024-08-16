@@ -15,6 +15,8 @@ import swaggerUi from "swagger-ui-express";
 import { PasswordResetRepository } from "./modules/password-reset/password-reset.repository";
 import { PasswordResetService } from "./modules/password-reset/password-reset.service";
 import { HttpError } from "./utilities/http-error";
+import { MediaRepository } from "./modules/media/media.repository";
+import { MediaService } from "./modules/media/media.service";
 
 export const makeApp = (dataSource: DataSource) => {
   const app = express();
@@ -36,6 +38,8 @@ export const makeApp = (dataSource: DataSource) => {
     });
   }
 
+  const mediaRepository = new MediaRepository(dataSource);
+  const mediaService = new MediaService(mediaRepository);
   const passwordResetRepository = new PasswordResetRepository(dataSource);
   const passwordResetService = new PasswordResetService(
     passwordResetRepository

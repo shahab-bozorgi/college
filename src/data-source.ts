@@ -4,6 +4,7 @@ import "reflect-metadata";
 import { UserEntity } from "./modules/user/entity/user.entity";
 import { DataSource } from "typeorm";
 import { PasswordResetEntity } from "./modules/password-reset/password-reset.entity";
+import { MediaEntity } from "./modules/media/media.entity";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -14,7 +15,7 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME,
   synchronize: true,
   logging: false,
-  entities: [UserEntity, PasswordResetEntity],
+  entities: [UserEntity, PasswordResetEntity, MediaEntity],
   migrations: [],
   subscribers: [],
   dropSchema: process.env.NODE_ENV === "test",

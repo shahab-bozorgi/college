@@ -7,7 +7,7 @@ export interface User {
   id: UserId;
   first_name?: string;
   last_name?: string;
-  avatar: Media;
+  avatar?: Media;
   bio?: string;
   username: Username;
   password: string;

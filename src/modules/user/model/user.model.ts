@@ -39,7 +39,7 @@ export interface ResetPassword {
 
 export interface UserProfile {
   userId: UserId;
-  avatar_url?: string;
+  avatar: Media;
   username: Username;
   first_name?: string;
   following: Username[];

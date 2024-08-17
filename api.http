@@ -13,16 +13,36 @@ POST http://localhost:3000/auth/login
 Content-Type: application/json
 
 {
-  "username": "shahab12",
+  "username": "shahab13",
   "password": "P@ssw0rd123"
 }
 
-###
-GET  http://localhost:3000/users/5247577e-9a8d-4616-8d05-dcc980f0a897
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoic2hhaGFiMSIsImlhdCI6MTcyMzgzNjQ4OSwiZXhwIjoxNzIzODQwMDg5fQ.Vm3_s35mXhbddaKrt8oOgUo0TgkzytHTOpcCCKzikMw
-
 
 ###
-POST http://localhost:3000/58defe2f-5a5b-47a8-adc9-4306acae9c75/follow/e46722bc-4b18-4a1c-ab53-5754a32115b7
+POST http://localhost:3000/users/fe12ac60-ecba-436d-8fbc-5269a816e735/follow/bb09c733-484f-40b4-bdf6-e923931eefcb
 Content-Type: application/json
-Authorization: Bearer your-jwt-token
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoic2hhaGFiMTIiLCJpYXQiOjE3MjM4NDc3NTcsImV4cCI6MTcyMzg1MTM1N30.sg2MbpQII9Jn8nty8SmvwE8_aqY7M-PtrMgMYQ_mzvo
+{
+  "first_name": "john",
+  "last_name": "Doe",
+  "bio": "I am John Doe. A fictional character.",
+  "is_private": true,
+  "email": "john_doe@gmail.com",
+  "password": "Pass1234",
+  "confirmPassword": "Pass1234"
+}
+
+
+
+###
+GET  http://localhost:3000/users/bb09c733-484f-40b4-bdf6-e923931eefcb/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoic2hhaGFiMTMiLCJpYXQiOjE3MjM4NzE0NzYsImV4cCI6MTcyMzg3NTA3Nn0.EX9Gex0l7dPGOKnJKv8edMb3Tc3uYy-GsjelB7fjalU
+
+###
+POST http://localhost:3000/users/bb09c733-484f-40b4-bdf6-e923931eefcb/follow/fe12ac60-ecba-436d-8fbc-5269a816e735
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoic2hhaGFiMTMiLCJpYXQiOjE3MjM4NzE0NzYsImV4cCI6MTcyMzg3NTA3Nn0.EX9Gex0l7dPGOKnJKv8edMb3Tc3uYy-GsjelB7fjalU
+
+###
+DELETE  http://localhost:3000/users/bb09c733-484f-40b4-bdf6-e923931eefcb/unfollow/fe12ac60-ecba-436d-8fbc-5269a816e735
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoic2hhaGFiMTMiLCJpYXQiOjE3MjM4NTgzNzQsImV4cCI6MTcyMzg2MTk3NH0.Ra0lJMkKTgFDGhz4cDFiSeRz-xmjjyFKrOAnTx07zHk

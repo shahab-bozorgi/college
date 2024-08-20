@@ -25,7 +25,7 @@ export const makeApp = (dataSource: DataSource) => {
   const app = express();
   const corsOptions = {
     origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   };
   app.use(express.json());

@@ -5,6 +5,7 @@ import { MBToBytes, uploadMultipleFiles } from "../utilities/upload";
 import { PositiveInt } from "../data/int";
 import { imageMIMEs } from "../modules/media/field-types/mime";
 import { UserService } from "../modules/user/user.service";
+import { v4 } from "uuid";
 
 export const makePostRouter = (
   postService: PostService,
@@ -31,5 +32,39 @@ export const makePostRouter = (
       }
     }
   );
+
+  app.post("/:postId/comment", (req, res) => {
+    const dto = {
+      postId: req.params.postId,
+      parentId: req.body.parentId,
+      description: req.body.description,
+    };
+
+    const data = {
+      id: v4(),
+      ...dto,
+    };
+
+    res.status(200).json({ ok: true, data });
+
+    //   handleExpress(res, () => { return { id: v4(), ...dto } });
+  });
+
+  app.post("/:postId/comments/:commentId/like", (req, res) => {
+    const dto = {
+      commentId: req.params.commentId,
+      userId: req.user.id,
+    };
+
+    const data = {
+      id: v4(),
+      ...dto,
+    };
+
+    res.status(200).json({ ok: true, data });
+
+    //   handleExpress(res, () => { return { id: v4(), ...dto } });
+  });
+
   return app;
 };

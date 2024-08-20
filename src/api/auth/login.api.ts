@@ -27,6 +27,11 @@
  *     responses:
  *       '200':
  *         description: A successful response
+ *         content:
+ *           application/json:
+ *             example:
+ *               ok: true
+ *               data: {}
  *       '400':
  *         description: Bad request, possibly missing or incorrect data
  *       '500':

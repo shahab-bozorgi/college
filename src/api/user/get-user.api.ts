@@ -16,6 +16,11 @@
  *     responses:
  *       '200':
  *         description: A successful response
+ *         content:
+ *           application/json:
+ *             example:
+ *               ok: true
+ *               data: {}
  *       '404':
  *         description: User not found
  *       '500':

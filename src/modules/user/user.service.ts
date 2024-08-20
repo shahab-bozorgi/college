@@ -136,4 +136,8 @@ export class UserService {
     )
       throw new HttpError(500, "Something went wrong");
   }
+
+  async whereUsernameIn(usernames: Username[]): Promise<User[]> {
+    return this.userRepo.whereUsernameIn(usernames);
+  }
 }

@@ -5,6 +5,7 @@ import { UserEntity } from "./modules/user/entity/user.entity";
 import { DataSource } from "typeorm";
 import { PasswordResetEntity } from "./modules/password-reset/password-reset.entity";
 import { MediaEntity } from "./modules/media/media.entity";
+import { PostEntity } from "./modules/post/post.entity";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -15,7 +16,7 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME,
   synchronize: true,
   logging: false,
-  entities: [UserEntity, PasswordResetEntity, MediaEntity],
+  entities: [UserEntity, PasswordResetEntity, MediaEntity, PostEntity],
   migrations: [],
   subscribers: [],
   dropSchema: process.env.NODE_ENV === "test",

@@ -10,4 +10,10 @@ export class MediaService {
     if (media) return media;
     throw new HttpError(500, "Internal server error!");
   }
+
+  async insert(fields: CreateMedia[]): Promise<Media[]> {
+    const media = await this.mediaRepo.insert(fields);
+    if (media.length) return media;
+    throw new HttpError(500, "Internal server error!");
+  }
 }

@@ -1,4 +1,4 @@
-import { DataSource, Repository } from "typeorm";
+import { DataSource, In, Repository } from "typeorm";
 import { UpdateUser, User } from "../user/model/user.model";
 import { CreateUser } from "../user/model/user.model";
 import { UserEntity } from "./entity/user.entity";
@@ -13,6 +13,7 @@ export interface IUserRepository {
   findById(id: UserId): Promise<User | null>;
   findByUsername(username: Username): Promise<User | null>;
   findByEmail(email: Email): Promise<User | null>;
+  whereUsernameIn(usernames: Username[]): Promise<User[]>;
 }
 
 export class UserRepository implements IUserRepository {
@@ -40,5 +41,9 @@ export class UserRepository implements IUserRepository {
 
   async findByEmail(email: Email): Promise<User | null> {
     return await this.repo.findOne({ where: { email } });
+  }
+
+  async whereUsernameIn(usernames: Username[]): Promise<User[]> {
+    return await this.repo.findBy({ username: In(usernames) });
   }
 }

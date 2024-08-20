@@ -5,6 +5,7 @@ import { v4 } from "uuid";
 
 export interface IMediaRepository {
   create(fields: CreateMedia): Promise<Media>;
+  insert(fields: CreateMedia[]): Promise<Media[]>;
 }
 
 export class MediaRepository implements IMediaRepository {
@@ -16,5 +17,13 @@ export class MediaRepository implements IMediaRepository {
 
   async create(fields: CreateMedia): Promise<Media> {
     return this.repo.save({ ...fields, id: v4() });
+  }
+
+  async insert(media: CreateMedia[]): Promise<Media[]> {
+    return this.repo.save(
+      media.map((md) => {
+        return { ...md, id: v4() };
+      })
+    );
   }
 }

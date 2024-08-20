@@ -17,6 +17,9 @@ import { PasswordResetService } from "./modules/password-reset/password-reset.se
 import { HttpError } from "./utilities/http-error";
 import { MediaRepository } from "./modules/media/media.repository";
 import { MediaService } from "./modules/media/media.service";
+import { PostRepository } from "./modules/post/post.repository";
+import { PostService } from "./modules/post/post.service";
+import { makePostRouter } from "./routes/post.route";
 
 export const makeApp = (dataSource: DataSource) => {
   const app = express();
@@ -46,12 +49,19 @@ export const makeApp = (dataSource: DataSource) => {
   );
   const userRepository = new UserRepository(dataSource);
   const userService = new UserService(userRepository);
+  const postRepository = new PostRepository(dataSource);
+  const postService = new PostService(postRepository, mediaService);
 
   app.use("/auth", makeAuthRouter(userService, passwordResetService));
   app.use(
     "/users",
     authMiddleware(userService),
     makeUserRouter(userService, mediaService)
+  );
+  app.use(
+    "/posts",
+    authMiddleware(userService),
+    makePostRouter(postService, userService)
   );
 
   app.use((req, res) => {

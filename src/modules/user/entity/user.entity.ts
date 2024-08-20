@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryColumn,
   UpdateDateColumn,
@@ -12,6 +13,7 @@ import { Username } from "../model/user-username";
 import { Password } from "../model/user-password";
 import { UserId } from "../model/user-user-id";
 import { MediaEntity } from "../../media/media.entity";
+import { PostEntity } from "../../post/post.entity";
 
 @Entity("users")
 export class UserEntity {
@@ -38,6 +40,9 @@ export class UserEntity {
 
   @Column({ default: false })
   is_private!: boolean;
+
+  @OneToMany(() => PostEntity, (post) => post.author)
+  posts!: PostEntity[];
 
   @OneToOne(() => MediaEntity)
   @JoinColumn()

@@ -33,6 +33,7 @@ export const makeApp = (dataSource: DataSource) => {
 
   const swaggerDocs = swaggerjsdoc(swaggerOptions);
   app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+  app.use("/uploads", express.static("uploads"));
 
   if (process.env.NODE_ENV !== "test") {
     app.use((req, res, next) => {

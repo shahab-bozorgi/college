@@ -2,15 +2,11 @@ import { Router } from "express";
 import { UserService } from "../modules/user/user.service";
 import { toUsername, Username } from "../modules/user/model/user-username";
 import { EditProfileDto } from "../modules/user/dto/edit-profile.dto";
-import {
-  imageMIMEs,
-  MBToBytes,
-  MIME,
-  uploadSingleFile,
-} from "../utilities/upload";
+import { MBToBytes, uploadSingleFile } from "../utilities/upload";
 import { PositiveInt } from "../data/int";
 import { MediaService } from "../modules/media/media.service";
 import { NoneEmptyString } from "../data/non-empty-string";
+import { imageMIMEs, MIME } from "../modules/media/field-types/mime";
 
 export const makeUserRouter = (
   userService: UserService,
@@ -21,10 +17,10 @@ export const makeUserRouter = (
   app.patch(
     "/profile",
     uploadSingleFile(
-      "user/avatar",
+      "users/avatar",
       "avatar",
       imageMIMEs,
-      MBToBytes(1 as PositiveInt)
+      MBToBytes(5 as PositiveInt)
     ),
     async (req, res, next) => {
       try {
@@ -36,7 +32,7 @@ export const makeUserRouter = (
             size: req.file.size,
             path: req.file.path,
           });
-          userService.updateAvatar(req.user, avatar!);
+          await userService.updateAvatar(req.user, avatar);
         }
         await userService.editProfile(req.user, dto);
         res.json({ ok: true, data: {} });

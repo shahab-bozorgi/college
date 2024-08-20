@@ -1,10 +1,13 @@
+import { HttpError } from "../../utilities/http-error";
 import { CreateMedia, Media } from "./media.model";
 import { IMediaRepository } from "./media.repository";
 
 export class MediaService {
   constructor(private mediaRepo: IMediaRepository) {}
 
-  async create(fields: CreateMedia): Promise<Media | null> {
-    return await this.mediaRepo.create(fields);
+  async create(fields: CreateMedia): Promise<Media> {
+    const media = await this.mediaRepo.create(fields);
+    if (media) return media;
+    throw new HttpError(500, "Internal server error!");
   }
 }

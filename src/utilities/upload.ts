@@ -6,20 +6,9 @@ import { v4 } from "uuid";
 import { extname } from "path";
 import fs from "fs";
 import { HttpError } from "./http-error";
+import { MIME } from "../modules/media/field-types/mime";
 
 const uploadPath = "./uploads";
-
-const ImgMIME = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/webp",
-  "image/avif",
-] as const;
-export const imageMIMEs = [...ImgMIME];
-export type ImageMIME = (typeof ImgMIME)[number];
-
-export type MIME = ImageMIME;
 
 const storage = (destination: string) =>
   multer.diskStorage({
@@ -48,6 +37,19 @@ const fileFilter =
 export const MBToBytes = (value: PositiveInt): PositiveInt =>
   (value * 1024 * 1024) as PositiveInt;
 
+const multerConfig = (
+  destination: string,
+  allowedMIME: MIME[],
+  maxSize: PositiveInt
+) =>
+  multer({
+    limits: {
+      fileSize: maxSize,
+    },
+    fileFilter: fileFilter(allowedMIME),
+    storage: storage(destination),
+  });
+
 export const uploadSingleFile =
   (
     destination: string,
@@ -56,18 +58,37 @@ export const uploadSingleFile =
     maxSize: PositiveInt
   ) =>
   async (req: Request, res: Response, next: NextFunction) => {
-    const uploader = multer({
-      limits: {
-        fileSize: maxSize,
-      },
-      fileFilter: fileFilter(allowedMIME),
-      storage: storage(destination),
-    }).single(fieldName);
+    const uploader = multerConfig(destination, allowedMIME, maxSize).single(
+      fieldName
+    );
+    uploader(req, res, (err) => {
+      if (err) {
+        if (err instanceof MulterError)
+          return next(new HttpError(400, err.message));
+        return next(err);
+      }
+      next();
+    });
+  };
+
+export const uploadMultipleFiles =
+  (
+    destination: string,
+    fieldName: string,
+    allowedMIME: MIME[],
+    maxSize: PositiveInt,
+    maxCount?: PositiveInt
+  ) =>
+  async (req: Request, res: Response, next: NextFunction) => {
+    const uploader = multerConfig(destination, allowedMIME, maxSize).array(
+      fieldName,
+      maxCount
+    );
 
     uploader(req, res, (err) => {
-      if (err instanceof MulterError) {
-        return next(new HttpError(400, err.message));
-      } else if (err) {
+      if (err) {
+        if (err instanceof MulterError)
+          return next(new HttpError(400, err.message));
         return next(err);
       }
       next();

@@ -4,7 +4,7 @@ import { MediaEntity } from "./media.entity";
 import { v4 } from "uuid";
 
 export interface IMediaRepository {
-  create(fields: CreateMedia): Promise<Media | null>;
+  create(fields: CreateMedia): Promise<Media>;
 }
 
 export class MediaRepository implements IMediaRepository {
@@ -14,7 +14,7 @@ export class MediaRepository implements IMediaRepository {
     this.repo = datasource.getRepository(MediaEntity);
   }
 
-  async create(fields: CreateMedia): Promise<Media | null> {
+  async create(fields: CreateMedia): Promise<Media> {
     return this.repo.save({ ...fields, id: v4() });
   }
 }

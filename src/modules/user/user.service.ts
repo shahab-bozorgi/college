@@ -86,7 +86,7 @@ export class UserService {
   }
 
   async updateAvatar(user: User, avatar: Media): Promise<void> {
-    this.userRepo.update(user.id, { avatar });
+    await this.userRepo.update(user.id, { avatar });
   }
 
   async userProfile(
@@ -102,7 +102,7 @@ export class UserService {
       username: user.username,
       first_name: user.first_name,
       bio: user.bio,
-      avatar_url: user.avatar_url,
+      // avatar_url: user.avatar_url,
     };
   }
 

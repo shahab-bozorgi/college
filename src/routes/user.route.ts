@@ -9,10 +9,12 @@ import { NoneEmptyString } from "../data/non-empty-string";
 import { imageMIMEs, MIME } from "../modules/media/field-types/mime";
 import { handleExpress } from "../utilities/handle-express";
 import { UserId } from "../modules/user/model/user-user-id";
+import { PostService } from "../modules/post/post.service";
 
 export const makeUserRouter = (
   userService: UserService,
-  mediaService: MediaService
+  mediaService: MediaService,
+  postService: PostService
 ) => {
   const app = Router();
 
@@ -45,19 +47,13 @@ export const makeUserRouter = (
   );
 
   app.get("/profile", (req, res) => {
-    res.status(200).json({ ok: true, data: req.user });
+    handleExpress(res, () => userService.userProfile(req.user.id, postService));
   });
 
   app.get("/:username", (req, res) => {
     const username: Username = toUsername(req.params.username);
     const user = userService.findByUsername(username);
     res.status(200).send(user);
-  });
-
-  app.get("/:id/profile", async (req, res) => {
-    const userId = req.params.id as UserId;
-    const userProfile = await userService.userProfile(userId);
-    res.status(200).send(userProfile);
   });
 
   app.post("/:followerId/follow/:followingId", async (req, res) => {
@@ -82,21 +78,21 @@ export const makeUserRouter = (
     });
   });
 
-  app.get("/username/:id/following", async (req, res) => {
-    const userId = req.params.id as UserId;
-    const { following } = (await userService.userProfile(userId)) ?? {
-      following: [],
-    };
-    res.status(200).json({ following });
-  });
+  // app.get("/username/:id/following", async (req, res) => {
+  //   const userId = req.params.id as UserId;
+  //   const { following } = (await userService.userProfile(userId)) ?? {
+  //     following: [],
+  //   };
+  //   res.status(200).json({ following });
+  // });
 
-  app.get("/username/:id/followers", async (req, res) => {
-    const userId = req.params.id as UserId;
-    const { followers } = (await userService.userProfile(userId)) ?? {
-      followers: [],
-    };
-    res.status(200).json({ followers });
-  });
+  // app.get("/username/:id/followers", async (req, res) => {
+  //   const userId = req.params.id as UserId;
+  //   const { followers } = (await userService.userProfile(userId)) ?? {
+  //     followers: [],
+  //   };
+  //   res.status(200).json({ followers });
+  // });
 
   return app;
 };

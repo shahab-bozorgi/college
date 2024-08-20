@@ -64,4 +64,8 @@ export class PostService {
       throw new NotFound(`No Users were found by ${notFound}`);
     }
   }
+
+  async getPostsCount(author: User): Promise<number> {
+    return await this.postRepo.postsCount(author);
+  }
 }

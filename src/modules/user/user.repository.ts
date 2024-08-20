@@ -64,9 +64,12 @@ export class UserRepository implements IUserRepository {
   async save(user: UserEntity): Promise<UserEntity> {
     return await this.repo.save(user);
   }
-  
+
   async findById(id: UserId): Promise<User | null> {
-    return await this.repo.findOne({where: { id }, relations: {avatar: true}});
+    return await this.repo.findOne({
+      where: { id },
+      relations: { avatar: true },
+    });
   }
 
   async findByUsername(username: Username): Promise<User | null> {
@@ -159,4 +162,3 @@ export class FollowRepository implements IFollowRepository {
     await this.flwrepo.delete(id);
   }
 }
-

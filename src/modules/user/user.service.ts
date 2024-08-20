@@ -3,6 +3,7 @@ import {
   BadRequest,
   Forbidden,
   HttpError,
+  NotFound,
   UnAuthorized,
 } from "../../utilities/http-error";
 import { SignUpDto } from "./dto/create-user.dto";
@@ -19,10 +20,10 @@ import { PasswordResetDto } from "../password-reset/dto/password-reset.dto";
 import { Media } from "../media/media.model";
 import { FollowEntity } from "./entity/follow.entity";
 import { UserEntity } from "./entity/user.entity";
+import { PostService } from "../post/post.service";
 
 export class UserService {
   constructor(
-    
     private userRepo: IUserRepository,
     private flwRepo: IFollowRepository
   ) {}
@@ -99,7 +100,7 @@ export class UserService {
     followerId: UserId,
     followingId: UserId
   ): Promise<FollowEntity> {
-    const follower = await this.userRepo.findById(followerId) as UserEntity;
+    const follower = (await this.userRepo.findById(followerId)) as UserEntity;
     const following = (await this.userRepo.findById(followingId)) as UserEntity;
 
     if (!follower || !following) {
@@ -120,11 +121,11 @@ export class UserService {
     });
   }
 
-  async unfollowUser(followerId: UserId, followingId: UserId): Promise<void>{
-    const follower = await this.userRepo.findById(followerId) as UserEntity;
-    const following = await this.userRepo.findById(followingId) as UserEntity
+  async unfollowUser(followerId: UserId, followingId: UserId): Promise<void> {
+    const follower = (await this.userRepo.findById(followerId)) as UserEntity;
+    const following = (await this.userRepo.findById(followingId)) as UserEntity;
 
-    if (!follower || !following){
+    if (!follower || !following) {
       throw new BadRequest("کاربر یافت نشد!");
     }
 
@@ -136,22 +137,29 @@ export class UserService {
       throw new BadRequest("شما این کاربر را فالو نکرده‌اید!");
     }
   }
-  
-  async userProfile(userId: UserId): Promise<Partial<UserProfile> | undefined> {
-    const user = await this.userRepo.findById(userId) as UserEntity;
+
+  async userProfile(
+    userId: UserId,
+    postService: PostService
+  ): Promise<Partial<UserProfile> | undefined> {
+    const user = await this.userRepo.findById(userId);
     if (!user) {
-      return undefined;
+      throw new NotFound("User not found");
     }
 
-    const followingCount = await this.flwRepo.countFollowing(user);
-    const followersCount = await this.flwRepo.countFollowers(user);
+    // const followingCount = await this.flwRepo.countFollowing(user);
+    // const followersCount = await this.flwRepo.countFollowers(user);
 
-    const { username, first_name, bio, avatar_url } = user;
     return {
+      id: user.id,
+      avatar: user.avatar,
       username: user.username,
       first_name: user.first_name,
+      last_name: user.last_name,
       bio: user.bio,
-      // avatar_url: user.avatar_url,
+      followingCount: 0,
+      followersCount: 0,
+      postsCount: await postService.getPostsCount(user),
     };
   }
 

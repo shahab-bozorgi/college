@@ -54,7 +54,7 @@ export class UserService {
 
     const secretKey = process.env.SECRET_KEY ?? "super-secret";
 
-    const token = jwt.sign({ user_id: user.username }, secretKey, {
+    const token = jwt.sign({ username: user.username }, secretKey, {
       expiresIn: "1h",
     });
 

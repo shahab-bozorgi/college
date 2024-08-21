@@ -13,7 +13,6 @@ export const makePostRouter = (
 ) => {
   const app = Router();
   const uploadPath = "/posts";
-
   app.post(
     "/",
     uploadMultipleFiles(

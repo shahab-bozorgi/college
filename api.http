@@ -13,10 +13,9 @@ POST http://localhost:3000/auth/login
 Content-Type: application/json
 
 {
-  "username": "shahab13",
+  "username": "shahabb",
   "password": "P@ssw0rd123"
 }
-
 
 ###
 POST http://localhost:3000/users/fe12ac60-ecba-436d-8fbc-5269a816e735/follow/bb09c733-484f-40b4-bdf6-e923931eefcb
@@ -32,17 +31,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoic2hha
   "confirmPassword": "Pass1234"
 }
 
-
-
 ###
 GET  http://localhost:3000/users/profile
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNoYWhhYjEzIiwiaWF0IjoxNzI0MTg4ODU2LCJleHAiOjE3MjQxOTI0NTZ9.9OubKDQjDVYFywq2SdDKWOD3HhBwog76H_ioKU78wLA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNoYWhhYmIiLCJpYXQiOjE3MjQyNzI2MjQsImV4cCI6MTcyNDI3NjIyNH0.GCFkHieoeYEZN5wZj8liYjHFSfMsg93XUXn2i51UPYo
 
 
 ###
-POST http://localhost:3000/users/bb09c733-484f-40b4-bdf6-e923931eefcb/follow/fe12ac60-ecba-436d-8fbc-5269a816e735
+POST http://localhost:3000/users/1aa9988d-848b-450a-8563-cc46bc801e42/follow/69fe1df8-4920-47c3-b3ec-c168daf8dcdc
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoic2hhaGFiMTMiLCJpYXQiOjE3MjM4NzE0NzYsImV4cCI6MTcyMzg3NTA3Nn0.EX9Gex0l7dPGOKnJKv8edMb3Tc3uYy-GsjelB7fjalU
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNoYWhhYmIiLCJpYXQiOjE3MjQyNzI2MjQsImV4cCI6MTcyNDI3NjIyNH0.GCFkHieoeYEZN5wZj8liYjHFSfMsg93XUXn2i51UPYo
+
 
 ###
 DELETE  http://localhost:3000/users/bb09c733-484f-40b4-bdf6-e923931eefcb/unfollow/fe12ac60-ecba-436d-8fbc-5269a816e735

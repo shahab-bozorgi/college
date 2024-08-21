@@ -7,20 +7,27 @@ import {
   Column,
 } from "typeorm";
 import { UserEntity } from "../entity/user.entity";
+import { UserId } from "../model/user-user-id";
 
 @Entity("follows")
 export class FollowEntity {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
+  @Column()
+  followerId!: UserId;
+
+  @Column()
+  followingId!: UserId;
+
   @ManyToOne(() => UserEntity, (user) => user.following)
-  @JoinColumn({ name: "follower_id" })
+  @JoinColumn()
   follower!: UserEntity;
 
   @ManyToOne(() => UserEntity, (user) => user.followers)
-  @JoinColumn({ name: "following_id" })
+  @JoinColumn()
   following!: UserEntity;
 
-  @CreateDateColumn()
-  createdAt!: Date;
+  // @CreateDateColumn()
+  // createdAt!: Date;
 }

@@ -9,36 +9,20 @@ import { v4 } from "uuid";
 import { FollowEntity } from "./entity/follow.entity";
 
 export interface IUserRepository {
-  incrementFollowingCount(followerId: UserId): any;
   create(user: CreateUser): Promise<User>;
   update(id: UserId, fields: UpdateUser): Promise<User | null>;
   findById(id: UserId): Promise<User | null>;
   findByUsername(username: Username): Promise<User | null>;
   findByEmail(email: Email): Promise<User | null>;
   whereUsernameIn(usernames: Username[]): Promise<User[]>;
-  incrementFollowingCount(userId: UserId): Promise<void>;
-  incrementFollowersCount(userId: UserId): Promise<void>;
   save(user: UserEntity): Promise<UserEntity>;
 }
 
 export interface IFollowRepository {
   findFollowers(user: UserEntity): Promise<FollowEntity[]>;
   findFollowing(user: UserEntity): Promise<FollowEntity[]>;
-  countFollowing(user: UserEntity): Promise<number>;
-  countFollowers(user: UserEntity): Promise<number>;
-  delete(id: string): Promise<void>;
-  create(follow: Partial<FollowEntity>): Promise<FollowEntity>;
-  findByFollowerAndFollowing(
-    follower: UserEntity,
-    following: UserEntity
-  ): Promise<FollowEntity | null>;
-}
-
-export interface IFollowRepository {
-  findFollowers(user: UserEntity): Promise<FollowEntity[]>;
-  findFollowing(user: UserEntity): Promise<FollowEntity[]>;
-  countFollowing(user: UserEntity): Promise<number>;
-  countFollowers(user: UserEntity): Promise<number>;
+  countFollowing(user: User): Promise<number>;
+  countFollowers(user: User): Promise<number>;
   delete(id: string): Promise<void>;
   create(follow: Partial<FollowEntity>): Promise<FollowEntity>;
   findByFollowerAndFollowing(
@@ -65,10 +49,10 @@ export class UserRepository implements IUserRepository {
     return await this.repo.save(user);
   }
 
-  async findById(id: UserId): Promise<User | null> {
+  async findById(id: UserId): Promise<UserEntity | null> {
     return await this.repo.findOne({
       where: { id },
-      relations: { avatar: true },
+      relations: { avatar: true, followers: true, following: true },
     });
   }
 
@@ -82,22 +66,6 @@ export class UserRepository implements IUserRepository {
 
   async whereUsernameIn(usernames: Username[]): Promise<User[]> {
     return await this.repo.findBy({ username: In(usernames) });
-  }
-
-  async incrementFollowingCount(followerId: UserId): Promise<void> {
-    const user = await this.repo.findOneBy({ id: followerId });
-    if (user) {
-      user.followingCount += 1;
-      await this.repo.save(user);
-    }
-  }
-
-  async incrementFollowersCount(userId: UserId): Promise<void> {
-    const user = await this.repo.findOneBy({ id: userId });
-    if (user) {
-      user.followersCount += 1;
-      await this.repo.save(user);
-    }
   }
 }
 
@@ -124,16 +92,12 @@ export class FollowRepository implements IFollowRepository {
     });
   }
 
-  async countFollowers(user: UserEntity): Promise<number> {
-    return this.flwrepo.count({
-      where: { follower: user },
-    });
+  async countFollowers(user: User): Promise<number> {
+    return this.flwrepo.countBy({ followingId: user.id });
   }
 
-  async countFollowing(user: UserEntity): Promise<number> {
-    return this.flwrepo.count({
-      where: { following: user },
-    });
+  async countFollowing(user: User): Promise<number> {
+    return this.flwrepo.countBy({ followerId: user.id });
   }
 
   async findByFollowerAndFollowing(
@@ -143,14 +107,6 @@ export class FollowRepository implements IFollowRepository {
     return this.flwrepo.findOne({
       where: { follower, following },
     });
-  }
-
-  async incrementFollowingCount(userId: UserId): Promise<void> {
-    await this.userRepository.incrementFollowingCount(userId);
-  }
-
-  async incrementFollowersCount(userId: UserId): Promise<void> {
-    await this.userRepository.incrementFollowersCount(userId);
   }
 
   async create(follow: Partial<FollowEntity>): Promise<FollowEntity> {

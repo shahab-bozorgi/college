@@ -111,6 +111,7 @@ export class UserService {
       follower,
       following
     );
+
     if (followEntity) {
       throw new BadRequest("شما قبلاً این کاربر را فالو کرده‌اید!");
     }
@@ -147,9 +148,6 @@ export class UserService {
       throw new NotFound("User not found");
     }
 
-    // const followingCount = await this.flwRepo.countFollowing(user);
-    // const followersCount = await this.flwRepo.countFollowers(user);
-
     return {
       id: user.id,
       avatar: user.avatar,
@@ -157,8 +155,8 @@ export class UserService {
       first_name: user.first_name,
       last_name: user.last_name,
       bio: user.bio,
-      followingCount: 0,
-      followersCount: 0,
+      followingCount: await this.flwRepo.countFollowing(user),
+      followersCount: await this.flwRepo.countFollowers(user),
       postsCount: await postService.getPostsCount(user),
     };
   }

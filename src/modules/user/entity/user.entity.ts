@@ -61,9 +61,9 @@ export class UserEntity {
   @OneToMany(() => FollowEntity, (follow) => follow.following)
   followers!: FollowEntity[];
 
-  @Column({ default: 0 })
-  followingCount!: number;
+  // @Column({ default: 0 })
+  // followingCount!: number;
 
-  @Column({ default: 0 })
-  followersCount!: number;
+  // @Column({ default: 0 })
+  // followersCount!: number;
 }

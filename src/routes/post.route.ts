@@ -6,10 +6,12 @@ import { PositiveInt } from "../data/int";
 import { imageMIMEs } from "../modules/media/field-types/mime";
 import { UserService } from "../modules/user/user.service";
 import { v4 } from "uuid";
+import { TagService } from "../modules/tag/tag.service";
 
 export const makePostRouter = (
   postService: PostService,
-  userService: UserService
+  userService: UserService,
+  tagService: TagService
 ) => {
   const app = Router();
   const uploadPath = "/posts";
@@ -24,7 +26,13 @@ export const makePostRouter = (
     async (req, res, next) => {
       try {
         const dto = CreatePostSchema.parse(req.body);
-        await postService.create(req.user, req.files, dto, userService);
+        await postService.create(
+          req.user,
+          req.files,
+          dto,
+          userService,
+          tagService
+        );
         res.status(201).json({ ok: true, data: {} });
       } catch (e) {
         next(e);

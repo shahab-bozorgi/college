@@ -10,6 +10,7 @@ import { PostId } from "./field-types/post-id";
 import { UserEntity } from "../user/entity/user.entity";
 import { MediaEntity } from "../media/media.entity";
 import { NoneEmptyString } from "../../data/non-empty-string";
+import { TagEntity } from "../tag/tag.entity";
 import { UserId } from "../user/model/user-user-id";
 
 @Entity("posts")
@@ -33,4 +34,8 @@ export class PostEntity {
   @ManyToMany(() => MediaEntity)
   @JoinTable()
   media!: MediaEntity[];
+
+  @ManyToMany(() => TagEntity)
+  @JoinTable()
+  tags!: TagEntity[];
 }

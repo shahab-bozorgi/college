@@ -23,6 +23,8 @@ import { MediaService } from "./modules/media/media.service";
 import { PostRepository } from "./modules/post/post.repository";
 import { PostService } from "./modules/post/post.service";
 import { makePostRouter } from "./routes/post.route";
+import { TagRepository } from "./modules/tag/tag.repository";
+import { TagService } from "./modules/tag/tag.service";
 
 export const makeApp = (dataSource: DataSource) => {
   const app = express();
@@ -56,6 +58,8 @@ export const makeApp = (dataSource: DataSource) => {
   const userService = new UserService(userRepository, followRepository);
   const postRepository = new PostRepository(dataSource);
   const postService = new PostService(postRepository, mediaService);
+  const tagRepository = new TagRepository(dataSource);
+  const tagService = new TagService(tagRepository);
 
   app.use("/auth", makeAuthRouter(userService, passwordResetService));
   app.use(
@@ -66,7 +70,7 @@ export const makeApp = (dataSource: DataSource) => {
   app.use(
     "/posts",
     authMiddleware(userService),
-    makePostRouter(postService, userService)
+    makePostRouter(postService, userService, tagService)
   );
 
   app.use((req, res) => {

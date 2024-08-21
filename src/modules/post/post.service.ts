@@ -6,6 +6,9 @@ import { MediaService } from "../media/media.service";
 import { parseMention } from "./field-types/mention";
 import { UserService } from "../user/user.service";
 import { Username } from "../user/model/user-username";
+import { extractTag } from "../tag/field-types/tag-title";
+import { TagService } from "../tag/tag.service";
+import { Tag } from "../tag/tag.model";
 
 export class PostService {
   constructor(
@@ -17,16 +20,17 @@ export class PostService {
     author: User,
     files: any,
     dto: CreatePostDto,
-    userService: UserService
+    userService: UserService,
+    tagService: TagService
   ): Promise<void> {
     if (!Array.isArray(files) || (Array.isArray(files) && !files.length))
       throw new HttpError(400, "Post must include at least one picture");
 
-    let mentionedUsers: User[] = [];
+    let mentions: User[] = [];
     if (dto.mentions) {
-      const mentions = parseMention(dto.mentions);
-      mentionedUsers = await userService.whereUsernameIn(mentions);
-      this.validateMentions(mentions, author, mentionedUsers);
+      const mentionedUsers = parseMention(dto.mentions);
+      mentions = await userService.whereUsernameIn(mentionedUsers);
+      this.validateMentions(mentionedUsers, author, mentions);
     }
 
     const media = await this.mediaService.insert(
@@ -40,11 +44,18 @@ export class PostService {
       })
     );
 
+    let tags: Tag[] = [];
+    const extractedTags = extractTag(dto.caption);
+    if (extractedTags.length) {
+      tags = await tagService.insert(extractedTags);
+    }
+
     await this.postRepo.create({
       author,
       caption: dto.caption,
-      media: media,
-      mentions: mentionedUsers,
+      media,
+      mentions,
+      tags,
     });
   }
 
@@ -61,7 +72,7 @@ export class PostService {
         .filter((mention) => !foundUsers.includes(mention))
         .map((mention) => `@${mention}`)
         .join(" ");
-      throw new NotFound(`No Users were found by ${notFound}`);
+      throw new NotFound(`No users were found by ${notFound}`);
     }
   }
 

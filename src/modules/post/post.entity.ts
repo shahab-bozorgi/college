@@ -38,4 +38,8 @@ export class PostEntity {
   @ManyToMany(() => TagEntity)
   @JoinTable()
   tags!: TagEntity[];
+
+  @ManyToMany(() => TagEntity)
+  @JoinTable()
+  tags!: TagEntity[];
 }

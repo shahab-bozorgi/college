@@ -66,7 +66,9 @@ export const makePostRouter = (
 
     const comment1 = {
       id: comment1Id,
-      userId: "7dc9d533-5786-4864-9b46-eefda2ea7d93",
+      username: 'ali',
+      firstname: 'Ali',
+      lastname: 'Ahmadi',
       parentId: null,
       postId: req.params.postId,
       description: description1,
@@ -78,7 +80,9 @@ export const makePostRouter = (
 
     const comment2 = {
       id: v4(),
-      userId: 'd9cccca3-9dc5-4479-bf40-bc8fe146b026',
+      username: "arefe",
+      firstname: "Arefe",
+      lastname: "Alavi",
       parentId: comment1Id,
       postId: req.params.postId,
       description: description2,

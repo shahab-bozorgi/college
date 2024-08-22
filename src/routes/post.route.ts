@@ -118,6 +118,7 @@ export const makePostRouter = (
 
     const comment2 = {
       id: v4(),
+      userId: 'd9cccca3-9dc5-4479-bf40-bc8fe146b026',
       parentId: comment1Id,
       postId: req.params.postId,
       description: description2,

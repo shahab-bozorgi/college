@@ -10,6 +10,7 @@ import { imageMIMEs, MIME } from "../modules/media/field-types/mime";
 import { handleExpress } from "../utilities/handle-express";
 import { UserId } from "../modules/user/model/user-user-id";
 import { PostService } from "../modules/post/post.service";
+import { date } from "zod";
 
 export const makeUserRouter = (
   userService: UserService,
@@ -56,27 +57,35 @@ export const makeUserRouter = (
     res.status(200).send(user);
   });
 
-  app.post("/:followerId/follow/:followingId", async (req, res) => {
-    const followerId: UserId = req.params.followerId as UserId;
-    const followingId: UserId = req.params.followingId as UserId;
-
-    const followEntity = await userService.followUser(followerId, followingId);
-
-    res.status(200).json({
-      message: "کاربر با موفقیت فالو شد!",
-      followEntity,
-    });
+  app.post("/follow/:followingId", async (req, res, next) => {
+    try {
+      await userService.followUser(
+        req.user.id,
+        req.params.followingId as UserId
+      );
+      res.status(200).json({ ok: true, data: {} });
+    } catch (e) {
+      next(e);
+    }
   });
 
-  app.delete("/:followerId/unfollow/:followingId", (req, res, next) => {
-    const followerId = req.params.followerId as UserId;
-    const followingId = req.params.followingId as UserId;
-    userService.unfollowUser(followerId, followingId).then(() => {
-      res.status(200).json({
-        message: "کاربر با موفقیت آنفالو شد!",
-      });
-    });
+  app.delete("/unfollow/:followingId", async (req, res, next) => {
+    try {
+      await userService.unfollowUser(
+        req.user.id,
+        req.params.followingId as UserId
+      );
+      res.status(200).json({ ok: true, data: {} });
+    } catch (e) {
+      next(e);
+    }
   });
+
+  // app.get("/following/:userId", async (req, res) => {
+  //   const userId: UserId = req.params.userId as UserId;
+  //   const following = await userService.getFollowing(userId);
+  //   res.status(200).json(following);
+  // });
 
   // app.get("/username/:id/following", async (req, res) => {
   //   const userId = req.params.id as UserId;

@@ -99,7 +99,12 @@ export class UserService {
   async followUser(
     followerId: UserId,
     followingId: UserId
-  ): Promise<FollowEntity> {
+  ): Promise<void> {
+
+    if (followerId == followingId){
+      throw new BadRequest("خودتو فالو نکن!");
+    }
+    
     const follower = (await this.userRepo.findById(followerId)) as UserEntity;
     const following = (await this.userRepo.findById(followingId)) as UserEntity;
 
@@ -116,11 +121,19 @@ export class UserService {
       throw new BadRequest("شما قبلاً این کاربر را فالو کرده‌اید!");
     }
 
-    return await this.flwRepo.create({
+    await this.flwRepo.create({
       follower,
       following,
     });
   }
+
+  // async getFollowing(followingId: UserId): Promise<FollowEntity> {
+
+  //   const following = (await this.userRepo.findById(followingId)) as UserEntity;
+  //   const followEntity = await this.flwRepo.findByFollowerAndFollowing(
+  //     following
+  //   );
+  // }
 
   async unfollowUser(followerId: UserId, followingId: UserId): Promise<void> {
     const follower = (await this.userRepo.findById(followerId)) as UserEntity;
@@ -137,6 +150,8 @@ export class UserService {
     if (!followEntity) {
       throw new BadRequest("شما این کاربر را فالو نکرده‌اید!");
     }
+
+    await this.flwRepo.delete(followEntity.id);
   }
 
   async userProfile(

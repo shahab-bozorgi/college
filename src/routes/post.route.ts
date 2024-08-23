@@ -9,12 +9,18 @@ import { v4 } from "uuid";
 import { TagService } from "../modules/tag/tag.service";
 import { UpdatePostSchema } from "../modules/post/dto/update-post.dto";
 import { PostId } from "../modules/post/model/post-id";
+import { CommentService } from "../modules/post/comment/comment.service";
+import { LikeCommentService } from "../modules/post/comment/like-comment/like-comment.service";
 import { handleExpress } from "../utilities/handle-express";
+import { CreateLikeCommentSchema } from "../modules/post/comment/like-comment/dto/create-like-comment.dto";
+import { GetCommentsSchema } from "../modules/post/comment/dto/get-comments.dto";
 
 export const makePostRouter = (
   postService: PostService,
   userService: UserService,
-  tagService: TagService
+  tagService: TagService,
+  commentService: CommentService,
+  likeCommentService: LikeCommentService
 ) => {
   const app = Router();
   const uploadPath = "/posts";
@@ -91,92 +97,17 @@ export const makePostRouter = (
   });
 
   app.get("/:postId/comments", (req, res) => {
-    const comment1Id = v4();
-
-    const description1 = "first comment";
-
-    const comment1 = {
-      id: comment1Id,
-      username: "ali",
-      firstname: "Ali",
-      lastname: "Ahmadi",
-      parentId: null,
+    const dto = GetCommentsSchema.parse({
+      skip: req.query.skip,
+      take: req.query.take,
       postId: req.params.postId,
-      description: description1,
-      likeCount: 2,
-      createdAt: "2024-08-12 09:43:31.408585",
-    };
-
-    const description2 = "second comment";
-
-    const comment2 = {
-      id: v4(),
-      username: "arefe",
-      firstname: "Arefe",
-      lastname: "Alavi",
-      parentId: comment1Id,
-      postId: req.params.postId,
-      description: description2,
-      likeCount: 5,
-      createdAt: "2024-08-19 10:56:36",
-    };
-
-    const data = [comment1, comment2];
-
-    res.status(200).json({ ok: true, data });
-
-    //   handleExpress(res, () => { return { id: v4(), ...dto } });
-  });
-
-  app.get("/:postId/comments", (req, res) => {
-    const comment1Id = v4();
-
-    const description1 = "first comment";
-
-    const comment1 = {
-      id: comment1Id,
-      parentId: null,
-      postId: req.params.postId,
-      description: description1,
-      likeCount: 2,
-      createdAt: "2024-08-12 09:43:31.408585",
-    };
-
-    const description2 = "second comment";
-
-    const comment2 = {
-      id: v4(),
-      username: "arefe",
-      firstname: "Arefe",
-      lastname: "Alavi",
-      parentId: comment1Id,
-      postId: req.params.postId,
-      description: description2,
-      likeCount: 5,
-      createdAt: "2024-08-19 10:56:36",
-    };
-
-    const data = [comment1, comment2];
-
-    res.status(200).json({ ok: true, data });
-
-    //   handleExpress(res, () => { return { id: v4(), ...dto } });
+    });
+    handleExpress(res, () => commentService.getComments(dto));
   });
 
   app.post("/:postId/comments/:commentId/like", (req, res) => {
-    const dto = {
-      commentId: req.params.commentId,
-      userId: req.user.id,
-    };
-
-    const data = {
-      id: v4(),
-      ...dto,
-    };
-
-    res.status(200).json({ ok: true, data });
-
-    //   handleExpress(res, () => { return { id: v4(), ...dto } });
+    const dto = CreateLikeCommentSchema.parse(req.body);
+    handleExpress(res, () => likeCommentService.createLikeComment(dto));
   });
 
   return app;

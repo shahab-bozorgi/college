@@ -15,6 +15,8 @@ import { UserId } from "../model/user-user-id";
 import { FollowEntity } from "./follow.entity";
 import { MediaEntity } from "../../media/media.entity";
 import { PostEntity } from "../../post/entity/post.entity";
+import { CommentEntity } from "../../post/comment/entity/comment.entity";
+import { LikeCommentEntity } from "../../post/comment/like-comment/entity/like-comment.entity";
 
 @Entity("users")
 export class UserEntity {
@@ -44,6 +46,12 @@ export class UserEntity {
 
   @OneToMany(() => PostEntity, (post) => post.author)
   posts!: PostEntity[];
+
+  @OneToMany(() => CommentEntity, (comment) => comment.user)
+  comments!: CommentEntity[];
+
+  @OneToMany(() => LikeCommentEntity, (likeComment) => likeComment.user)
+  likeComments!: LikeCommentEntity[];
 
   @OneToOne(() => MediaEntity)
   @JoinColumn()

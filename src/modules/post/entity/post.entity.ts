@@ -4,6 +4,7 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryColumn,
 } from "typeorm";
 import { PostId } from "../model/post-id";
@@ -12,6 +13,7 @@ import { MediaEntity } from "../../media/media.entity";
 import { NoneEmptyString } from "../../../data/non-empty-string";
 import { TagEntity } from "../../tag/tag.entity";
 import { UserId } from "../../user/model/user-user-id";
+import { CommentEntity } from "../comment/entity/comment.entity";
 
 @Entity("posts")
 export class PostEntity {
@@ -38,4 +40,7 @@ export class PostEntity {
   @ManyToMany(() => TagEntity)
   @JoinTable()
   tags!: TagEntity[];
+
+  @OneToMany(() => CommentEntity, (comment) => comment.post)
+  comments!: CommentEntity[];
 }

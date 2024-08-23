@@ -81,27 +81,27 @@ export const makeUserRouter = (
     }
   });
 
-  // app.get("/following/:userId", async (req, res) => {
-  //   const userId: UserId = req.params.userId as UserId;
-  //   const following = await userService.getFollowing(userId);
-  //   res.status(200).json(following);
-  // });
+app.get("/:userId/followers", async (req, res) => {
+  const userId: UserId = req.params.userId as UserId;
+  try {
+    const followers = await userService.getFollowers(userId);
+    res.status(200).json({ok: true, data: {followers} });
+  } catch (error) {
+    res.status(500).json({ message: "مشکلی در دریافت لیست فالوورها رخ داد." });
+  }
+});
 
-  // app.get("/username/:id/following", async (req, res) => {
-  //   const userId = req.params.id as UserId;
-  //   const { following } = (await userService.userProfile(userId)) ?? {
-  //     following: [],
-  //   };
-  //   res.status(200).json({ following });
-  // });
 
-  // app.get("/username/:id/followers", async (req, res) => {
-  //   const userId = req.params.id as UserId;
-  //   const { followers } = (await userService.userProfile(userId)) ?? {
-  //     followers: [],
-  //   };
-  //   res.status(200).json({ followers });
-  // });
-
+app.get("/:userId/followings", async (req, res) => {
+  const userId: UserId = req.params.userId as UserId;
+  try {
+    const following = await userService.getFollowing(userId);
+    res.status(200).json({ ok: true, data: { following } });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "مشکلی در دریافت لیست فالویینگ‌ها رخ داد." });
+  }
+});
   return app;
 };

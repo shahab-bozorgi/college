@@ -20,7 +20,7 @@ export class LikeCommentRepository implements ILikeCommentRepository {
   }
 
   async create(likeComment: CreateLikeComment): Promise<LikeComment> {
-    return await this.repo.save({ id: v4(), ...likeComment });
+    return await this.repo.save({ ...likeComment });
   }
 
   async delete(likeComment: DeleteLikeComment) {

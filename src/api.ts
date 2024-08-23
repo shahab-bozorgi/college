@@ -25,6 +25,10 @@ import { PostService } from "./modules/post/post.service";
 import { makePostRouter } from "./routes/post.route";
 import { TagRepository } from "./modules/tag/tag.repository";
 import { TagService } from "./modules/tag/tag.service";
+import { CommentService } from "./modules/post/comment/comment.service";
+import { CommentRepository } from "./modules/post/comment/comment.repository";
+import { LikeCommentRepository } from "./modules/post/comment/like-comment/like-comment-repository";
+import { LikeCommentService } from "./modules/post/comment/like-comment/like-comment.service";
 
 export const makeApp = (dataSource: DataSource) => {
   const app = express();
@@ -60,6 +64,10 @@ export const makeApp = (dataSource: DataSource) => {
   const postService = new PostService(postRepository, mediaService);
   const tagRepository = new TagRepository(dataSource);
   const tagService = new TagService(tagRepository);
+  const commentRepository = new CommentRepository(dataSource);
+  const commentService = new CommentService(commentRepository);
+  const likeCommentRepository = new LikeCommentRepository(dataSource);
+  const likeCommentService = new LikeCommentService(likeCommentRepository);
 
   app.use("/auth", makeAuthRouter(userService, passwordResetService));
   app.use(
@@ -70,7 +78,7 @@ export const makeApp = (dataSource: DataSource) => {
   app.use(
     "/posts",
     authMiddleware(userService),
-    makePostRouter(postService, userService, tagService)
+    makePostRouter(postService, userService, tagService, commentService, likeCommentService)
   );
 
   app.use((req, res) => {

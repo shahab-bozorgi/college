@@ -26,7 +26,7 @@ export class CommentEntity {
   @Column()
   postId!: PostId;
 
-  @Column()
+  @Column({ nullable: true, type: "text" })
   parentId!: CommentId | null;
 
   @ManyToOne(() => UserEntity, (user) => user.comments, {

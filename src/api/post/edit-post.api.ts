@@ -10,14 +10,22 @@
  * security:
  *   - bearerAuth: []
  *
- * /posts:
- *   post:
+ * /posts/{id}:
+ *   patch:
  *     security:
  *       - bearerAuth: []
  *     tags:
  *       - Post
- *     summary: Create post.
- *     description: Create new posts. users can create new posts.
+ *     summary: Edit post.
+ *     description: Edit an existing post. Users can update their posts.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The ID of the post to edit.
+ *         schema:
+ *           type: string
+ *           format: uuid
  *     requestBody:
  *       content:
  *         multipart/form-data:
@@ -27,10 +35,10 @@
  *               caption:
  *                 type: string
  *                 description: Caption for the post.
- *                 example: This is an example of a caption.
+ *                 example: This is an example of a caption with #tag.
  *               mentions:
  *                 type: string
- *                 description: User's to be mentioned in the post.
+ *                 description: User's to be mentioned in the post. if not set or empty, mentioned users will be deleted if any.
  *                 example: "@testUser @someOtherUser"
  *               pictures:
  *                 type: array
@@ -38,6 +46,11 @@
  *                   type: string
  *                   format: binary
  *                 description: An array of post's picture's binaries.
+ *               deletedMedia:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: An array of post's deleted media IDs.
  *           encoding:
  *             pictures:
  *               contentType:

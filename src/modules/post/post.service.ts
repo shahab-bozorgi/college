@@ -1,4 +1,9 @@
-import { HttpError, NotFound } from "../../utilities/http-error";
+import {
+  BadRequest,
+  Forbidden,
+  HttpError,
+  NotFound,
+} from "../../utilities/http-error";
 import { User } from "../user/model/user.model";
 import { CreatePostDto } from "./dto/create-post.dto";
 import { IPostRepository } from "./post.repository";
@@ -9,6 +14,11 @@ import { Username } from "../user/model/user-username";
 import { extractTag } from "../tag/field-types/tag-title";
 import { TagService } from "../tag/tag.service";
 import { Tag } from "../tag/tag.model";
+import { PostId } from "./field-types/post-id";
+import { UpdatePostDto } from "./dto/update-post.dto";
+import { MIME } from "../media/field-types/mime";
+import { NoneEmptyString } from "../../data/non-empty-string";
+import { UserId } from "../user/model/user-user-id";
 
 export class PostService {
   constructor(
@@ -57,6 +67,72 @@ export class PostService {
       mentions,
       tags,
     });
+  }
+
+  async update(
+    postId: PostId,
+    authorId: UserId,
+    dto: UpdatePostDto,
+    userService: UserService,
+    tagService: TagService,
+    files?: Express.Multer.File[]
+  ): Promise<void> {
+    const post = await this.postRepo.findById(postId, [
+      "author",
+      "tags",
+      "mentions",
+      "media",
+    ]);
+
+    if (!post) throw new NotFound("Post not found");
+
+    if (post.author.id !== authorId) throw new Forbidden("Access Forbidden");
+
+    if (dto.caption) {
+      post.caption = dto.caption;
+      post.tags = await tagService.insert(extractTag(dto.caption));
+    }
+
+    if (!dto.mentions) {
+      post.mentions = [];
+    } else {
+      const mentionedUsers = parseMention(dto.mentions);
+      post.mentions = await userService.whereUsernameIn(mentionedUsers);
+      this.validateMentions(mentionedUsers, post.author, post.mentions);
+    }
+
+    const deletedMedia = dto.deletedMedia;
+    if (deletedMedia) {
+      const postMediaIds = post.media.map((md) => md.id);
+      if (deletedMedia.find((dm) => !postMediaIds.includes(dm)))
+        throw new BadRequest("Wrong media ids to delete.");
+
+      const remainingMedia = post.media.filter(
+        (md) => !deletedMedia.includes(md.id)
+      );
+      if (!remainingMedia.length && (!files || (files && !files.length)))
+        throw new BadRequest("You cannot delete all of the post's media.");
+
+      await this.mediaService.delete(deletedMedia);
+      post.media = remainingMedia;
+    }
+
+    if (files && files.length) {
+      post.media = post.media.concat(
+        await this.mediaService.insert(
+          files.map((file) => {
+            return {
+              name: file.filename as NoneEmptyString,
+              mime: file.mimetype as MIME,
+              size: file.size,
+              path: file.path,
+            };
+          })
+        )
+      );
+    }
+
+    await this.postRepo.update(post);
   }
 
   private validateMentions(

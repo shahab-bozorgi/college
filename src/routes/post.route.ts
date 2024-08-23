@@ -7,6 +7,8 @@ import { imageMIMEs } from "../modules/media/field-types/mime";
 import { UserService } from "../modules/user/user.service";
 import { v4 } from "uuid";
 import { TagService } from "../modules/tag/tag.service";
+import { UpdatePostSchema } from "../modules/post/dto/update-post.dto";
+import { PostId } from "../modules/post/field-types/post-id";
 
 export const makePostRouter = (
   postService: PostService,
@@ -40,6 +42,32 @@ export const makePostRouter = (
     }
   );
 
+  app.patch(
+    "/:id",
+    uploadMultipleFiles(
+      uploadPath,
+      "pictures",
+      imageMIMEs,
+      MBToBytes(5 as PositiveInt)
+    ),
+    async (req, res, next) => {
+      try {
+        const dto = UpdatePostSchema.parse(req.body);
+        await postService.update(
+          req.params.id as PostId,
+          req.user.id,
+          dto,
+          userService,
+          tagService,
+          Array.isArray(req.files) ? req.files : undefined
+        );
+        res.status(200).json({ ok: true, data: {} });
+      } catch (e) {
+        next(e);
+      }
+    }
+  );
+
   app.post("/:postId/comment", (req, res) => {
     const dto = {
       postId: req.params.postId,
@@ -58,23 +86,22 @@ export const makePostRouter = (
   });
 
   app.get("/:postId/comments", (req, res) => {
-
     const comment1Id = v4();
 
     const description1 = "first comment";
 
     const comment1 = {
       id: comment1Id,
-      username: 'ali',
-      firstname: 'Ali',
-      lastname: 'Ahmadi',
+      username: "ali",
+      firstname: "Ali",
+      lastname: "Ahmadi",
       parentId: null,
       postId: req.params.postId,
       description: description1,
       likeCount: 2,
       createdAt: "2024-08-12 09:43:31.408585",
     };
-    
+
     const description2 = "second comment";
 
     const comment2 = {
@@ -89,10 +116,7 @@ export const makePostRouter = (
       createdAt: "2024-08-19 10:56:36",
     };
 
-    const data = [
-      comment1,
-      comment2,
-    ];
+    const data = [comment1, comment2];
 
     res.status(200).json({ ok: true, data });
 

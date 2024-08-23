@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 import { MediaId } from "./field-types/media-id";
 import { NoneEmptyString } from "../../data/non-empty-string";
 import { MIME } from "./field-types/mime";
@@ -19,7 +19,4 @@ export class MediaEntity {
 
   @Column()
   path!: string;
-
-  @CreateDateColumn()
-  createdAt!: Date;
 }

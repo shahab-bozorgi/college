@@ -20,6 +20,12 @@
  *     description: Like a comment. users can like a comment.
  *     parameters:
  *       - in: path
+ *         name: postId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: postId
+ *       - in: path
  *         name: commentId
  *         schema:
  *           type: string

@@ -1,63 +1,59 @@
 /**
  * @swagger
- * /{id}/profile:
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *
+ * security:
+ *   - bearerAuth: []
+ * users/profile:
  *   get:
- *     summary: Get user profile
- *     description: Retrieves the profile of a user based on their user ID.
- *     tags: [User]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *         required: true
- *         description: User ID
+ *     summary: Retrieve user profile information
+ *     description: Get the profile information of a user. JWT token should be provided in the Authorization header.
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Successfully retrieved the user profile
+ *         description: Successfully retrieved user profile
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
+ *                 id:
+ *                   type: string
+ *                   description: User ID
+ *                 avatar:
+ *                   type: string
+ *                   description: URL of the user's avatar
  *                 username:
  *                   type: string
- *                   example: "jack_hashemi"
+ *                   description: Username of the user
  *                 first_name:
  *                   type: string
- *                   example: "jack"
+ *                   description: User's first name
+ *                 last_name:
+ *                   type: string
+ *                   description: User's last name
  *                 bio:
  *                   type: string
- *                   example: "Full-stack developer"
- *                 avatar_url:
- *                   type: string
- *                   example: "https://example.com/avatar.jpg"
+ *                   description: Bio of the user
  *                 followingCount:
  *                   type: integer
- *                   example: 100
+ *                   description: Number of users the profile is following
  *                 followersCount:
  *                   type: integer
- *                   example: 150
- *                 following:
- *                   type: array
- *                   items:
- *                     type: string
- *                   example: ["user1", "user2"]
- *                 followers:
- *                   type: array
- *                   items:
- *                     type: string
- *                   example: ["user3", "user4"]
- *       404:
- *         description: User not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "User not found"
- *       500:
+ *                   description: Number of users following the profile
+ *                 postsCount:
+ *                   type: integer
+ *                   description: Number of posts made by the user
+ *       '400':
+ *         description: Bad request, possibly incorrect data
+ *       '401':
+ *         description: Not authenticated
+ *       '500':
  *         description: Internal server error
  */

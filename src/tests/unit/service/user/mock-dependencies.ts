@@ -4,12 +4,20 @@ import {
   UpdateUser,
   User,
 } from "../../../../modules/user/model/user.model";
-import { IUserRepository } from "../../../../modules/user/user.repository";
+import {
+  IFollowRepository,
+  IUserRepository,
+} from "../../../../modules/user/user.repository";
 import { UserId } from "../../../../modules/user/model/user-user-id";
 import { Username } from "../../../../modules/user/model/user-username";
 import { Email } from "../../../../data/email";
+import { UserEntity } from "../../../../modules/user/entity/user.entity";
+import { FollowEntity } from "../../../../modules/user/entity/follow.entity";
 
 export class MockUserRepository implements IUserRepository {
+  save(user: UserEntity): Promise<UserEntity> {
+    throw new Error("Method not implemented.");
+  }
   private users: User[] = [];
 
   async create(user: CreateUser): Promise<User> {
@@ -35,6 +43,39 @@ export class MockUserRepository implements IUserRepository {
   }
 
   whereUsernameIn(usernames: Username[]): Promise<User[]> {
+    throw new Error("Method not implemented.");
+  }
+}
+
+export class MockFollowRepository implements IFollowRepository {
+  findFollowing(user: UserEntity): Promise<FollowEntity[]> {
+    throw new Error("Method not implemented.");
+  }
+  findFollowingByUser(userId: UserId): Promise<UserEntity[]> {
+    throw new Error("Method not implemented.");
+  }
+  findFollowers(user: UserEntity): Promise<FollowEntity[]> {
+    throw new Error("Method not implemented.");
+  }
+  findFollowersByUser(userId: UserId): Promise<UserEntity[]> {
+    throw new Error("Method not implemented.");
+  }
+  countFollowing(user: User): Promise<number> {
+    throw new Error("Method not implemented.");
+  }
+  countFollowers(user: User): Promise<number> {
+    throw new Error("Method not implemented.");
+  }
+  delete(id: string): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+  create(follow: Partial<FollowEntity>): Promise<FollowEntity> {
+    throw new Error("Method not implemented.");
+  }
+  findByFollowerAndFollowing(
+    follower: UserEntity,
+    following: UserEntity
+  ): Promise<FollowEntity | null> {
     throw new Error("Method not implemented.");
   }
 }

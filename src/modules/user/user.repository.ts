@@ -11,9 +11,12 @@ import { FollowEntity } from "./entity/follow.entity";
 export interface IUserRepository {
   create(user: CreateUser): Promise<User>;
   update(id: UserId, fields: UpdateUser): Promise<User | null>;
-  findById(id: UserId): Promise<User | null>;
-  findByUsername(username: Username): Promise<User | null>;
-  findByEmail(email: Email): Promise<User | null>;
+  findById(id: UserId, relations?: string[]): Promise<User | null>;
+  findByUsername(
+    username: Username,
+    relations?: string[]
+  ): Promise<User | null>;
+  findByEmail(email: Email, relations?: string[]): Promise<User | null>;
   whereUsernameIn(usernames: Username[]): Promise<User[]>;
   save(user: UserEntity): Promise<UserEntity>;
 }
@@ -52,19 +55,22 @@ export class UserRepository implements IUserRepository {
     return await this.repo.save(user);
   }
 
-  async findById(id: UserId): Promise<UserEntity | null> {
+  async findById(id: UserId, relations?: string[]): Promise<UserEntity | null> {
     return await this.repo.findOne({
       where: { id },
-      relations: { avatar: true, followers: true, following: true },
+      relations,
     });
   }
 
-  async findByUsername(username: Username): Promise<User | null> {
-    return await this.repo.findOne({ where: { username } });
+  async findByUsername(
+    username: Username,
+    relations?: string[]
+  ): Promise<User | null> {
+    return await this.repo.findOne({ where: { username }, relations });
   }
 
-  async findByEmail(email: Email): Promise<User | null> {
-    return await this.repo.findOne({ where: { email } });
+  async findByEmail(email: Email, relations?: string[]): Promise<User | null> {
+    return await this.repo.findOne({ where: { email }, relations });
   }
 
   async whereUsernameIn(usernames: Username[]): Promise<User[]> {

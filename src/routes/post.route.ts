@@ -9,6 +9,7 @@ import { v4 } from "uuid";
 import { TagService } from "../modules/tag/tag.service";
 import { UpdatePostSchema } from "../modules/post/dto/update-post.dto";
 import { PostId } from "../modules/post/model/post-id";
+import { handleExpress } from "../utilities/handle-express";
 
 export const makePostRouter = (
   postService: PostService,
@@ -41,6 +42,10 @@ export const makePostRouter = (
       }
     }
   );
+
+  app.get("/:id", (req, res) => {
+    handleExpress(res, () => postService.getPost(req.params.id, userService));
+  });
 
   app.patch(
     "/:id",

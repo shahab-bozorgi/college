@@ -4,6 +4,8 @@ import { Tag } from "../../tag/tag.model";
 import { UserId } from "../../user/model/user-user-id";
 import { User } from "../../user/model/user.model";
 import { PostId } from "./post-id";
+import { TagTitle } from "../../tag/field-types/tag-title";
+import { Username } from "../../user/model/user-username";
 
 export interface Post {
   id: PostId;
@@ -33,4 +35,21 @@ export interface UpdatePost
   extends Partial<PostSelectedRelations<["tags", "mentions", "media"]>> {
   id: PostId;
   caption?: NoneEmptyString;
+}
+
+export interface ShowPost {
+  id: PostId;
+  caption: NoneEmptyString;
+  author: {
+    first_name?: string;
+    last_name?: string;
+    username: Username;
+    avatar?: Media;
+  };
+  mentions: Username[];
+  tags: TagTitle[];
+  media: Media[];
+  bookmarksCount: number;
+  likesCount: number;
+  commentsCount: number;
 }

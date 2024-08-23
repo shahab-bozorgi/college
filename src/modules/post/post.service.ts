@@ -14,11 +14,12 @@ import { Username } from "../user/model/user-username";
 import { extractTag } from "../tag/field-types/tag-title";
 import { TagService } from "../tag/tag.service";
 import { Tag } from "../tag/tag.model";
-import { PostId } from "./model/post-id";
+import { isPostId, PostId } from "./model/post-id";
 import { UpdatePostDto } from "./dto/update-post.dto";
 import { MIME } from "../media/field-types/mime";
 import { NoneEmptyString } from "../../data/non-empty-string";
 import { UserId } from "../user/model/user-user-id";
+import { ShowPost } from "./model/post.model";
 
 export class PostService {
   constructor(
@@ -67,6 +68,35 @@ export class PostService {
       mentions,
       tags,
     });
+  }
+
+  async getPost(postId: string, userService: UserService): Promise<ShowPost> {
+    if (!isPostId(postId)) throw new BadRequest("Invalid post ID.");
+    const post = await this.postRepo.findById(postId, [
+      "media",
+      "mentions",
+      "tags",
+      "author",
+    ]);
+    if (!post) throw new NotFound("Post not found");
+    const avatar = (await userService.getUserBy(post.authorId, ["avatar"]))
+      ?.avatar;
+    return {
+      id: post.id,
+      caption: post.caption,
+      author: {
+        first_name: post.author.first_name,
+        last_name: post.author.last_name,
+        username: post.author.username,
+        avatar,
+      },
+      tags: post.tags.map((tag) => tag.title),
+      mentions: post.mentions.map((mention) => mention.username),
+      media: post.media,
+      bookmarksCount: 0,
+      likesCount: 0,
+      commentsCount: 0,
+    };
   }
 
   async update(

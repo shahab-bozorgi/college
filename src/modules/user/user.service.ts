@@ -12,16 +12,15 @@ import { IFollowRepository, IUserRepository } from "./user.repository";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { EditProfileDto } from "./dto/edit-profile.dto";
 import jwt from "jsonwebtoken";
-import { Username } from "./model/user-username";
+import { isUsername, Username } from "./model/user-username";
 import { UserId } from "./model/user-user-id";
 import { Email, isEmail } from "../../data/email";
 import { PasswordResetService } from "../password-reset/password-reset.service";
 import { PasswordResetDto } from "../password-reset/dto/password-reset.dto";
 import { Media } from "../media/media.model";
-import { FollowEntity } from "./entity/follow.entity";
 import { UserEntity } from "./entity/user.entity";
 import { PostService } from "../post/post.service";
-import {  UserListsDtoType } from "./dto/follow-user.dto";
+import { UserListsDtoType } from "./dto/follow-user.dto";
 
 export class UserService {
   constructor(
@@ -97,13 +96,8 @@ export class UserService {
     await this.userRepo.update(user.id, { avatar });
   }
 
-
-  async followUser(
-    followerId: UserId,
-    followingId: UserId
-  ): Promise<void> {
-
-    if (followerId == followingId){
+  async followUser(followerId: UserId, followingId: UserId): Promise<void> {
+    if (followerId == followingId) {
       throw new BadRequest("خودتو فالو نکن!");
     }
 
@@ -151,7 +145,7 @@ export class UserService {
 
   async getFollowing(userId: UserId): Promise<UserListsDtoType[]> {
     const followingEntities = await this.flwRepo.findFollowingByUser(userId);
-    
+
     const followingUsers = await Promise.all(
       followingEntities.map(async (followingEntity) => {
         const followersCount = await this.flwRepo.countFollowers(
@@ -165,7 +159,7 @@ export class UserService {
           first_name: followingEntity.first_name,
           last_name: followingEntity.last_name,
           bio: followingEntity.bio,
-          followersCount: followersCount, 
+          followersCount: followersCount,
         };
       })
     );
@@ -196,7 +190,7 @@ export class UserService {
     userId: UserId,
     postService: PostService
   ): Promise<Partial<UserProfile> | undefined> {
-    const user = await this.userRepo.findById(userId);
+    const user = await this.userRepo.findById(userId, ["avatar"]);
     if (!user) {
       throw new NotFound("User not found");
     }
@@ -214,12 +208,17 @@ export class UserService {
     };
   }
 
-  async getUserBy(field: Email | Username): Promise<User | null> {
+  async getUserBy(
+    field: Email | Username | UserId,
+    relations?: string[]
+  ): Promise<User | null> {
     let user;
     if (isEmail(field)) {
-      user = await this.userRepo.findByEmail(field);
+      user = await this.userRepo.findByEmail(field, relations);
+    } else if (isUsername(field)) {
+      user = await this.userRepo.findByUsername(field, relations);
     } else {
-      user = await this.userRepo.findByUsername(field);
+      user = await this.userRepo.findById(field, relations);
     }
 
     return user;

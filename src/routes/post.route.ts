@@ -8,7 +8,7 @@ import { UserService } from "../modules/user/user.service";
 import { v4 } from "uuid";
 import { TagService } from "../modules/tag/tag.service";
 import { UpdatePostSchema } from "../modules/post/dto/update-post.dto";
-import { PostId } from "../modules/post/field-types/post-id";
+import { PostId } from "../modules/post/model/post-id";
 
 export const makePostRouter = (
   postService: PostService,
@@ -124,7 +124,6 @@ export const makePostRouter = (
   });
 
   app.get("/:postId/comments", (req, res) => {
-
     const comment1Id = v4();
 
     const description1 = "first comment";
@@ -137,7 +136,7 @@ export const makePostRouter = (
       likeCount: 2,
       createdAt: "2024-08-12 09:43:31.408585",
     };
-    
+
     const description2 = "second comment";
 
     const comment2 = {
@@ -152,10 +151,7 @@ export const makePostRouter = (
       createdAt: "2024-08-19 10:56:36",
     };
 
-    const data = [
-      comment1,
-      comment2,
-    ];
+    const data = [comment1, comment2];
 
     res.status(200).json({ ok: true, data });
 

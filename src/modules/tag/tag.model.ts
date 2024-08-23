@@ -1,4 +1,4 @@
-import { Post } from "../post/post.model";
+import { Post } from "../post/model/post.model";
 import { TagId } from "./field-types/tag-id";
 import { TagTitle } from "./field-types/tag-title";
 

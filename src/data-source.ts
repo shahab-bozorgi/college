@@ -5,7 +5,7 @@ import { UserEntity } from "./modules/user/entity/user.entity";
 import { DataSource } from "typeorm";
 import { PasswordResetEntity } from "./modules/password-reset/password-reset.entity";
 import { MediaEntity } from "./modules/media/media.entity";
-import { PostEntity } from "./modules/post/post.entity";
+import { PostEntity } from "./modules/post/entity/post.entity";
 import { TagEntity } from "./modules/tag/tag.entity";
 import { FollowEntity } from "./modules/user/entity/follow.entity";
 

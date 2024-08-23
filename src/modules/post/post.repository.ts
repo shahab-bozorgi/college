@@ -5,10 +5,10 @@ import {
   PostRelations,
   PostSelectedRelations,
   UpdatePost,
-} from "./post.model";
-import { PostEntity } from "./post.entity";
+} from "./model/post.model";
+import { PostEntity } from "./entity/post.entity";
 import { v4 } from "uuid";
-import { PostId } from "./field-types/post-id";
+import { PostId } from "./model/post-id";
 import { User } from "../user/model/user.model";
 
 export interface IPostRepository {

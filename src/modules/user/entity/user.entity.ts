@@ -14,7 +14,7 @@ import { Password } from "../model/user-password";
 import { UserId } from "../model/user-user-id";
 import { FollowEntity } from "./follow.entity";
 import { MediaEntity } from "../../media/media.entity";
-import { PostEntity } from "../../post/post.entity";
+import { PostEntity } from "../../post/entity/post.entity";
 
 @Entity("users")
 export class UserEntity {
@@ -60,5 +60,4 @@ export class UserEntity {
 
   @OneToMany(() => FollowEntity, (follow) => follow.following)
   followers!: FollowEntity[];
-
 }

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { isNoneEmptyString } from "../../../data/non-empty-string";
-import { zodMention } from "../field-types/mention";
+import { zodMention } from "../model/mention";
 
 export const CreatePostSchema = z.object({
   caption: z.string().refine(isNoneEmptyString),

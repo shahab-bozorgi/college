@@ -8,7 +8,7 @@ import {
 } from "typeorm";
 import { TagId } from "./field-types/tag-id";
 import { TagTitle } from "./field-types/tag-title";
-import { PostEntity } from "../post/post.entity";
+import { PostEntity } from "../post/entity/post.entity";
 
 @Entity("tags")
 export class TagEntity {

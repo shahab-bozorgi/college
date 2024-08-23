@@ -1,9 +1,9 @@
-import { NoneEmptyString } from "../../data/non-empty-string";
-import { Media } from "../media/media.model";
-import { Tag } from "../tag/tag.model";
-import { UserId } from "../user/model/user-user-id";
-import { User } from "../user/model/user.model";
-import { PostId } from "./field-types/post-id";
+import { NoneEmptyString } from "../../../data/non-empty-string";
+import { Media } from "../../media/media.model";
+import { Tag } from "../../tag/tag.model";
+import { UserId } from "../../user/model/user-user-id";
+import { User } from "../../user/model/user.model";
+import { PostId } from "./post-id";
 
 export interface Post {
   id: PostId;

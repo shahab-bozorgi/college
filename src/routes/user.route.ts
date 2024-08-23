@@ -81,6 +81,7 @@ export const makeUserRouter = (
     }
   });
 
+<<<<<<< HEAD
 app.get("/:userId/followers", async (req, res) => {
   const userId: UserId = req.params.userId as UserId;
   try {
@@ -90,6 +91,21 @@ app.get("/:userId/followers", async (req, res) => {
     res.status(500).json({ message: "مشکلی در دریافت لیست فالوورها رخ داد." });
   }
 });
+=======
+  // app.get("/following/:userId", async (req, res) => {
+  //   const userId: UserId = req.params.userId as UserId;
+  //   const following = await userService.getFollowing(userId);
+  //   res.status(200).json(following);
+  // });
+
+  // app.get("/username/:id/following", async (req, res) => {
+  //   const userId = req.params.id as UserId;
+  //   const { following } = (await userService.userProfile(userId)) ?? {
+  //     following: [],
+  //   };
+  //   res.status(200).json({ following });
+  // });
+>>>>>>> 2429b6cd4d031481471b3cfc2c6e24f7e5278ecd
 
 
 app.get("/:userId/followings", async (req, res) => {

@@ -97,10 +97,16 @@ export class UserService {
     await this.userRepo.update(user.id, { avatar });
   }
 
-  async followUser(followerId: UserId, followingId: UserId): Promise<void> {
-    if (followerId == followingId) {
+
+  async followUser(
+    followerId: UserId,
+    followingId: UserId
+  ): Promise<void> {
+
+    if (followerId == followingId){
       throw new BadRequest("خودتو فالو نکن!");
     }
+
     const follower = (await this.userRepo.findById(followerId)) as UserEntity;
     const following = (await this.userRepo.findById(followingId)) as UserEntity;
     if (!follower || !following) {

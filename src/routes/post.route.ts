@@ -14,6 +14,7 @@ import { LikeCommentService } from "../modules/post/comment/like-comment/like-co
 import { handleExpress } from "../utilities/handle-express";
 import { LikeCommentSchema } from "../modules/post/comment/like-comment/dto/like-comment.dto";
 import { GetCommentsSchema } from "../modules/post/comment/dto/get-comments.dto";
+import { CreateCommentSchema } from "../modules/post/comment/dto/create-comment.dto";
 
 export const makePostRouter = (
   postService: PostService,
@@ -79,6 +80,18 @@ export const makePostRouter = (
     }
   );
 
+  app.post("/:postId/comment", (req, res) => {
+    const dto = CreateCommentSchema.parse({
+      userId: req.user.id,
+      postId: req.params.postId,
+      parentId: req.body.parentId,
+      description: req.body.description,
+    });
+    handleExpress(res, () =>
+      commentService.createComment(dto, userService, postService)
+    );
+  });
+
   app.get("/:postId/comments", (req, res) => {
     const dto = GetCommentsSchema.parse({
       skip: req.query.skip,
@@ -90,12 +103,16 @@ export const makePostRouter = (
 
   app.post("/:postId/comments/:commentId/like", (req, res) => {
     const dto = LikeCommentSchema.parse(req.body);
-    handleExpress(res, () => likeCommentService.createLikeComment(dto));
+    handleExpress(res, () =>
+      likeCommentService.createLikeComment(dto, userService, commentService)
+    );
   });
 
   app.post("/:postId/comments/:commentId/unlike", (req, res) => {
     const dto = LikeCommentSchema.parse(req.body);
-    handleExpress(res, () => likeCommentService.createLikeComment(dto));
+    handleExpress(res, () =>
+      likeCommentService.createLikeComment(dto, userService, commentService)
+    );
   });
 
   return app;

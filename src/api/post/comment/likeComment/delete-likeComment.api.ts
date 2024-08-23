@@ -10,14 +10,14 @@
  * security:
  *   - bearerAuth: []
  *
- * /posts/{postId}/comments/{commentId}/like:
+ * /posts/{postId}/comments/{commentId}/unlike:
  *   post:
  *     security:
  *       - bearerAuth: []
  *     tags:
  *       - Post
- *     summary: Like comment.
- *     description: Like a comment. users can like a comment.
+ *     summary: Unlike comment.
+ *     description: Unlike a comment. users can Unlike a comment.
  *     parameters:
  *       - in: path
  *         name: commentId

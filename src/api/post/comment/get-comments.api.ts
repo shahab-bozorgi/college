@@ -32,7 +32,7 @@
  *           application/json:
  *             example:
  *               ok: true
- *               data: []
+ *               data: {}
  *       '404':
  *         description: Post not found
  *       '500':

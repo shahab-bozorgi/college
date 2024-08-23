@@ -1,4 +1,5 @@
 import { LikeCommentDto } from "./dto/like-comment.dto";
+import { UnLikeCommentDto } from "./dto/unlike-comment.dto";
 import { ILikeCommentRepository } from "./like-comment-repository";
 
 export class LikeCommentService {
@@ -11,7 +12,7 @@ export class LikeCommentService {
     });
   }
 
-  async deleteLikeComment(dto: LikeCommentDto) {
+  async deleteLikeComment(dto: UnLikeCommentDto) {
     return await this.likeCommentRepo.delete({
       userId: dto.userId,
       commentId: dto.commentId,

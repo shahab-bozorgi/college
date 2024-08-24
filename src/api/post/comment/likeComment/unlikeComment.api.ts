@@ -11,11 +11,11 @@
  *   - bearerAuth: []
  *
  * /posts/{postId}/comments/{commentId}/unlike:
- *   post:
+ *   delete:
  *     security:
  *       - bearerAuth: []
  *     tags:
- *       - Post
+ *       - Comment
  *     summary: Unlike comment.
  *     description: Unlike a comment. users can Unlike a comment.
  *     parameters:

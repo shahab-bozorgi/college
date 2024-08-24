@@ -135,7 +135,7 @@ export const makePostRouter = (
     );
   });
 
-  app.post("/:postId/comments/:commentId/unlike", (req, res) => {
+  app.delete("/:postId/comments/:commentId/unlike", (req, res) => {
     const dto = LikeCommentSchema.parse(req.body);
     handleExpress(res, () =>
       likeCommentService.createLikeComment(dto, userService, commentService)

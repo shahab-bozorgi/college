@@ -15,7 +15,7 @@
  *     security:
  *       - bearerAuth: []
  *     tags:
- *       - Post
+ *       - Comment
  *     summary: Like comment.
  *     description: Like a comment. users can like a comment.
  *     parameters:

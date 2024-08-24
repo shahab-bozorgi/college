@@ -15,7 +15,7 @@
  *     security:
  *       - bearerAuth: []
  *     tags:
- *       - Post
+ *       - Comment
  *     summary: Get comments.
  *     description: Get comments of post by PostId.
  *     parameters:

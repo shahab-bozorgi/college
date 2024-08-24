@@ -15,7 +15,7 @@
  *     security:
  *       - bearerAuth: []
  *     tags:
- *       - Post
+ *       - Comment
  *     summary: Create comment.
  *     description: Create new comments. users can create new comments.
  *     parameters:

@@ -1,5 +1,6 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinTable,
   ManyToMany,
@@ -28,6 +29,9 @@ export class PostEntity {
 
   @Column("text")
   caption!: NoneEmptyString;
+
+  @CreateDateColumn()
+  createdAt!: Date;
 
   @ManyToMany(() => UserEntity)
   @JoinTable()

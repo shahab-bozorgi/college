@@ -10,6 +10,7 @@ import { PostEntity } from "./entity/post.entity";
 import { v4 } from "uuid";
 import { PostId } from "./model/post-id";
 import { User } from "../user/model/user.model";
+import { UserId } from "../user/model/user-user-id";
 
 export interface IPostRepository {
   create(fields: CreatePost): Promise<CreatePost & Post>;
@@ -19,6 +20,11 @@ export interface IPostRepository {
     relations: R
   ): Promise<(Post & PostSelectedRelations<R>) | null>;
   findById(id: PostId, relations?: undefined): Promise<Post | null>;
+  findManyByAuthor(
+    authorId: UserId,
+    skip: number,
+    take: number
+  ): Promise<(Post & PostSelectedRelations<["media"]>)[]>;
   create(fields: CreatePost): Promise<Post | null>;
   postsCount(author: User): Promise<number>;
 }
@@ -46,5 +52,19 @@ export class PostRepository implements IPostRepository {
     relations?: R
   ): Promise<(Post & PostSelectedRelations<R>) | Post | null> {
     return await this.repo.findOne({ where: { id }, relations });
+  }
+
+  async findManyByAuthor(
+    authorId: UserId,
+    skip: number,
+    take: number
+  ): Promise<(Post & PostSelectedRelations<["media"]>)[]> {
+    return await this.repo.find({
+      where: { authorId },
+      relations: ["media"],
+      order: { createdAt: "DESC" },
+      skip: skip,
+      take: take,
+    });
   }
 }

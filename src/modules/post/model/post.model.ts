@@ -11,6 +11,7 @@ export interface Post {
   id: PostId;
   caption: NoneEmptyString;
   authorId: UserId;
+  createdAt: Date;
 }
 
 export interface PostRelations {
@@ -52,4 +53,10 @@ export interface ShowPost {
   bookmarksCount: number;
   likesCount: number;
   commentsCount: number;
+  createdAt: Date;
+}
+
+export interface ShowPosts {
+  id: PostId;
+  media: Media[];
 }

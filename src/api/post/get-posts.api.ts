@@ -10,22 +10,30 @@
  * security:
  *   - bearerAuth: []
  *
- * /posts/{id}:
+ * /posts?page=1&limit=2&username=someUser:
  *   get:
  *     security:
  *       - bearerAuth: []
  *     tags:
  *       - Post
- *     summary: Get a post by ID.
- *     description: Retrieve a post using its ID.
+ *     summary: Get posts.
+ *     description: Get all posts of a specifed user..
  *     parameters:
- *       - name: id
+ *       - name: page
  *         in: path
- *         required: true
- *         description: The ID of the post.
+ *         description: page number.
+ *         schema:
+ *           type: number
+ *       - name: limit
+ *         in: path
+ *         description: page size.
+ *         schema:
+ *           type: number
+ *       - name: username
+ *         in: path
+ *         description: posts of username.
  *         schema:
  *           type: string
- *           format: uuid
  *     responses:
  *       '200':
  *         description: A successful response
@@ -35,26 +43,8 @@
  *               ok: true
  *               data: {
  *                "id": "781d31da-5c67-406b-9dd4-996381a2bdc1",
+ *                "authorId": "4e1b4e5d-662f-423e-a926-d8a48b632a99",
  *                "caption": "some caption",
- *                "author": {
- *                    "first_name": "name",
- *                    "last_name": "lname",
- *                    "username": "username",
- *                    "avatar": {
- *                        "id": "b17b5225-4b0c-4236-9119-aeed0c9534f5",
- *                        "name": "99a183dc-e1db-461f-8484-b6aaa8b55a12.jpg",
- *                        "mime": "image/jpeg",
- *                        "size": 1842302,
- *                        "path": "uploads/users/avatar/99a183dc-e1db-461f-8484-b6aaa8b55a12.jpg"
- *                    }
- *                },
- *                "tags": [
- *                    "tag1",
- *                    "tag2",
- *                ],
- *                "mentions": [
- *                    "someUser"
- *                ],
  *                "media": [
  *                    {
  *                        "id": "11a69c2a-112b-439d-af2b-9243b23079da",
@@ -71,11 +61,8 @@
  *                        "path": "uploads/posts/144028a0-ac7e-46c3-afcc-3379984c577f.jpeg"
  *                    }
  *                ],
- *                "bookmarksCount": 0,
- *                "likesCount": 0,
- *                "commentsCount": 0,
- *                "createdAt": 2024-08-24T02:37:15.664Z
- *            }
+ *                "createdAt": "2024-08-24T02:37:19.860Z",
+ *               }
  *       '400':
  *         description: Bad request, possibly incorrect ID
  *       '401':

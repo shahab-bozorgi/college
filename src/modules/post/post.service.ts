@@ -19,13 +19,22 @@ import { UpdatePostDto } from "./dto/update-post.dto";
 import { MIME } from "../media/field-types/mime";
 import { NoneEmptyString } from "../../data/non-empty-string";
 import { UserId } from "../user/model/user-user-id";
-import { ShowPost } from "./model/post.model";
+import { ShowPost, ShowPosts } from "./model/post.model";
+import { Pagination } from "../../data/pagination";
 
 export class PostService {
   constructor(
     private postRepo: IPostRepository,
     private mediaService: MediaService
   ) {}
+
+  async getPosts(
+    author: User,
+    skip: number,
+    limit: number
+  ): Promise<ShowPosts[]> {
+    return await this.postRepo.findManyByAuthor(author.id, skip, limit);
+  }
 
   async create(
     author: User,
@@ -96,6 +105,7 @@ export class PostService {
       bookmarksCount: 0,
       likesCount: 0,
       commentsCount: 0,
+      createdAt: post.createdAt,
     };
   }
 

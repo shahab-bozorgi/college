@@ -15,7 +15,7 @@
  *     security:
  *       - bearerAuth: []
  *     tags:
- *       - Edit
+ *       - Profile
  *     summary: Edit profile info.
  *     description: Patch edit-profile data. Users can update their personal information and privacy settings.
  *     requestBody:

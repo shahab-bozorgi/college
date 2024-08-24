@@ -39,12 +39,13 @@ export interface ResetPassword {
 
 export interface UserProfile {
   id: UserId;
-  avatar: Media;
+  avatar?: Media;
   username: Username;
-  first_name: string | null;
-  last_name: string | null;
+  first_name?: string;
+  last_name?: string;
   followingCount: number;
   followersCount: number;
   postsCount: number;
-  bio: string | null;
+  bio?: string;
+  followingStatus?: boolean;
 }

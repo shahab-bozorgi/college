@@ -15,6 +15,8 @@
  *     description: Allows a user to follow another user by their ID.
  *     security:
  *       - bearerAuth: []
+ *     tags:
+ *       - Following
  *     parameters:
  *       - in: path
  *         name: followingId

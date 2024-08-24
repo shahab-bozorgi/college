@@ -48,7 +48,10 @@ export const makeUserRouter = (
   );
 
   app.get("/profile", (req, res) => {
-    handleExpress(res, () => userService.userProfile(req.user.id, postService));
+    const username = (req.query.username as Username) ?? req.user.username;
+    handleExpress(res, () =>
+      userService.userProfile(username, req.user, postService)
+    );
   });
 
   app.get("/:username", (req, res) => {
@@ -81,27 +84,28 @@ export const makeUserRouter = (
     }
   });
 
-app.get("/:userId/followers", async (req, res) => {
-  const userId: UserId = req.params.userId as UserId;
-  try {
-    const followers = await userService.getFollowers(userId);
-    res.status(200).json({ok: true, data: {followers} });
-  } catch (error) {
-    res.status(500).json({ message: "مشکلی در دریافت لیست فالوورها رخ داد." });
-  }
-});
+  app.get("/:userId/followers", async (req, res) => {
+    const userId: UserId = req.params.userId as UserId;
+    try {
+      const followers = await userService.getFollowers(userId);
+      res.status(200).json({ ok: true, data: { followers } });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "مشکلی در دریافت لیست فالوورها رخ داد." });
+    }
+  });
 
-
-app.get("/:userId/followings", async (req, res) => {
-  const userId: UserId = req.params.userId as UserId;
-  try {
-    const following = await userService.getFollowing(userId);
-    res.status(200).json({ ok: true, data: { following } });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "مشکلی در دریافت لیست فالویینگ‌ها رخ داد." });
-  }
-});
+  app.get("/:userId/followings", async (req, res) => {
+    const userId: UserId = req.params.userId as UserId;
+    try {
+      const following = await userService.getFollowing(userId);
+      res.status(200).json({ ok: true, data: { following } });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "مشکلی در دریافت لیست فالویینگ‌ها رخ داد." });
+    }
+  });
   return app;
 };

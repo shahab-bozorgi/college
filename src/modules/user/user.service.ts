@@ -187,15 +187,16 @@ export class UserService {
   }
 
   async userProfile(
-    userId: UserId,
+    username: Username,
+    authenticatedUser: User,
     postService: PostService
   ): Promise<Partial<UserProfile> | undefined> {
-    const user = await this.userRepo.findById(userId, ["avatar"]);
+    const user = await this.userRepo.findByUsername(username, ["avatar"]);
     if (!user) {
       throw new NotFound("User not found");
     }
 
-    return {
+    const userProfile: UserProfile = {
       id: user.id,
       avatar: user.avatar,
       username: user.username,
@@ -206,6 +207,15 @@ export class UserService {
       followersCount: await this.flwRepo.countFollowers(user),
       postsCount: await postService.getPostsCount(user),
     };
+
+    if (user.id !== authenticatedUser.id) {
+      const followingStatus = await this.flwRepo.findByFollowerAndFollowing(
+        authenticatedUser as UserEntity,
+        user as UserEntity
+      );
+      userProfile.followingStatus = Boolean(followingStatus);
+    }
+    return userProfile;
   }
 
   async getUserBy(

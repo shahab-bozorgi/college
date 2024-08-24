@@ -9,12 +9,15 @@
  *
  * security:
  *   - bearerAuth: []
- * users/profile:
+ * /users/profile?username=someUser:
  *   get:
  *     summary: Retrieve user profile information
  *     description: Get the profile information of a user. JWT token should be provided in the Authorization header.
+ *       if username is set profile info of the specified user will be returned.
  *     security:
  *       - bearerAuth: []
+ *     tags:
+ *       - Profile
  *     responses:
  *       200:
  *         description: Successfully retrieved user profile
@@ -50,6 +53,9 @@
  *                 postsCount:
  *                   type: integer
  *                   description: Number of posts made by the user
+ *                 followingStatus:
+ *                   type: boolean
+ *                   description: true if logged in user follows other user.
  *       '400':
  *         description: Bad request, possibly incorrect data
  *       '401':

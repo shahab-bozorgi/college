@@ -15,6 +15,8 @@
  *     description: Retrieves the list of users who are following the specified user.
  *     security:
  *       - bearerAuth: []
+ *     tags:
+ *       - Following
  *     parameters:
  *       - in: path
  *         name: userId

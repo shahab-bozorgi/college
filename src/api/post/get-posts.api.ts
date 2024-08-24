@@ -23,12 +23,12 @@
  *         in: path
  *         description: page number.
  *         schema:
- *           type: number
+ *           type: integer
  *       - name: limit
  *         in: path
  *         description: page size.
  *         schema:
- *           type: number
+ *           type: integer
  *       - name: username
  *         in: path
  *         description: posts of username.

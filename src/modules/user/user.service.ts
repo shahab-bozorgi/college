@@ -203,6 +203,7 @@ export class UserService {
       first_name: user.first_name,
       last_name: user.last_name,
       bio: user.bio,
+      email: user.email,
       followingCount: await this.flwRepo.countFollowing(user),
       followersCount: await this.flwRepo.countFollowers(user),
       postsCount: await postService.getPostsCount(user),

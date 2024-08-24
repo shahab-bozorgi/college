@@ -41,6 +41,7 @@ export interface UserProfile {
   id: UserId;
   avatar?: Media;
   username: Username;
+  email: Email;
   first_name?: string;
   last_name?: string;
   followingCount: number;

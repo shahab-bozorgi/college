@@ -14,6 +14,12 @@
  *     summary: Retrieve user profile information
  *     description: Get the profile information of a user. JWT token should be provided in the Authorization header.
  *       if username is set profile info of the specified user will be returned.
+ *     parameters:
+ *       - name: username
+ *         in: path
+ *         description: user's username.
+ *         schema:
+ *           type: string
  *     security:
  *       - bearerAuth: []
  *     tags:

@@ -121,9 +121,10 @@ export const makePostRouter = (
 
   app.get("/:postId/comments", (req, res) => {
     const dto = GetCommentsSchema.parse({
-      skip: req.query.skip,
-      take: req.query.take,
       postId: req.params.postId,
+      page: req.query.page,
+      take: req.query.limit,
+      baseUrl: req.baseUrl,
     });
     handleExpress(res, () => commentService.getComments(dto));
   });

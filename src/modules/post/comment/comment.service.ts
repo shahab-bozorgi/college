@@ -1,7 +1,5 @@
 import { NotFound } from "../../../utilities/http-error";
-import { IUserRepository } from "../../user/user.repository";
 import { UserService } from "../../user/user.service";
-import { IPostRepository } from "../post.repository";
 import { PostService } from "../post.service";
 import { ICommentRepository } from "./comment.repository";
 import { CreateCommentDto } from "./dto/create-comment.dto";
@@ -43,6 +41,9 @@ export class CommentService {
   }
 
   async getComments(dto: GetCommentsDto) {
-    return await this.commentRepo.getAll(dto);
+    return {
+      comments: await this.commentRepo.getAll(dto),
+      nextPage: `${dto.baseUrl}?page=${dto.page + 1}&limit=${dto.take}`,
+    };
   }
 }

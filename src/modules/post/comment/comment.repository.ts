@@ -33,7 +33,7 @@ export class CommentRepository implements ICommentRepository {
       where: { postId: query.postId },
       order: { createdAt: "DESC" },
       take: query.take,
-      skip: query.skip,
+      skip: (query.page - 1) * query.take,
     });
   }
 }

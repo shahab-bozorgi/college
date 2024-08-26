@@ -1,6 +1,6 @@
 type ErrorCode = 400 | 401 | 403 | 404 | 422 | 500;
 
-export type FieldErrorLabel = "invalid" | "required" | "recordNotFound";
+export type FieldErrorLabel = "invalid" | "required";
 
 export type FieldsObjectError = {
   [key: string]: FieldErrorLabel;

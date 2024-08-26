@@ -19,14 +19,14 @@
  *     summary: Unlike comment.
  *     description: Unlike a comment. users can Unlike a comment.
  *     parameters:
- *       - in: path
- *         name: postId
+ *       - name: postId
+ *         in: path
  *         schema:
  *           type: string
  *         required: true
  *         description: postId
- *       - in: path
- *         name: commentId
+ *       - name: commentId
+ *         in: path
  *         schema:
  *           type: string
  *         required: true

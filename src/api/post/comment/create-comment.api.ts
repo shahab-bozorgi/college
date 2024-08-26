@@ -10,7 +10,7 @@
  * security:
  *   - bearerAuth: []
  *
- * /posts/{postId}/comment:
+ * /posts/{postId}/comments:
  *   post:
  *     security:
  *       - bearerAuth: []
@@ -19,8 +19,8 @@
  *     summary: Create comment.
  *     description: Create new comments. users can create new comments.
  *     parameters:
- *       - in: path
- *         name: postId
+ *       - name: postId
+ *         in: path
  *         schema:
  *           type: string
  *         required: true

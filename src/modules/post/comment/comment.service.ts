@@ -5,6 +5,7 @@ import { ICommentRepository } from "./comment.repository";
 import { CreateCommentDto } from "./dto/create-comment.dto";
 import { GetCommentsDto } from "./dto/get-comments.dto";
 import { CommentId } from "./model/comment-id";
+import { Comment } from "./model/comment.model";
 
 export class CommentService {
   constructor(private commentRepo: ICommentRepository) {}
@@ -40,10 +41,44 @@ export class CommentService {
     return await this.commentRepo.findById(commentId);
   }
 
-  async getComments(dto: GetCommentsDto) {
-    return {
-      comments: await this.commentRepo.getAll(dto),
-      nextPage: `${dto.baseUrl}?page=${dto.page + 1}&limit=${dto.take}`,
-    };
+  async getComments(
+    dto: GetCommentsDto,
+    userService: UserService,
+    postService: PostService
+  ) {
+    if ((await postService.getPost(dto.postId, userService)) === null) {
+      throw new NotFound("Post is not found");
+    }
+
+    const comments = await this.commentRepo.getAll(dto);
+
+    let parentComments: Comment[] = [];
+
+    if (comments !== null) {
+      parentComments = comments.filter((comment) => comment.parentId === null);
+
+      const childComments = comments.filter(
+        (comment) => comment.parentId !== null
+      );
+
+      parentComments.forEach((parent) => {
+        parent.replies = childComments.filter(
+          (child) => child.parentId === parent.id
+        );
+      });
+
+      const orphans = childComments.filter(
+        (child) => !comments.some((parent) => parent.id === child.parentId)
+      );
+
+      orphans.forEach((orph) => {
+        parentComments.push({
+          ...orph,
+          replies: [],
+        });
+      });
+    }
+
+    return { comments: parentComments };
   }
 }

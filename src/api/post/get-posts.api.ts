@@ -10,7 +10,7 @@
  * security:
  *   - bearerAuth: []
  *
- * /posts?page=1&limit=2&username=someUser:
+ * /posts?page=1&take=2&username=someUser:
  *   get:
  *     security:
  *       - bearerAuth: []
@@ -24,7 +24,7 @@
  *         description: page number.
  *         schema:
  *           type: integer
- *       - name: limit
+ *       - name: take
  *         in: path
  *         description: page size.
  *         schema:

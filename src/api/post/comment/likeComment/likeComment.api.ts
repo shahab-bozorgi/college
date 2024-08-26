@@ -19,14 +19,14 @@
  *     summary: Like comment.
  *     description: Like a comment. users can like a comment.
  *     parameters:
- *       - in: path
- *         name: postId
+ *       - name: postId
+ *         in: path
  *         schema:
  *           type: string
  *         required: true
  *         description: postId
- *       - in: path
- *         name: commentId
+ *       - name: commentId
+ *         in: path
  *         schema:
  *           type: string
  *         required: true

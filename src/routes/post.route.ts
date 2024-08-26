@@ -17,6 +17,8 @@ import { GetCommentsSchema } from "../modules/post/comment/dto/get-comments.dto"
 import { CreateCommentSchema } from "../modules/post/comment/dto/create-comment.dto";
 import { NotFound } from "../utilities/http-error";
 import { paginationSchema } from "../data/pagination";
+import { z } from "zod";
+import { parseDtoWithSchema } from "../utilities/parse-dto-handler";
 
 export const makePostRouter = (
   postService: PostService,
@@ -107,37 +109,57 @@ export const makePostRouter = (
     }
   );
 
-  app.post("/:postId/comment", (req, res) => {
-    const dto = CreateCommentSchema.parse({
-      userId: req.user.id,
-      postId: req.params.postId,
-      parentId: req.body.parentId,
-      description: req.body.description,
-    });
+  app.post("/:postId/comments", (req, res) => {
+    const dto = parseDtoWithSchema(
+      {
+        userId: req.user.id,
+        postId: req.params.postId,
+        parentId: req.body.parentId,
+        description: req.body.description,
+      },
+      CreateCommentSchema
+    );
+
     handleExpress(res, () =>
       commentService.createComment(dto, userService, postService)
     );
   });
 
   app.get("/:postId/comments", (req, res) => {
-    const dto = GetCommentsSchema.parse({
-      postId: req.params.postId,
-      page: req.query.page,
-      take: req.query.limit,
-      baseUrl: req.baseUrl,
-    });
-    handleExpress(res, () => commentService.getComments(dto));
+    const dto = parseDtoWithSchema(
+      {
+        postId: req.params.postId,
+        page: req.query.page,
+        take: req.query.take,
+      },
+      GetCommentsSchema
+    );
+    handleExpress(res, () =>
+      commentService.getComments(dto, userService, postService)
+    );
   });
 
   app.post("/:postId/comments/:commentId/like", (req, res) => {
-    const dto = LikeCommentSchema.parse(req.body);
+    const dto = parseDtoWithSchema(
+      {
+        userId: req.user.id,
+        commentId: req.params.commentId,
+      },
+      LikeCommentSchema
+    );
     handleExpress(res, () =>
       likeCommentService.createLikeComment(dto, userService, commentService)
     );
   });
 
   app.delete("/:postId/comments/:commentId/unlike", (req, res) => {
-    const dto = LikeCommentSchema.parse(req.body);
+    const dto = parseDtoWithSchema(
+      {
+        userId: req.user.id,
+        commentId: req.params.commentId,
+      },
+      LikeCommentSchema
+    );
     handleExpress(res, () =>
       likeCommentService.createLikeComment(dto, userService, commentService)
     );

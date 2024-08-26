@@ -10,6 +10,7 @@ export interface Comment {
   parentId: CommentId | null;
   description: NoneEmptyString;
   createdAt: Date;
+  replies: Comment[];
 }
 
 export interface CreateComment {

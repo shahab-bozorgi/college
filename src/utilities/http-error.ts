@@ -9,36 +9,36 @@ export type FieldValidationError = {
 export class HttpError {
   constructor(
     public code: ErrorCode,
-    public msg: string | FieldValidationError
+    public message: string | FieldValidationError
   ) {}
 }
 
 export class BadRequest extends HttpError {
-  constructor(msg: string) {
-    super(400, msg);
+  constructor(message: string) {
+    super(400, message);
   }
 }
 
 export class UnAuthorized extends HttpError {
-  constructor(msg: string) {
-    super(401, msg);
+  constructor(message: string) {
+    super(401, message);
   }
 }
 
 export class Forbidden extends HttpError {
-  constructor(msg: string) {
-    super(403, msg);
+  constructor(message: string) {
+    super(403, message);
   }
 }
 
 export class NotFound extends HttpError {
-  constructor(msg: string) {
-    super(404, msg);
+  constructor(message: string) {
+    super(404, message);
   }
 }
 
 export class UserError extends HttpError {
-  constructor(msg: FieldValidationError) {
-    super(422, msg);
+  constructor(message: FieldValidationError) {
+    super(422, message);
   }
 }

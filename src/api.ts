@@ -1,4 +1,4 @@
-import express, { ErrorRequestHandler } from "express";
+import express from "express";
 import dotenv from "dotenv-flow";
 dotenv.config();
 import {
@@ -8,7 +8,6 @@ import {
 import { UserService } from "./modules/user/user.service";
 import { makeUserRouter } from "./routes/user.route";
 import { DataSource } from "typeorm";
-import { ZodError } from "zod";
 import { authMiddleware } from "./middleware/authenticate.middleware";
 import { makeAuthRouter } from "./routes/auth.route";
 import cors from "cors";
@@ -17,7 +16,6 @@ import swaggerjsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import { PasswordResetRepository } from "./modules/password-reset/password-reset.repository";
 import { PasswordResetService } from "./modules/password-reset/password-reset.service";
-import { HttpError } from "./utilities/http-error";
 import { MediaRepository } from "./modules/media/media.repository";
 import { MediaService } from "./modules/media/media.service";
 import { PostRepository } from "./modules/post/post.repository";
@@ -29,6 +27,7 @@ import { CommentService } from "./modules/post/comment/comment.service";
 import { CommentRepository } from "./modules/post/comment/comment.repository";
 import { LikeCommentRepository } from "./modules/post/comment/like-comment/like-comment-repository";
 import { LikeCommentService } from "./modules/post/comment/like-comment/like-comment.service";
+import { errorHandler } from "./utilities/error-handler";
 
 export const makeApp = (dataSource: DataSource) => {
   const app = express();
@@ -84,24 +83,6 @@ export const makeApp = (dataSource: DataSource) => {
   app.use((req, res) => {
     res.status(404).send({ message: "Not Found!" });
   });
-
-  const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-    if (err instanceof ZodError) {
-      res
-        .status(400)
-        .json({ ok: false, message: err.errors.map((err) => err.message) });
-      return;
-    }
-    if (err instanceof HttpError) {
-      res.status(err.code).json({
-        ok: false,
-        message: [err.message],
-      });
-      return;
-    }
-
-    res.status(500).json({ ok: false, message: ["Internal server error!"] });
-  };
 
   app.use(errorHandler);
 

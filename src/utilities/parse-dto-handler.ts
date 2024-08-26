@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { FieldErrorLabel, UserError, FieldValidationError } from "./http-error";
+import { FieldError, FieldsObjectError } from "./http-error";
 
-const translateZodMessage: FieldValidationError = {
+const translateZodMessage: FieldsObjectError = {
   "Invalid input": "invalid",
   Required: "required",
 };
@@ -24,9 +24,12 @@ export const parseDtoWithSchema = (
         }
 
         return acc;
-      }, {} as { [key: string]: FieldErrorLabel });
+      }, {} as FieldsObjectError);
 
-      throw new UserError(errorMessages);
+      throw new FieldError(
+        "Check validation key of this object!",
+        errorMessages
+      );
     }
   }
 };

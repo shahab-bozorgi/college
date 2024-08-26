@@ -1,16 +1,19 @@
-type ErrorCode = 400 | 401 | 403 | 404 | 413 | 422 | 500;
+type ErrorCode = 400 | 401 | 403 | 404 | 422 | 500;
 
 export type FieldErrorLabel = "invalid" | "required" | "recordNotFound";
 
-export type FieldValidationError = {
+export type FieldsObjectError = {
   [key: string]: FieldErrorLabel;
 };
 
-export class HttpError {
+export class HttpError extends Error {
   constructor(
     public code: ErrorCode,
-    public message: string | FieldValidationError
-  ) {}
+    public message: string,
+    public validation?: FieldsObjectError
+  ) {
+    super(message);
+  }
 }
 
 export class BadRequest extends HttpError {
@@ -37,8 +40,8 @@ export class NotFound extends HttpError {
   }
 }
 
-export class UserError extends HttpError {
-  constructor(message: FieldValidationError) {
-    super(422, message);
+export class FieldError extends HttpError {
+  constructor(message: string, validation: FieldsObjectError) {
+    super(422, message, validation);
   }
 }

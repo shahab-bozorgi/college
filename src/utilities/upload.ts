@@ -31,7 +31,7 @@ const fileFilter =
   ) => {
     allowedMIME.includes(file.mimetype as MIME)
       ? cb(null, true)
-      : cb(new HttpError(400, "Invalid File type"));
+      : cb(new HttpError(400, "Invalid File type", {}));
   };
 
 export const MBToBytes = (value: PositiveInt): PositiveInt =>
@@ -64,7 +64,7 @@ export const uploadSingleFile =
     uploader(req, res, (err) => {
       if (err) {
         if (err instanceof MulterError)
-          return next(new HttpError(400, err.message));
+          return next(new HttpError(400, err.message, {}));
         return next(err);
       }
       next();
@@ -88,7 +88,7 @@ export const uploadMultipleFiles =
     uploader(req, res, (err) => {
       if (err) {
         if (err instanceof MulterError)
-          return next(new HttpError(400, err.message));
+          return next(new HttpError(400, err.message, {}));
         return next(err);
       }
       next();

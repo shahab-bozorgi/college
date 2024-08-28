@@ -31,12 +31,8 @@ describe("Update user", () => {
     is_private: true,
   };
 
-  it("Should return false if no matching record was found.", async () => {
-    expect(await userRepo.update("wrongID" as UserId, newInfo)).toBe(false);
-  });
-
   it("Should return true if update was done.", async () => {
-    expect(await userRepo.update(user.id, newInfo)).toBe(true);
+    await userRepo.update({ ...user, ...newInfo });
     const updatedUser = await userRepo.findByEmail(user.email);
     expect(updatedUser?.username).toBe(newInfo.username);
     expect(updatedUser?.password).toBe(newInfo.password);

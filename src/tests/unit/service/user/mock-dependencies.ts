@@ -4,15 +4,13 @@ import {
   UpdateUser,
   User,
 } from "../../../../modules/user/model/user.model";
-import {
-  IFollowRepository,
-  IUserRepository,
-} from "../../../../modules/user/user.repository";
+import { IUserRepository } from "../../../../modules/user/user.repository";
 import { UserId } from "../../../../modules/user/model/user-user-id";
 import { Username } from "../../../../modules/user/model/user-username";
 import { Email } from "../../../../data/email";
 import { UserEntity } from "../../../../modules/user/entity/user.entity";
-import { FollowEntity } from "../../../../modules/user/entity/follow.entity";
+import { FollowEntity } from "../../../../modules/user/follow/entity/follow.entity";
+import { IFollowRepository } from "../../../../modules/user/follow/follow.repository";
 
 export class MockUserRepository implements IUserRepository {
   save(user: UserEntity): Promise<UserEntity> {

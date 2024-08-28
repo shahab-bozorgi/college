@@ -9,24 +9,37 @@
  *
  * security:
  *   - bearerAuth: []
- * users/{userId}/followers:
+
+ * /users/{userId}/followings?page=1&limit=2:
  *   get:
- *     summary: Get a list of users following the specified user
- *     description: Retrieves the list of users who are following the specified user.
+ *     summary: Get a list of users that the specified user is following
+ *     description: Retrieves the list of users that the specified user is following.
  *     security:
  *       - bearerAuth: []
  *     tags:
  *       - Following
  *     parameters:
- *       - in: path
- *         name: userId
+ *       - name: userId
+ *         in: path
  *         required: true
  *         schema:
  *           type: string
- *         description: The ID of the user whose followers are to be retrieved.
+ *         description: The ID of the user whose followings are to be retrieved.
+ *       - name: page
+ *         in: query
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: page number.
+ *       - name: limit
+ *         in: query
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: page size.
  *     responses:
  *       200:
- *         description: Successfully retrieved the list of followers
+ *         description: Successfully retrieved the list of followed users
  *         content:
  *           application/json:
  *             schema:
@@ -38,38 +51,36 @@
  *                 data:
  *                   type: object
  *                   properties:
- *                     followers:
+ *                     following:
  *                       type: array
  *                       items:
  *                         type: object
  *                         properties:
  *                           id:
  *                             type: string
- *                             description: User ID of the follower
+ *                             description: User ID of the followed user
  *                           avatar:
  *                             type: string
  *                             nullable: true
- *                             description: URL of the follower's avatar
+ *                             description: URL of the followed user's avatar
  *                           username:
  *                             type: string
- *                             description: Username of the follower
+ *                             description: Username of the followed user
  *                           first_name:
  *                             type: string
- *                             description: First name of the follower
+ *                             description: First name of the followed user
  *                           last_name:
  *                             type: string
- *                             description: Last name of the follower
+ *                             description: Last name of the followed user
  *                           bio:
  *                             type: string
  *                             nullable: true
- *                             description: Bio of the follower
+ *                             description: Bio of the followed user
  *                           followersCount:
  *                             type: integer
- *                             description: Number of followers the follower has
+ *                             description: Number of followers the followed user has
  *       400:
  *         description: Bad request, possibly due to invalid user ID
- *       401:
- *         description: Unauthorized, user must be authenticated
  *       404:
  *         description: User not found
  *       500:

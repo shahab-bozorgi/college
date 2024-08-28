@@ -1,10 +1,7 @@
 import express from "express";
 import dotenv from "dotenv-flow";
 dotenv.config();
-import {
-  FollowRepository,
-  UserRepository,
-} from "./modules/user/user.repository";
+import { UserRepository } from "./modules/user/user.repository";
 import { UserService } from "./modules/user/user.service";
 import { makeUserRouter } from "./routes/user.route";
 import { DataSource } from "typeorm";
@@ -28,6 +25,8 @@ import { CommentRepository } from "./modules/post/comment/comment.repository";
 import { LikeCommentRepository } from "./modules/post/comment/like-comment/like-comment-repository";
 import { LikeCommentService } from "./modules/post/comment/like-comment/like-comment.service";
 import { errorHandler } from "./utilities/error-handler";
+import { FollowService } from "./modules/user/follow/follow.service";
+import { FollowRepository } from "./modules/user/follow/follow.repository";
 
 export const makeApp = (dataSource: DataSource) => {
   const app = express();
@@ -57,8 +56,9 @@ export const makeApp = (dataSource: DataSource) => {
     passwordResetRepository
   );
   const userRepository = new UserRepository(dataSource);
+  const userService = new UserService(userRepository);
   const followRepository = new FollowRepository(dataSource);
-  const userService = new UserService(userRepository, followRepository);
+  const followService = new FollowService(followRepository);
   const postRepository = new PostRepository(dataSource);
   const postService = new PostService(postRepository, mediaService);
   const tagRepository = new TagRepository(dataSource);
@@ -72,12 +72,18 @@ export const makeApp = (dataSource: DataSource) => {
   app.use(
     "/users",
     authMiddleware(userService),
-    makeUserRouter(userService, mediaService, postService)
+    makeUserRouter(userService, followService, mediaService, postService)
   );
   app.use(
     "/posts",
     authMiddleware(userService),
-    makePostRouter(postService, userService, tagService, commentService, likeCommentService)
+    makePostRouter(
+      postService,
+      userService,
+      tagService,
+      commentService,
+      likeCommentService
+    )
   );
 
   app.use((req, res) => {

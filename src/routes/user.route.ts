@@ -7,13 +7,19 @@ import { PositiveInt } from "../data/int";
 import { MediaService } from "../modules/media/media.service";
 import { NoneEmptyString } from "../data/non-empty-string";
 import { imageMIMEs, MIME } from "../modules/media/field-types/mime";
-import { handleExpress } from "../utilities/handle-express";
+import { expressHandler, handleExpress } from "../utilities/handle-express";
 import { UserId } from "../modules/user/model/user-user-id";
 import { PostService } from "../modules/post/post.service";
-import { date } from "zod";
+import { FollowService } from "../modules/user/follow/follow.service";
+import { parseDtoWithSchema } from "../utilities/parse-dto-handler";
+import { FollowDto } from "../modules/user/follow/dto/follow.dto";
+import { UnFollowDto } from "../modules/user/follow/dto/unfollow.dto";
+import { GetFollowingListsSchema } from "../modules/user/follow/dto/get-followings.dto";
+import { GetFollowerListsSchema } from "../modules/user/follow/dto/get-followers.dto";
 
 export const makeUserRouter = (
   userService: UserService,
+  followService: FollowService,
   mediaService: MediaService,
   postService: PostService
 ) => {
@@ -50,7 +56,7 @@ export const makeUserRouter = (
   app.get("/profile", (req, res) => {
     const username = (req.query.username as Username) ?? req.user.username;
     handleExpress(res, () =>
-      userService.userProfile(username, req.user, postService)
+      userService.userProfile(username, req.user, postService, followService)
     );
   });
 
@@ -61,51 +67,73 @@ export const makeUserRouter = (
   });
 
   app.post("/follow/:followingId", async (req, res, next) => {
-    try {
-      await userService.followUser(
-        req.user.id,
-        req.params.followingId as UserId
+    const dto = parseDtoWithSchema(
+      {
+        followerId: req.user.id,
+        followingId: req.params.followingId,
+      },
+      FollowDto
+    );
+    expressHandler(req, res, () => {
+      return followService.followUser(
+        dto.followerId,
+        dto.followingId,
+        userService
       );
-      res.status(200).json({ ok: true, data: {} });
-    } catch (e) {
-      next(e);
-    }
+    });
   });
 
   app.delete("/unfollow/:followingId", async (req, res, next) => {
-    try {
-      await userService.unfollowUser(
-        req.user.id,
-        req.params.followingId as UserId
+    const dto = parseDtoWithSchema(
+      {
+        followerId: req.user.id,
+        followingId: req.params.followingId,
+      },
+      UnFollowDto
+    );
+    expressHandler(req, res, () => {
+      return followService.unfollowUser(
+        dto.followerId,
+        dto.followingId,
+        userService
       );
-      res.status(200).json({ ok: true, data: {} });
-    } catch (e) {
-      next(e);
-    }
+    });
   });
 
   app.get("/:userId/followers", async (req, res) => {
-    const userId: UserId = req.params.userId as UserId;
-    try {
-      const followers = await userService.getFollowers(userId);
-      res.status(200).json({ ok: true, data: { followers } });
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: "مشکلی در دریافت لیست فالوورها رخ داد." });
-    }
+    const dto = parseDtoWithSchema(
+      {
+        followingId: req.params.userId,
+        page: req.query.page,
+        limit: req.query.limit,
+      },
+      GetFollowerListsSchema
+    );
+    expressHandler(req, res, () => {
+      return followService.getFollowers({
+        followingId: dto.followingId,
+        page: dto.page,
+        limit: dto.limit,
+      });
+    });
   });
 
   app.get("/:userId/followings", async (req, res) => {
-    const userId: UserId = req.params.userId as UserId;
-    try {
-      const following = await userService.getFollowing(userId);
-      res.status(200).json({ ok: true, data: { following } });
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: "مشکلی در دریافت لیست فالویینگ‌ها رخ داد." });
-    }
+    const dto = parseDtoWithSchema(
+      {
+        followerId: req.params.userId,
+        page: req.query.page,
+        limit: req.query.limit,
+      },
+      GetFollowingListsSchema
+    );
+    expressHandler(req, res, () => {
+      return followService.getFollowings({
+        followerId: dto.followerId,
+        page: dto.page,
+        limit: dto.limit,
+      });
+    });
   });
   return app;
 };

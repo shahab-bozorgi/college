@@ -8,7 +8,7 @@ import {
 } from "../../utilities/http-error";
 import { SignUpDto } from "./dto/create-user.dto";
 import { UpdateUser, User, UserProfile } from "./model/user.model";
-import { IFollowRepository, IUserRepository } from "./user.repository";
+import { IUserRepository } from "./user.repository";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { EditProfileDto } from "./dto/edit-profile.dto";
 import jwt from "jsonwebtoken";
@@ -20,13 +20,10 @@ import { PasswordResetDto } from "../password-reset/dto/password-reset.dto";
 import { Media } from "../media/media.model";
 import { UserEntity } from "./entity/user.entity";
 import { PostService } from "../post/post.service";
-import { UserListsDtoType } from "./dto/follow-user.dto";
+import { FollowService } from "./follow/follow.service";
 
 export class UserService {
-  constructor(
-    private userRepo: IUserRepository,
-    private flwRepo: IFollowRepository
-  ) {}
+  constructor(private userRepo: IUserRepository) {}
 
   async create(dto: SignUpDto): Promise<User> {
     if (await this.userRepo.findByUsername(dto.username)) {
@@ -96,100 +93,11 @@ export class UserService {
     await this.userRepo.update(user.id, { avatar });
   }
 
-  async followUser(followerId: UserId, followingId: UserId): Promise<void> {
-    if (followerId == followingId) {
-      throw new BadRequest("خودتو فالو نکن!");
-    }
-
-    const follower = (await this.userRepo.findById(followerId)) as UserEntity;
-    const following = (await this.userRepo.findById(followingId)) as UserEntity;
-    if (!follower || !following) {
-      throw new BadRequest("کاربر یافت نشد!");
-    }
-    const followEntity = await this.flwRepo.findByFollowerAndFollowing(
-      follower,
-      following
-    );
-    if (followEntity) {
-      throw new BadRequest("شما قبلاً این کاربر را فالو کرده‌اید!");
-    }
-
-    await this.flwRepo.create({
-      follower,
-      following,
-    });
-  }
-
-  async getFollowers(userId: UserId): Promise<UserListsDtoType[]> {
-    const followersEntities = await this.flwRepo.findFollowersByUser(userId);
-    const followersUsers = await Promise.all(
-      followersEntities.map(async (followerEntity) => {
-        const followersCount = await this.flwRepo.countFollowers(
-          followerEntity
-        );
-
-        return {
-          id: followerEntity.id,
-          avatar: followerEntity.avatar ? followerEntity.avatar.path : null,
-          username: followerEntity.username,
-          first_name: followerEntity.first_name,
-          last_name: followerEntity.last_name,
-          bio: followerEntity.bio,
-          followersCount: followersCount,
-        };
-      })
-    );
-
-    return followersUsers;
-  }
-
-  async getFollowing(userId: UserId): Promise<UserListsDtoType[]> {
-    const followingEntities = await this.flwRepo.findFollowingByUser(userId);
-
-    const followingUsers = await Promise.all(
-      followingEntities.map(async (followingEntity) => {
-        const followersCount = await this.flwRepo.countFollowers(
-          followingEntity
-        );
-
-        return {
-          id: followingEntity.id,
-          avatar: followingEntity.avatar ? followingEntity.avatar.path : null,
-          username: followingEntity.username,
-          first_name: followingEntity.first_name,
-          last_name: followingEntity.last_name,
-          bio: followingEntity.bio,
-          followersCount: followersCount,
-        };
-      })
-    );
-
-    return followingUsers;
-  }
-
-  async unfollowUser(followerId: UserId, followingId: UserId): Promise<void> {
-    const follower = (await this.userRepo.findById(followerId)) as UserEntity;
-    const following = (await this.userRepo.findById(followingId)) as UserEntity;
-
-    if (!follower || !following) {
-      throw new BadRequest("کاربر یافت نشد!");
-    }
-
-    const followEntity = await this.flwRepo.findByFollowerAndFollowing(
-      follower,
-      following
-    );
-    if (!followEntity) {
-      throw new BadRequest("شما این کاربر را فالو نکرده‌اید!");
-    }
-
-    await this.flwRepo.delete(followEntity.id);
-  }
-
   async userProfile(
     username: Username,
     authenticatedUser: User,
-    postService: PostService
+    postService: PostService,
+    followService: FollowService
   ): Promise<Partial<UserProfile> | undefined> {
     const user = await this.userRepo.findByUsername(username, ["avatar"]);
     if (!user) {
@@ -204,15 +112,15 @@ export class UserService {
       last_name: user.last_name,
       bio: user.bio,
       email: user.email,
-      followingCount: await this.flwRepo.countFollowing(user),
-      followersCount: await this.flwRepo.countFollowers(user),
+      followingCount: await followService.getcountFollowing(user.id),
+      followersCount: await followService.getcountFollowers(user.id),
       postsCount: await postService.getPostsCount(user),
     };
 
     if (user.id !== authenticatedUser.id) {
-      const followingStatus = await this.flwRepo.findByFollowerAndFollowing(
-        authenticatedUser as UserEntity,
-        user as UserEntity
+      const followingStatus = await followService.getFollow(
+        authenticatedUser.id,
+        user.id
       );
       userProfile.followingStatus = Boolean(followingStatus);
     }

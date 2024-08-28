@@ -7,7 +7,7 @@ import { PasswordResetEntity } from "./modules/password-reset/password-reset.ent
 import { MediaEntity } from "./modules/media/media.entity";
 import { PostEntity } from "./modules/post/entity/post.entity";
 import { TagEntity } from "./modules/tag/tag.entity";
-import { FollowEntity } from "./modules/user/entity/follow.entity";
+import { FollowEntity } from "./modules/user/follow/entity/follow.entity";
 import { LikeCommentEntity } from "./modules/post/comment/like-comment/entity/like-comment.entity";
 import { CommentEntity } from "./modules/post/comment/entity/comment.entity";
 

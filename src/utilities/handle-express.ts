@@ -20,7 +20,7 @@ export const handleExpress = async <T>(res: Response, cb: () => Promise<T>) => {
   }
 };
 
-export const handleExpress2 = async <T>(
+export const expressHandler = async <T>(
   req: Request,
   res: Response,
   cb: () => Promise<T>

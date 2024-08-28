@@ -1,4 +1,4 @@
-type ErrorCode = 400 | 401 | 403 | 404 | 422 | 500;
+type ErrorCode = 400 | 401 | 403 | 404 | 413 | 422 | 500;
 
 export type FieldErrorLabel = "invalid" | "required";
 
@@ -37,6 +37,12 @@ export class Forbidden extends HttpError {
 export class NotFound extends HttpError {
   constructor(message: string) {
     super(404, message);
+  }
+}
+
+export class DuplicatedRecord extends HttpError {
+  constructor(message: string) {
+    super(413, message);
   }
 }
 

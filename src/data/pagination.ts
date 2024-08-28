@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { zodInt, zodPositiveInt } from "./int";
+import { zodPositiveInt } from "./int";
 
 export const paginationSchema = z.object({
-  page: zodPositiveInt.optional(),
-  limit: zodPositiveInt.optional(),
+  page: zodPositiveInt,
+  limit: zodPositiveInt,
 });
 
 export type Pagination = z.infer<typeof paginationSchema>;

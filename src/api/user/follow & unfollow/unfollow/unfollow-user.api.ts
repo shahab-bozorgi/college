@@ -9,7 +9,7 @@
  *
  * security:
  *   - bearerAuth: []
- * users/unfollow/{followingId}:
+ * /users/unfollow/{followingId}:
  *   delete:
  *     summary: Unfollow a user
  *     description: Allows a user to unfollow another user by their ID.
@@ -28,22 +28,29 @@
  *       200:
  *         description: Successfully unfollowed the user
  *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 ok:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   description: An empty object indicating success
+ *          application/json:
+ *            example:
+ *              ok: true,
+ *              data: {
+ *                  "unfollowStatus": true
+ *              }      
  *       400:
  *         description: Bad request, possibly due to invalid user ID or attempt to unfollow a user who was not followed
  *       401:
  *         description: Unauthorized, user must be authenticated
  *       404:
- *         description: User not found or follow relationship not found
+ *         description: Follower user not found | Following user not found
+ *       422:
+ *           description: Field has an invalid or required value
+ *           content:
+ *            application/json:
+ *               example:
+ *                ok: true
+ *                message: "Check validation key of this object!"
+ *                validation: { 
+ *                      "followerId": "invalid | required",
+ *                      "followingId": "invalid | required",
+ *                }                
  *       500:
  *         description: Internal server error
  */

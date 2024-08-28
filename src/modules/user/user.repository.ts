@@ -6,7 +6,6 @@ import { Username } from "./model/user-username";
 import { Email } from "../../data/email";
 import { UserId } from "./model/user-user-id";
 import { v4 } from "uuid";
-import { FollowEntity } from "./entity/follow.entity";
 
 export interface IUserRepository {
   create(user: CreateUser): Promise<User>;
@@ -19,22 +18,6 @@ export interface IUserRepository {
   findByEmail(email: Email, relations?: string[]): Promise<User | null>;
   whereUsernameIn(usernames: Username[]): Promise<User[]>;
   save(user: UserEntity): Promise<UserEntity>;
-}
-
-export interface IFollowRepository {
-  findFollowing(user: UserEntity): Promise<FollowEntity[]>;
-  findFollowingByUser(userId: UserId): Promise<UserEntity[]>;
-  findFollowers(user: UserEntity): Promise<FollowEntity[]>;
-  findFollowersByUser(userId: UserId): Promise<UserEntity[]>;
-  countFollowing(user: User): Promise<number>;
-  countFollowers(user: User): Promise<number>;
-  delete(id: string): Promise<void>;
-  create(follow: Partial<FollowEntity>): Promise<FollowEntity>;
-
-  findByFollowerAndFollowing(
-    follower: UserEntity,
-    following: UserEntity
-  ): Promise<FollowEntity | null>;
 }
 
 export class UserRepository implements IUserRepository {
@@ -75,73 +58,5 @@ export class UserRepository implements IUserRepository {
 
   async whereUsernameIn(usernames: Username[]): Promise<User[]> {
     return await this.repo.findBy({ username: In(usernames) });
-  }
-}
-
-export class FollowRepository implements IFollowRepository {
-  private flwrepo: Repository<FollowEntity>;
-  private userRepository: UserRepository;
-
-  constructor(dataSource: DataSource) {
-    this.flwrepo = dataSource.getRepository(FollowEntity);
-    this.userRepository = new UserRepository(dataSource);
-  }
-
-  async findFollowers(user: UserEntity): Promise<FollowEntity[]> {
-    return this.flwrepo.find({
-      where: { following: user },
-      relations: ["follower"],
-    });
-  }
-
-  async findFollowing(user: UserEntity): Promise<FollowEntity[]> {
-    return this.flwrepo.find({
-      where: { follower: user },
-      relations: ["following"],
-    });
-  }
-
-  async countFollowers(user: User): Promise<number> {
-    return this.flwrepo.countBy({ followingId: user.id });
-  }
-
-  async countFollowing(user: User): Promise<number> {
-    return this.flwrepo.countBy({ followerId: user.id });
-  }
-
-  async findByFollowerAndFollowing(
-    follower: UserEntity,
-    following: UserEntity
-  ): Promise<FollowEntity | null> {
-    return this.flwrepo.findOne({
-      where: {
-        followerId: follower.id,
-        followingId: following.id,
-      },
-    });
-  }
-  async findFollowersByUser(userId: UserId): Promise<UserEntity[]> {
-    const followers = await this.flwrepo.find({
-      where: { following: { id: userId } },
-      relations: ["follower"],
-    });
-    return followers.map((follow) => follow.follower);
-  }
-
-  async findFollowingByUser(userId: UserId): Promise<UserEntity[]> {
-    const followings = await this.flwrepo.find({
-      where: { follower: { id: userId } },
-      relations: ["following"],
-    });
-    return followings.map((follow) => follow.following);
-  }
-
-  async create(follow: Partial<FollowEntity>): Promise<FollowEntity> {
-    const newFollow = this.flwrepo.create(follow);
-    return this.flwrepo.save(newFollow);
-  }
-
-  async delete(id: UserId): Promise<void> {
-    await this.flwrepo.delete(id);
   }
 }

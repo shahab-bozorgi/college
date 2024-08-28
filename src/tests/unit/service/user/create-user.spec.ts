@@ -4,7 +4,7 @@ import { Password } from "../../../../modules/user/model/user-password";
 import { Username } from "../../../../modules/user/model/user-username";
 import { UserService } from "../../../../modules/user/user.service";
 import { BadRequest } from "../../../../utilities/http-error";
-import { MockFollowRepository, MockUserRepository } from "./mock-dependencies";
+import { MockUserRepository } from "./mock-dependencies";
 
 let userService: UserService;
 describe("UserService", () => {
@@ -15,10 +15,7 @@ describe("UserService", () => {
   };
 
   beforeAll(async () => {
-    userService = new UserService(
-      new MockUserRepository(),
-      new MockFollowRepository()
-    );
+    userService = new UserService(new MockUserRepository());
   });
 
   describe("Create User", () => {

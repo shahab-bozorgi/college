@@ -6,8 +6,8 @@ import { zodBoolean } from "../../../data/boolean";
 
 export const EditProfileSchema = z
   .object({
-    first_name: z.string().min(1).optional(),
-    last_name: z.string().min(1).optional(),
+    first_name: z.string().optional(),
+    last_name: z.string().optional(),
     email: z
       .string()
       .refine((value) => isSpecificLengthString(value, 0, 255), {

@@ -22,7 +22,7 @@ export class MockUserRepository implements IUserRepository {
     return newUser;
   }
 
-  update(id: UserId, fields: UpdateUser): Promise<User | null> {
+  update(user: UpdateUser): Promise<User> {
     throw new Error("Method not implemented.");
   }
 

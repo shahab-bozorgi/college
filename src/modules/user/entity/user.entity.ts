@@ -53,7 +53,7 @@ export class UserEntity {
   @OneToMany(() => LikeCommentEntity, (likeComment) => likeComment.user)
   likeComments!: LikeCommentEntity[];
 
-  @OneToOne(() => MediaEntity)
+  @OneToOne(() => MediaEntity, { onDelete: "SET NULL" })
   @JoinColumn()
   avatar!: MediaEntity;
 

@@ -7,7 +7,7 @@ import {
   UnAuthorized,
 } from "../../utilities/http-error";
 import { SignUpDto } from "./dto/create-user.dto";
-import { UpdateUser, User, UserProfile } from "./model/user.model";
+import { User, UserProfile } from "./model/user.model";
 import { IUserRepository } from "./user.repository";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { EditProfileDto } from "./dto/edit-profile.dto";
@@ -17,10 +17,11 @@ import { UserId } from "./model/user-user-id";
 import { Email, isEmail } from "../../data/email";
 import { PasswordResetService } from "../password-reset/password-reset.service";
 import { PasswordResetDto } from "../password-reset/dto/password-reset.dto";
-import { Media } from "../media/media.model";
-import { UserEntity } from "./entity/user.entity";
 import { PostService } from "../post/post.service";
 import { FollowService } from "./follow/follow.service";
+import { MediaService } from "../media/media.service";
+import { NoneEmptyString } from "../../data/non-empty-string";
+import { MIME } from "../media/field-types/mime";
 
 export class UserService {
   constructor(private userRepo: IUserRepository) {}
@@ -65,7 +66,13 @@ export class UserService {
     return { token: token };
   }
 
-  async editProfile(user: User, dto: EditProfileDto): Promise<User | null> {
+  async editProfile(
+    userId: UserId,
+    dto: EditProfileDto,
+    mediaService: MediaService,
+    file?: Express.Multer.File
+  ): Promise<User | null> {
+    const user = (await this.userRepo.findById(userId, ["avatar"]))!;
     if (
       dto.email &&
       dto.email !== user.email &&
@@ -74,23 +81,30 @@ export class UserService {
       throw new BadRequest("این ایمیل از قبل وجود دارد!");
     }
 
-    const fields: UpdateUser = {
+    if (file) {
+      if (user.avatar) {
+        await mediaService.delete(user.avatar.id);
+      }
+      user.avatar = await mediaService.create({
+        name: file.filename as NoneEmptyString,
+        mime: file.mimetype as MIME,
+        size: file.size,
+        path: file.path,
+      });
+    }
+
+    if (dto.password) {
+      user.password = await hash(dto.password, 12);
+    }
+
+    return await this.userRepo.update({
+      ...user,
       first_name: dto.first_name,
       last_name: dto.last_name,
       bio: dto.bio,
       email: dto.email,
       is_private: dto.is_private,
-    };
-
-    if (dto.password) {
-      fields.password = await hash(dto.password, 12);
-    }
-
-    return await this.userRepo.update(user.id, fields);
-  }
-
-  async updateAvatar(user: User, avatar: Media): Promise<void> {
-    await this.userRepo.update(user.id, { avatar });
+    });
   }
 
   async userProfile(
@@ -112,6 +126,7 @@ export class UserService {
       last_name: user.last_name,
       bio: user.bio,
       email: user.email,
+      is_private: user.is_private,
       followingCount: await followService.getcountFollowing(user.id),
       followersCount: await followService.getcountFollowers(user.id),
       postsCount: await postService.getPostsCount(user),
@@ -155,11 +170,8 @@ export class UserService {
     if (passwordReset.expireAt < new Date())
       throw new BadRequest("Token expired");
 
-    if (
-      !(await this.userRepo.update(passwordReset.user.id, {
-        password: await hash(dto.password, 12),
-      }))
-    )
+    passwordReset.user.password = await hash(dto.password, 12);
+    if (!(await this.userRepo.update(passwordReset.user)))
       throw new HttpError(500, "Something went wrong");
   }
 

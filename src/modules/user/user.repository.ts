@@ -9,7 +9,7 @@ import { v4 } from "uuid";
 
 export interface IUserRepository {
   create(user: CreateUser): Promise<User>;
-  update(id: UserId, fields: UpdateUser): Promise<User | null>;
+  update(user: UpdateUser): Promise<User>;
   findById(id: UserId, relations?: string[]): Promise<User | null>;
   findByUsername(
     username: Username,
@@ -31,8 +31,8 @@ export class UserRepository implements IUserRepository {
     return await this.repo.save({ ...user, id: v4() });
   }
 
-  async update(id: UserId, fields: UpdateUser): Promise<User | null> {
-    return await this.repo.save({ ...fields, id });
+  async update(user: UpdateUser): Promise<User> {
+    return await this.repo.save(user);
   }
   async save(user: UserEntity): Promise<UserEntity> {
     return await this.repo.save(user);

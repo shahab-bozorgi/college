@@ -1,14 +1,12 @@
 import { Router } from "express";
 import { UserService } from "../modules/user/user.service";
 import { toUsername, Username } from "../modules/user/model/user-username";
-import { EditProfileDto } from "../modules/user/dto/edit-profile.dto";
+import { EditProfileSchema } from "../modules/user/dto/edit-profile.dto";
 import { MBToBytes, uploadSingleFile } from "../utilities/upload";
 import { PositiveInt } from "../data/int";
 import { MediaService } from "../modules/media/media.service";
-import { NoneEmptyString } from "../data/non-empty-string";
-import { imageMIMEs, MIME } from "../modules/media/field-types/mime";
+import { imageMIMEs } from "../modules/media/field-types/mime";
 import { expressHandler, handleExpress } from "../utilities/handle-express";
-import { UserId } from "../modules/user/model/user-user-id";
 import { PostService } from "../modules/post/post.service";
 import { FollowService } from "../modules/user/follow/follow.service";
 import { parseDtoWithSchema } from "../utilities/parse-dto-handler";
@@ -35,17 +33,8 @@ export const makeUserRouter = (
     ),
     async (req, res, next) => {
       try {
-        const dto = EditProfileDto.parse(req.body);
-        if (req.file) {
-          const avatar = await mediaService.create({
-            name: req.file.filename as NoneEmptyString,
-            mime: req.file.mimetype as MIME,
-            size: req.file.size,
-            path: req.file.path,
-          });
-          await userService.updateAvatar(req.user, avatar);
-        }
-        await userService.editProfile(req.user, dto);
+        const dto = EditProfileSchema.parse(req.body);
+        await userService.editProfile(req.user.id, dto, mediaService, req.file);
         res.json({ ok: true, data: {} });
       } catch (e) {
         next(e);

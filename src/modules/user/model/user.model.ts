@@ -42,6 +42,7 @@ export interface UserProfile {
   avatar?: Media;
   username: Username;
   email: Email;
+  is_private?: boolean;
   first_name?: string;
   last_name?: string;
   followingCount: number;

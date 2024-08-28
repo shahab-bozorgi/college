@@ -2,11 +2,12 @@ import { z } from "zod";
 import { Email, isEmail } from "../../../data/email";
 import { isPassword, Password } from "../model/user-password";
 import { isSpecificLengthString } from "../../../data/specific-length-string";
+import { zodBoolean } from "../../../data/boolean";
 
-export const EditProfileDto = z
+export const EditProfileSchema = z
   .object({
-    first_name: z.string().optional(),
-    last_name: z.string().optional(),
+    first_name: z.string().min(1).optional(),
+    last_name: z.string().min(1).optional(),
     email: z
       .string()
       .refine((value) => isSpecificLengthString(value, 0, 255), {
@@ -25,7 +26,7 @@ export const EditProfileDto = z
       })
       .optional(),
 
-    is_private: z.boolean().optional(),
+    is_private: zodBoolean.optional(),
 
     password: z
       .string()
@@ -51,4 +52,4 @@ export const EditProfileDto = z
     }
   );
 
-export type EditProfileDto = z.infer<typeof EditProfileDto>;
+export type EditProfileDto = z.infer<typeof EditProfileSchema>;

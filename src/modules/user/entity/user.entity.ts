@@ -17,6 +17,7 @@ import { MediaEntity } from "../../media/media.entity";
 import { PostEntity } from "../../post/entity/post.entity";
 import { CommentEntity } from "../../post/comment/entity/comment.entity";
 import { LikeCommentEntity } from "../../post/comment/like-comment/entity/like-comment.entity";
+import { BookmarkEntity } from "../../post/bookmark/entity/bookmark.entity";
 
 @Entity("users")
 export class UserEntity {
@@ -68,4 +69,7 @@ export class UserEntity {
 
   @OneToMany(() => FollowEntity, (follow) => follow.following)
   followers!: FollowEntity[];
+
+  @OneToMany(() => BookmarkEntity, (bookmark) => bookmark.post)
+  bookmarks!: BookmarkEntity[];
 }

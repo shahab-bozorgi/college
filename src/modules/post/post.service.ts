@@ -19,8 +19,7 @@ import { UpdatePostDto } from "./dto/update-post.dto";
 import { MIME } from "../media/field-types/mime";
 import { NoneEmptyString } from "../../data/non-empty-string";
 import { UserId } from "../user/model/user-user-id";
-import { ShowPost, ShowPosts } from "./model/post.model";
-import { Pagination } from "../../data/pagination";
+import { Post, ShowPost, ShowPosts } from "./model/post.model";
 
 export class PostService {
   constructor(
@@ -79,13 +78,18 @@ export class PostService {
     });
   }
 
-  async getPost(postId: string, userService: UserService): Promise<ShowPost> {
+  async getPost(
+    postId: string,
+    viewer: User,
+    userService: UserService
+  ): Promise<ShowPost> {
     if (!isPostId(postId)) throw new BadRequest("Invalid post ID.");
     const post = await this.postRepo.findById(postId, [
       "media",
       "mentions",
       "tags",
       "author",
+      "bookmarks",
     ]);
     if (!post) throw new NotFound("Post not found");
     const avatar = (await userService.getUserBy(post.authorId, ["avatar"]))
@@ -102,7 +106,8 @@ export class PostService {
       tags: post.tags.map((tag) => tag.title),
       mentions: post.mentions.map((mention) => mention.username),
       media: post.media,
-      bookmarksCount: 0,
+      isBookmarked: post.bookmarks.some((bk) => bk.userId === viewer.id),
+      bookmarksCount: post.bookmarks.length,
       likesCount: 0,
       commentsCount: 0,
       createdAt: post.createdAt,
@@ -194,5 +199,9 @@ export class PostService {
 
   async getPostsCount(author: User): Promise<number> {
     return await this.postRepo.postsCount(author);
+  }
+
+  async findPostById(id: PostId): Promise<Post | null> {
+    return await this.postRepo.findById(id);
   }
 }

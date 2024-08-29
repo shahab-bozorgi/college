@@ -17,15 +17,17 @@ import { GetCommentsSchema } from "../modules/post/comment/dto/get-comments.dto"
 import { CreateCommentSchema } from "../modules/post/comment/dto/create-comment.dto";
 import { NotFound } from "../utilities/http-error";
 import { paginationSchema } from "../data/pagination";
-import { z } from "zod";
 import { parseDtoWithSchema } from "../utilities/parse-dto-handler";
+import { CreateBookmarkSchema } from "../modules/post/bookmark/dto/create-bookmark.dto";
+import { BookmarkService } from "../modules/post/bookmark/bookmark.service";
 
 export const makePostRouter = (
   postService: PostService,
   userService: UserService,
   tagService: TagService,
   commentService: CommentService,
-  likeCommentService: LikeCommentService
+  likeCommentService: LikeCommentService,
+  bookmarkService: BookmarkService
 ) => {
   const app = Router();
   const uploadPath = "/posts";
@@ -80,7 +82,9 @@ export const makePostRouter = (
   );
 
   app.get("/:id", (req, res) => {
-    handleExpress(res, () => postService.getPost(req.params.id, userService));
+    handleExpress(res, () =>
+      postService.getPost(req.params.id, req.user, userService)
+    );
   });
 
   app.patch(
@@ -163,6 +167,38 @@ export const makePostRouter = (
     handleExpress(res, () =>
       likeCommentService.createLikeComment(dto, userService, commentService)
     );
+  });
+
+  app.post("/:postId/bookmark", async (req, res, next) => {
+    try {
+      const dto = parseDtoWithSchema(
+        {
+          userId: req.user.id,
+          postId: req.params.postId,
+        },
+        CreateBookmarkSchema
+      );
+      await bookmarkService.createBookmark(dto, userService, postService);
+      res.status(201).json({ ok: true, data: {} });
+    } catch (e) {
+      next(e);
+    }
+  });
+
+  app.delete("/:postId/unbookmark", async (req, res, next) => {
+    try {
+      const dto = parseDtoWithSchema(
+        {
+          userId: req.user.id,
+          postId: req.params.postId,
+        },
+        CreateBookmarkSchema
+      );
+      await bookmarkService.deleteBookmark(dto, userService, postService);
+      res.status(201).json({ ok: true, data: {} });
+    } catch (e) {
+      next(e);
+    }
   });
 
   return app;

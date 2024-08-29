@@ -6,6 +6,7 @@ import { User } from "../../user/model/user.model";
 import { PostId } from "./post-id";
 import { TagTitle } from "../../tag/field-types/tag-title";
 import { Username } from "../../user/model/user-username";
+import { Bookmark } from "../bookmark/model/bookmark.model";
 
 export interface Post {
   id: PostId;
@@ -19,6 +20,7 @@ export interface PostRelations {
   mentions: User[];
   tags: Tag[];
   media: Media[];
+  bookmarks: Bookmark[];
 }
 
 export type PostSelectedRelations<R extends Array<keyof PostRelations>> = {
@@ -50,6 +52,7 @@ export interface ShowPost {
   mentions: Username[];
   tags: TagTitle[];
   media: Media[];
+  isBookmarked: boolean;
   bookmarksCount: number;
   likesCount: number;
   commentsCount: number;

@@ -15,7 +15,7 @@ export class CommentService {
     userService: UserService,
     postService: PostService
   ) {
-    if ((await postService.getPost(dto.postId, userService)) === null) {
+    if ((await postService.findPostById(dto.postId)) === null) {
       throw new NotFound("Post is not found");
     }
 
@@ -46,7 +46,7 @@ export class CommentService {
     userService: UserService,
     postService: PostService
   ) {
-    if ((await postService.getPost(dto.postId, userService)) === null) {
+    if ((await postService.findPostById(dto.postId)) === null) {
       throw new NotFound("Post is not found");
     }
 

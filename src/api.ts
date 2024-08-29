@@ -27,6 +27,8 @@ import { LikeCommentService } from "./modules/post/comment/like-comment/like-com
 import { errorHandler } from "./utilities/error-handler";
 import { FollowService } from "./modules/user/follow/follow.service";
 import { FollowRepository } from "./modules/user/follow/follow.repository";
+import { BookmarkRepository } from "./modules/post/bookmark/bookmark.repository";
+import { BookmarkService } from "./modules/post/bookmark/bookmark.service";
 
 export const makeApp = (dataSource: DataSource) => {
   const app = express();
@@ -67,6 +69,8 @@ export const makeApp = (dataSource: DataSource) => {
   const commentService = new CommentService(commentRepository);
   const likeCommentRepository = new LikeCommentRepository(dataSource);
   const likeCommentService = new LikeCommentService(likeCommentRepository);
+  const bookmarkRepository = new BookmarkRepository(dataSource);
+  const bookmarkService = new BookmarkService(bookmarkRepository);
 
   app.use("/auth", makeAuthRouter(userService, passwordResetService));
   app.use(
@@ -82,7 +86,8 @@ export const makeApp = (dataSource: DataSource) => {
       userService,
       tagService,
       commentService,
-      likeCommentService
+      likeCommentService,
+      bookmarkService
     )
   );
 

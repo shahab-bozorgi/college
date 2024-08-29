@@ -15,6 +15,7 @@ import { NoneEmptyString } from "../../../data/non-empty-string";
 import { TagEntity } from "../../tag/tag.entity";
 import { UserId } from "../../user/model/user-user-id";
 import { CommentEntity } from "../comment/entity/comment.entity";
+import { BookmarkEntity } from "../bookmark/entity/bookmark.entity";
 
 @Entity("posts")
 export class PostEntity {
@@ -47,4 +48,7 @@ export class PostEntity {
 
   @OneToMany(() => CommentEntity, (comment) => comment.post)
   comments!: CommentEntity[];
+
+  @OneToMany(() => BookmarkEntity, (bookmark) => bookmark.post)
+  bookmarks!: BookmarkEntity[];
 }

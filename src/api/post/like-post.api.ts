@@ -17,7 +17,7 @@
  *     tags:
  *       - Post
  *     summary: Like post.
- *     description: Like a post. users can like a comment.
+ *     description: Like a post. users can like a post.
  *     parameters:
  *       - name: postId
  *         in: path

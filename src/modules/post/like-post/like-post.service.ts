@@ -14,7 +14,7 @@ export class LikePostService {
     userService: UserService,
     postService: PostService
   ) {
-    if ((await postService.getPostById(dto.postId)) === null) {
+    if ((await postService.findPostById(dto.postId)) === null) {
       throw new NotFound("Post is not found");
     }
 
@@ -30,7 +30,11 @@ export class LikePostService {
     if (existingLike) {
       throw new BadRequest("You have already liked this post");
     }
-    return await this.likePostRepo.create(dto.userId, dto.postId);
+
+    return await this.likePostRepo.create({
+      userId: dto.userId,
+      postId: dto.postId,
+    });
   }
 
   async unLikePost(
@@ -38,7 +42,7 @@ export class LikePostService {
     userService: UserService,
     postService: PostService
   ) {
-    if ((await postService.getPostById(dto.postId)) === null) {
+    if ((await postService.findPostById(dto.postId)) === null) {
       throw new NotFound("Post is not found");
     }
 
@@ -46,6 +50,9 @@ export class LikePostService {
       throw new NotFound("User is not found");
     }
 
-    await this.likePostRepo.delete(dto.userId, dto.postId);
+    await this.likePostRepo.delete({
+      userId: dto.userId,
+      postId: dto.postId,
+    });
   }
 }

@@ -4,7 +4,7 @@ import { PostId } from "../../model/post-id";
 export interface LikePost {
   userId: UserId;
   postId: PostId;
-  createAt: Date;
+  createdAt: Date; 
 }
 
 export interface CreateLikePost {

@@ -39,8 +39,8 @@ export class PostEntity {
   @JoinTable()
   mentions!: UserEntity[];
 
-  @OneToMany(() => LikePostEntity, (likepost) => likepost.user)
-  likePosts!: LikePostEntity[];
+  @OneToMany(() => LikePostEntity, (likepost) => likepost.post)
+  likes!: LikePostEntity[];
 
   @ManyToMany(() => MediaEntity)
   @JoinTable()

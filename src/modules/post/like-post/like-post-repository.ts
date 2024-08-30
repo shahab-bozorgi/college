@@ -11,7 +11,7 @@ export interface ILikePostRepository {
 }
 
 export class LikePostRepository implements ILikePostRepository {
-  private repo: Repository<LikePost>;
+  private repo: Repository<LikePostEntity>;
 
   constructor(dataSource: DataSource) {
     this.repo = dataSource.getRepository(LikePostEntity);

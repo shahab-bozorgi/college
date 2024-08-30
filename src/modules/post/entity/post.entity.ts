@@ -16,6 +16,7 @@ import { TagEntity } from "../../tag/tag.entity";
 import { UserId } from "../../user/model/user-user-id";
 import { CommentEntity } from "../comment/entity/comment.entity";
 import { BookmarkEntity } from "../bookmark/entity/bookmark.entity";
+import { LikePostEntity } from "../like-post/entity/like-post-entity";
 
 @Entity("posts")
 export class PostEntity {
@@ -37,6 +38,9 @@ export class PostEntity {
   @ManyToMany(() => UserEntity)
   @JoinTable()
   mentions!: UserEntity[];
+
+  @OneToMany(() => LikePostEntity, (likepost) => likepost.user)
+  likePosts!: LikePostEntity[];
 
   @ManyToMany(() => MediaEntity)
   @JoinTable()

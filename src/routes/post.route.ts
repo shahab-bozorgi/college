@@ -20,6 +20,8 @@ import { paginationSchema } from "../data/pagination";
 import { parseDtoWithSchema } from "../utilities/parse-dto-handler";
 import { CreateBookmarkSchema } from "../modules/post/bookmark/dto/create-bookmark.dto";
 import { BookmarkService } from "../modules/post/bookmark/bookmark.service";
+import { LikePostSchema } from "../modules/post/like-post/dto/like-post-dto";
+import { LikePostService } from "../modules/post/like-post/like-post.service";
 
 export const makePostRouter = (
   postService: PostService,
@@ -27,6 +29,7 @@ export const makePostRouter = (
   tagService: TagService,
   commentService: CommentService,
   likeCommentService: LikeCommentService,
+  likePostService: LikePostService,
   bookmarkService: BookmarkService
 ) => {
   const app = Router();
@@ -168,6 +171,34 @@ export const makePostRouter = (
       likeCommentService.createLikeComment(dto, userService, commentService)
     );
   });
+
+   app.post("/:postId/like", (req, res) => {
+     const dto = parseDtoWithSchema(
+       {
+         userId: req.user.id,
+         postId: req.params.postId,
+       },
+       LikePostSchema
+     );
+
+     handleExpress(res, async () => {
+       await likePostService.likePost(dto, userService, postService);
+       return {};
+     });
+   });
+
+   app.delete("/:postId/unlike", (req, res) => {
+     const dto = parseDtoWithSchema(
+       {
+         userId: req.user.id,
+         postId: req.params.postId,
+       },
+       LikePostSchema
+     );
+     handleExpress(res, () =>
+       likePostService.unLikePost(dto, userService, postService)
+     );
+   });
 
   app.post("/:postId/bookmark", async (req, res, next) => {
     try {

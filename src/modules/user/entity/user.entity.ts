@@ -18,6 +18,7 @@ import { PostEntity } from "../../post/entity/post.entity";
 import { CommentEntity } from "../../post/comment/entity/comment.entity";
 import { LikeCommentEntity } from "../../post/comment/like-comment/entity/like-comment.entity";
 import { BookmarkEntity } from "../../post/bookmark/entity/bookmark.entity";
+import { LikePostEntity } from "../../post/like-post/entity/like-post-entity";
 
 @Entity("users")
 export class UserEntity {
@@ -53,6 +54,9 @@ export class UserEntity {
 
   @OneToMany(() => LikeCommentEntity, (likeComment) => likeComment.user)
   likeComments!: LikeCommentEntity[];
+
+  @OneToMany(() => LikePostEntity, (likePost) => likePost.user)
+  likePosts!: LikePostEntity[];
 
   @OneToOne(() => MediaEntity, { onDelete: "SET NULL" })
   @JoinColumn()

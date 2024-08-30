@@ -204,4 +204,7 @@ export class PostService {
   async findPostById(id: PostId): Promise<Post | null> {
     return await this.postRepo.findById(id);
   }
+  async getPostById(postId: PostId) {
+    return await this.postRepo.findById(postId);
+  }
 }

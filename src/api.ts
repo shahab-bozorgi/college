@@ -27,6 +27,8 @@ import { LikeCommentService } from "./modules/post/comment/like-comment/like-com
 import { errorHandler } from "./utilities/error-handler";
 import { FollowService } from "./modules/user/follow/follow.service";
 import { FollowRepository } from "./modules/user/follow/follow.repository";
+import { LikePostService } from "./modules/post/like-post/like-post.service";
+import { LikePostRepository } from "./modules/post/like-post/like-post-repository";
 import { BookmarkRepository } from "./modules/post/bookmark/bookmark.repository";
 import { BookmarkService } from "./modules/post/bookmark/bookmark.service";
 
@@ -69,6 +71,8 @@ export const makeApp = (dataSource: DataSource) => {
   const commentService = new CommentService(commentRepository);
   const likeCommentRepository = new LikeCommentRepository(dataSource);
   const likeCommentService = new LikeCommentService(likeCommentRepository);
+  const likePostRepository = new LikePostRepository(dataSource);
+  const likePostService = new LikePostService(likePostRepository);
   const bookmarkRepository = new BookmarkRepository(dataSource);
   const bookmarkService = new BookmarkService(bookmarkRepository);
 
@@ -87,6 +91,7 @@ export const makeApp = (dataSource: DataSource) => {
       tagService,
       commentService,
       likeCommentService,
+      likePostService,
       bookmarkService
     )
   );

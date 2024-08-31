@@ -14,6 +14,7 @@ import { FollowDto } from "../modules/user/follow/dto/follow.dto";
 import { UnFollowDto } from "../modules/user/follow/dto/unfollow.dto";
 import { GetFollowingListsSchema } from "../modules/user/follow/dto/get-followings.dto";
 import { GetFollowerListsSchema } from "../modules/user/follow/dto/get-followers.dto";
+import { FollowRequestDto } from "../modules/user/follow/dto/follow-request.dto";
 
 export const makeUserRouter = (
   userService: UserService,
@@ -124,5 +125,40 @@ export const makeUserRouter = (
       });
     });
   });
+
+  app.patch("/follow/:followerId/request/accept", async (req, res) => {
+    const dto = parseDtoWithSchema(
+      {
+        followerId: req.params.followerId,
+        followingId: req.user.id,
+      },
+      FollowRequestDto
+    );
+    expressHandler(req, res, () => {
+      return followService.acceptFollowUser(
+        dto.followerId,
+        dto.followingId,
+        userService
+      );
+    });
+  });
+
+  app.delete("/follow/:followerId/request/reject", async (req, res) => {
+    const dto = parseDtoWithSchema(
+      {
+        followerId: req.params.followerId,
+        followingId: req.user.id,
+      },
+      FollowRequestDto
+    );
+    expressHandler(req, res, () => {
+      return followService.rejectFollowUser(
+        dto.followerId,
+        dto.followingId,
+        userService
+      );
+    });
+  });
+
   return app;
 };

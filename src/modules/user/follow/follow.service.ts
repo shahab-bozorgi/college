@@ -26,8 +26,13 @@ export class FollowService {
 
     const follower = await userService.getUserBy(followerId);
     const following = await userService.getUserBy(followingId);
-    if (!follower || !following) {
-      throw new NotFound("User not found!");
+
+    if (!following) {
+      throw new NotFound("Following not found!");
+    }
+
+    if (!follower) {
+      throw new NotFound("Follower not found!");
     }
 
     const followEntity = await this.getFollow(follower.id, following.id);
@@ -112,8 +117,12 @@ export class FollowService {
     const follower = await userService.getUserBy(followerId);
     const following = await userService.getUserBy(followingId);
 
-    if (!follower || !following) {
-      throw new NotFound("User not found!");
+    if (!following) {
+      throw new NotFound("Following not found!");
+    }
+
+    if (!follower) {
+      throw new NotFound("Follower not found!");
     }
 
     const followEntity = await this.getFollow(follower.id, following.id);
@@ -124,6 +133,65 @@ export class FollowService {
 
     return {
       unfollowStatus: await this.flwRepo.delete({
+        followerId: followEntity.followerId,
+        followingId: followEntity.followingId,
+      }),
+    };
+  }
+
+  async acceptFollowUser(
+    followerId: UserId,
+    followingId: UserId,
+    userService: UserService
+  ): Promise<Follow> {
+    const follower = await userService.getUserBy(followerId);
+    const following = await userService.getUserBy(followingId);
+
+    if (!following) {
+      throw new NotFound("Following not found!");
+    }
+
+    if (!follower) {
+      throw new NotFound("Follower not found!");
+    }
+
+    const followEntity = await this.getFollow(follower.id, following.id);
+
+    if (!followEntity) {
+      throw new NotFound("Follow not found!");
+    }
+
+    return await this.flwRepo.update({
+      followerId: followEntity.followerId,
+      followingId: followEntity.followingId,
+      requestStatus: "accepted",
+    });
+  }
+
+  async rejectFollowUser(
+    followerId: UserId,
+    followingId: UserId,
+    userService: UserService
+  ): Promise<{ rejectStatus: boolean }> {
+    const follower = await userService.getUserBy(followerId);
+    const following = await userService.getUserBy(followingId);
+
+    if (!following) {
+      throw new NotFound("Following not found!");
+    }
+
+    if (!follower) {
+      throw new NotFound("Follower not found!");
+    }
+
+    const followEntity = await this.getFollow(follower.id, following.id);
+
+    if (!followEntity) {
+      throw new NotFound("Follow not found!");
+    }
+
+    return {
+      rejectStatus: await this.flwRepo.delete({
         followerId: followEntity.followerId,
         followingId: followEntity.followingId,
       }),

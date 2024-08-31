@@ -1,7 +1,12 @@
 import { DataSource, Repository } from "typeorm";
 import { UserId } from "../model/user-user-id";
 import { FollowEntity } from "./entity/follow.entity";
-import { CreateFollow, DeleteFollow, Follow } from "./model/follow.model";
+import {
+  CreateFollow,
+  DeleteFollow,
+  Follow,
+  UpdateFollow,
+} from "./model/follow.model";
 import { UserEntity } from "../entity/user.entity";
 import { GetFollowerListsDto } from "./dto/get-followers.dto";
 import { GetFollowingListsDto } from "./dto/get-followings.dto";
@@ -14,6 +19,7 @@ export interface IFollowRepository {
   countFollowing(followingId: UserId): Promise<number>;
   countFollowers(followerId: UserId): Promise<number>;
   delete(follow: DeleteFollow): Promise<boolean>;
+  update(follow: UpdateFollow): Promise<Follow>;
   create(follow: CreateFollow): Promise<Follow>;
 
   findByFollowerAndFollowing(
@@ -81,8 +87,7 @@ export class FollowRepository implements IFollowRepository {
   }
 
   async create(follow: CreateFollow): Promise<Follow> {
-    const newFollow = this.flwrepo.create(follow);
-    return this.flwrepo.save(newFollow);
+    return await this.flwrepo.save({ ...follow });
   }
 
   async delete(follow: DeleteFollow): Promise<boolean> {
@@ -94,5 +99,15 @@ export class FollowRepository implements IFollowRepository {
         })
       ).affected
     );
+  }
+
+  async update(follow: UpdateFollow): Promise<Follow> {
+    return await this.flwrepo.save({
+      requestStatus: follow.requestStatus,
+      where: {
+        followerId: follow.followerId,
+        followingId: follow.followingId,
+      },
+    });
   }
 }

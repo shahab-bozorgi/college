@@ -17,7 +17,7 @@
  *     security:
  *       - bearerAuth: []
  *     tags:
- *       - Following
+ *       - Follow
  *     parameters:
  *       - name: userId
  *         in: path

@@ -9,37 +9,35 @@
  *
  * security:
  *   - bearerAuth: []
- * /users/follow/{followingId}:
- *   post:
- *     summary: Follow a user
- *     description: Allows a user to follow another user by their ID.
+ * /users/unfollow/{followingId}:
+ *   delete:
+ *     summary: Unfollow a user
+ *     description: Allows a user to unfollow another user by their ID.
  *     security:
  *       - bearerAuth: []
  *     tags:
- *       - Following
+ *       - Follow
  *     parameters:
  *       - in: path
  *         name: followingId
  *         required: true
  *         schema:
  *           type: string
- *         description: The ID of the user to follow.
+ *         description: The ID of the user to unfollow.
  *     responses:
  *       200:
- *         description: Successfully followed the user
+ *         description: Successfully unfollowed the user
  *         content:
  *          application/json:
  *            example:
- *              ok: true
+ *              ok: true,
  *              data: {
- *                  "followerId": "2cfcc034-1d5f-444d-b194-f99fb1551629",
- *                  "followingId": "d9ae9bd5-abf8-4dc6-ade2-9b23f71615ff",
- *                  "requestStatus": "accepted | pending"
- *              }
+ *                  "unfollowStatus": true
+ *              }      
  *       400:
- *         description: Bad request, possibly incorrect data
+ *         description: Bad request, possibly due to invalid user ID or attempt to unfollow a user who was not followed
  *       401:
- *         description: Not authenticated
+ *         description: Unauthorized, user must be authenticated
  *       404:
  *         description: Follower user not found | Following user not found
  *       422:
@@ -52,7 +50,7 @@
  *                validation: { 
  *                      "followerId": "invalid | required",
  *                      "followingId": "invalid | required",
- *                }        
+ *                }                
  *       500:
  *         description: Internal server error
  */

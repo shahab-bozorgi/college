@@ -18,3 +18,9 @@ export interface DeleteFollow {
   followerId: UserId;
   followingId: UserId;
 }
+
+export interface UpdateFollow {
+  followerId: UserId;
+  followingId: UserId;
+  requestStatus: RequestStatus;
+}

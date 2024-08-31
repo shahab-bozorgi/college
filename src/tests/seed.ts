@@ -19,7 +19,7 @@ export const seedUser = async () => {
   const count = await userRepo.count();
 
   if (count === 0) {
-    await userRepo.save({
+    return await userRepo.save({
       id: v4() as UserId,
       username: "ali" as Username,
       password: await hash("Ali@1234", 12),

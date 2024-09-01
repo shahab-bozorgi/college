@@ -1,8 +1,9 @@
 import { v4 } from "uuid";
 import { hash } from "bcrypt";
-import { AppDataSource } from "../data-source";
+import request from "supertest";
+import { Express } from "express";
 import { UserEntity } from "../modules/user/entity/user.entity";
-import { UserId } from "../modules/user/model/user-user-id";
+import { isUserId, UserId } from "../modules/user/model/user-user-id";
 import { Username } from "../modules/user/model/user-username";
 import { DataSource } from "typeorm";
 import { User } from "../modules/user/model/user.model";
@@ -12,20 +13,27 @@ import { PostId } from "../modules/post/model/post-id";
 import { MediaEntity } from "../modules/media/media.entity";
 import { TagEntity } from "../modules/tag/tag.entity";
 import { extractTag } from "../modules/tag/field-types/tag-title";
+import { Password } from "../modules/user/model/user-password";
 
-export const seedUser = async () => {
-  const userRepo = AppDataSource.getRepository(UserEntity);
+export const seedUser = async (
+  dataSource: DataSource,
+  username: Username,
+  password: Password
+) => {
+  const userRepo = dataSource.getRepository(UserEntity);
 
-  const count = await userRepo.count();
+  const user = await userRepo.save({
+    id: v4() as UserId,
+    username: username,
+    password: await hash(password, 12),
+    email: username + "@gmail.com",
+  });
 
-  if (count === 0) {
-    return await userRepo.save({
-      id: v4() as UserId,
-      username: "ali" as Username,
-      password: await hash("Ali@1234", 12),
-      email: "alialavi@gmail.com",
-    });
-  }
+  return {
+    userId: user.id,
+    username: username,
+    password: password,
+  };
 };
 
 export const seedPost = async (dataSource: DataSource) => {

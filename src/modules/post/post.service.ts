@@ -20,6 +20,7 @@ import { MIME } from "../media/field-types/mime";
 import { NoneEmptyString } from "../../data/non-empty-string";
 import { UserId } from "../user/model/user-user-id";
 import { Post, ShowPost, ShowPosts } from "./model/post.model";
+import { PaginatedResult, PaginationDto } from "../../data/pagination";
 
 export class PostService {
   constructor(
@@ -28,11 +29,13 @@ export class PostService {
   ) {}
 
   async getPosts(
-    author: User,
-    skip: number,
-    limit: number
-  ): Promise<ShowPosts[]> {
-    return await this.postRepo.findManyByAuthor(author.id, skip, limit);
+    username: Username,
+    paginationDto: PaginationDto,
+    userService: UserService
+  ): Promise<PaginatedResult<ShowPosts>> {
+    const author = await userService.getUserBy(username);
+    if (!author) throw new NotFound("User not found");
+    return await this.postRepo.authorPosts(author.id, paginationDto);
   }
 
   async create(

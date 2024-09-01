@@ -16,7 +16,7 @@
  *       if username is set profile info of the specified user will be returned.
  *     parameters:
  *       - name: username
- *         in: path
+ *         in: query
  *         description: user's username.
  *         schema:
  *           type: string

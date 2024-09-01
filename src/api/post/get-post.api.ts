@@ -71,6 +71,7 @@
  *                        "path": "uploads/posts/144028a0-ac7e-46c3-afcc-3379984c577f.jpeg"
  *                    }
  *                ],
+ *                "isBookmarked": true,
  *                "bookmarksCount": 0,
  *                "likesCount": 0,
  *                "commentsCount": 0,

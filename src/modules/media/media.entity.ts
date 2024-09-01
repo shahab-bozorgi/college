@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { AfterLoad, Column, Entity, PrimaryColumn } from "typeorm";
 import { MediaId } from "./field-types/media-id";
 import { NoneEmptyString } from "../../data/non-empty-string";
 import { MIME } from "./field-types/mime";
@@ -19,4 +19,9 @@ export class MediaEntity {
 
   @Column()
   path!: string;
+
+  @AfterLoad()
+  setUrl() {
+    this.path = `${process.env.API_URL}/${this.path}`;
+  }
 }

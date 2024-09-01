@@ -60,6 +60,5 @@ export interface ShowPost {
 }
 
 export interface ShowPosts {
-  id: PostId;
-  media: Media[];
+  posts: Array<{ id: PostId; createdAt: Date; media: Media[] }>;
 }

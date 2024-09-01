@@ -20,17 +20,17 @@
  *     description: Get all posts of a specifed user..
  *     parameters:
  *       - name: page
- *         in: path
+ *         in: query
  *         description: page number.
  *         schema:
  *           type: integer
  *       - name: take
- *         in: path
+ *         in: query
  *         description: page size.
  *         schema:
  *           type: integer
  *       - name: username
- *         in: path
+ *         in: query
  *         description: posts of username.
  *         schema:
  *           type: string
@@ -42,26 +42,28 @@
  *             example:
  *               ok: true
  *               data: {
- *                "id": "781d31da-5c67-406b-9dd4-996381a2bdc1",
- *                "authorId": "4e1b4e5d-662f-423e-a926-d8a48b632a99",
- *                "caption": "some caption",
- *                "media": [
- *                    {
- *                        "id": "11a69c2a-112b-439d-af2b-9243b23079da",
- *                        "name": "3a935f79-cb50-49d5-9aa5-eb4faf773b66.jpg",
- *                        "mime": "image/jpeg",
- *                        "size": 1842302,
- *                        "path": "uploads/posts/3a935f79-cb50-49d5-9aa5-eb4faf773b66.jpg"
- *                    },
- *                    {
- *                        "id": "adc5cadf-7d26-4562-8a62-3fdeb4801b1c",
- *                        "name": "144028a0-ac7e-46c3-afcc-3379984c577f.jpeg",
- *                        "mime": "image/jpeg",
- *                        "size": 9402,
- *                        "path": "uploads/posts/144028a0-ac7e-46c3-afcc-3379984c577f.jpeg"
- *                    }
- *                ],
- *                "createdAt": "2024-08-24T02:37:19.860Z",
+ *                 "posts": [
+ *                   {
+ *                     "id": "2cf303ab-3095-43ce-a578-3c5b10fef519",
+ *                     "createdAt": "2024-08-24T02:37:19.860Z",
+ *                     "media": [
+ *                       {
+ *                         "id": "a99ce403-fbb2-4c3e-a8bb-66a615cc136f",
+ *                         "name": "061ee257-1a2f-46c0-b152-b7381d678f7a.png",
+ *                         "mime": "image/png",
+ *                         "size": 111061,
+ *                         "path": "http://localhost:4000/uploads/posts/061ee257-1a2f-46c0-b152-b7381d678f7a.png"
+ *                       }
+ *                     ]
+ *                   },
+ *                   {
+ *                     "id": "60615098-fb31-432d-aefc-e9c73d327bf2",
+ *                     "createdAt": "2024-08-24T02:37:19.205Z",
+ *                     "media": []
+ *                   }
+ *                 ],
+ *                 "nextPage": 2,
+ *                 "totalPages": 12
  *               }
  *       '400':
  *         description: Bad request, possibly incorrect ID

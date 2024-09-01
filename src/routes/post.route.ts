@@ -11,15 +11,13 @@ import { PostId } from "../modules/post/model/post-id";
 import { CommentService } from "../modules/post/comment/comment.service";
 import { LikeCommentService } from "../modules/post/comment/like-comment/like-comment.service";
 import { handleExpress } from "../utilities/handle-express";
-import { Username } from "../modules/user/model/user-username";
 import { LikeCommentSchema } from "../modules/post/comment/like-comment/dto/like-comment.dto";
 import { GetCommentsSchema } from "../modules/post/comment/dto/get-comments.dto";
 import { CreateCommentSchema } from "../modules/post/comment/dto/create-comment.dto";
-import { NotFound } from "../utilities/http-error";
-import { paginationSchema } from "../data/pagination";
 import { parseDtoWithSchema } from "../utilities/parse-dto-handler";
 import { CreateBookmarkSchema } from "../modules/post/bookmark/dto/create-bookmark.dto";
 import { BookmarkService } from "../modules/post/bookmark/bookmark.service";
+import { getPostsSchema } from "../modules/post/dto/get-posts.dto";
 import { LikePostSchema } from "../modules/post/like-post/dto/like-post-dto";
 import { LikePostService } from "../modules/post/like-post/like-post.service";
 
@@ -37,22 +35,18 @@ export const makePostRouter = (
 
   app.get("/", async (req, res, next) => {
     try {
-      const author = await userService.getUserBy(
-        (req.query.username as Username) ?? req.user.username
-      );
-      if (!author) throw new NotFound("User not found");
-      const pagination = paginationSchema.parse({ ...req.query });
-      const page = pagination.page || 1;
-      const limit = pagination.limit || 9;
-      const skip = (page - 1) * limit;
-      const posts = await postService.getPosts(author, skip, limit);
-      const nextPage = `${req.baseUrl}?page=${page + 1}&limit=${limit}`;
-      res.status(200).json({
+      const { username, page, limit } = getPostsSchema.parse({
+        username: req.query.username ?? req.user.username,
+        page: req.query.page,
+        limit: req.query.limit,
+      });
+      const data = res.status(200).json({
         ok: true,
-        data: {
-          posts,
-          nextPage: posts.length ? `${process.env.API_URL}${nextPage}` : "",
-        },
+        data: await postService.getPosts(
+          username,
+          { page, limit },
+          userService
+        ),
       });
     } catch (e) {
       next(e);
@@ -172,33 +166,33 @@ export const makePostRouter = (
     );
   });
 
-   app.post("/:postId/like", (req, res) => {
-     const dto = parseDtoWithSchema(
-       {
-         userId: req.user.id,
-         postId: req.params.postId,
-       },
-       LikePostSchema
-     );
+  app.post("/:postId/like", (req, res) => {
+    const dto = parseDtoWithSchema(
+      {
+        userId: req.user.id,
+        postId: req.params.postId,
+      },
+      LikePostSchema
+    );
 
-     handleExpress(res, async () => {
-       await likePostService.likePost(dto, userService, postService);
-       return {};
-     });
-   });
+    handleExpress(res, async () => {
+      await likePostService.likePost(dto, userService, postService);
+      return {};
+    });
+  });
 
-   app.delete("/:postId/unlike", (req, res) => {
-     const dto = parseDtoWithSchema(
-       {
-         userId: req.user.id,
-         postId: req.params.postId,
-       },
-       LikePostSchema
-     );
-     handleExpress(res, () =>
-       likePostService.unLikePost(dto, userService, postService)
-     );
-   });
+  app.delete("/:postId/unlike", (req, res) => {
+    const dto = parseDtoWithSchema(
+      {
+        userId: req.user.id,
+        postId: req.params.postId,
+      },
+      LikePostSchema
+    );
+    handleExpress(res, () =>
+      likePostService.unLikePost(dto, userService, postService)
+    );
+  });
 
   app.post("/:postId/bookmark", async (req, res, next) => {
     try {

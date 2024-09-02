@@ -10,6 +10,6 @@ COPY . .
 
 RUN yarn tsc
 
-EXPOSE 5000
+EXPOSE 4000
 
 CMD [ "yarn", "start:dev" ]

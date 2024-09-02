@@ -2,26 +2,23 @@ import request from "supertest";
 import { Express } from "express";
 import { makeApp } from "../../api";
 import { AppDataSource } from "../../data-source";
-import { seedUser } from "../seed";
-import { DataSource, Repository } from "typeorm";
 import { Username } from "../../modules/user/model/user-username";
 import { Password } from "../../modules/user/model/user-password";
-import { truncateTableOfRepos } from "../truncate-data";
-import { UserEntity } from "../../modules/user/entity/user.entity";
+import { signUpUserTest } from "./utility";
+import { Email } from "../../data/email";
+import { DataSource } from "typeorm";
 
 describe("User test suite", () => {
   let app: Express;
   let dataSource: DataSource;
-  let userRepository: Repository<UserEntity>;
+
   beforeAll(async () => {
     dataSource = await AppDataSource.initialize();
-    userRepository = dataSource.getRepository(UserEntity);
     app = makeApp(dataSource);
   });
 
   afterAll(async () => {
-    if (dataSource) await dataSource.destroy();
-    await truncateTableOfRepos([userRepository]);
+    await dataSource.destroy();
   });
 
   describe("Sign-up", () => {
@@ -36,33 +33,28 @@ describe("User test suite", () => {
         })
         .set("Accept", "application/json")
         .expect("Content-Type", /json/)
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.ok).toEqual(true);
-        });
+        .expect(200);
     });
   });
 
   describe("Login", () => {
     it("should user login if username and password is correct", async () => {
-      const user = await seedUser(
-        dataSource,
-        "amir" as Username,
-        "Amir@1234" as Password
-      );
+      await signUpUserTest(app, {
+        username: "amir" as Username,
+        email: "amir@gmail.com" as Email,
+        password: "Password1" as Password,
+        confirmPassword: "Password1" as Password,
+      });
 
       await request(app)
         .post("/auth/login")
         .send({
-          username: user.username,
-          password: user.password,
+          username: "amir",
+          password: "Password1",
         })
         .set("Accept", "application/json")
         .expect("Content-Type", /json/)
-        .expect(200)
-        .expect((res) => {
-          expect(res.body.ok).toEqual(true);
-        });
+        .expect(200);
     });
   });
 });

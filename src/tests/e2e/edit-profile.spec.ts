@@ -2,30 +2,38 @@ import request from "supertest";
 import { Express } from "express";
 import { makeApp } from "../../api";
 import { AppDataSource } from "../../data-source";
+import { DataSource } from "typeorm";
+import { loginUserTest, signUpUserTest } from "./utility";
+import { Username } from "../../modules/user/model/user-username";
+import { Email } from "../../data/email";
+import { Password } from "../../modules/user/model/user-password";
 
-let app: Express;
-let token: string;
-beforeAll(async () => {
-  const dataSource = AppDataSource;
-  app = makeApp(dataSource);
-  await request(app).post("/auth/sign-up").send({
-    username: "testUser",
-    email: "abc@g.com",
-    password: "Pass1234",
-    confirmPassword: "Pass1234",
+describe("Edit Profile", () => {
+  let app: Express;
+  let token: string;
+  let dataSource: DataSource;
+
+  beforeAll(async () => {
+    dataSource = await AppDataSource.initialize();
+    app = makeApp(dataSource);
+
+    await signUpUserTest(app, {
+      username: "testUser" as Username,
+      email: "abc@g.com" as Email,
+      password: "Pass1234" as Password,
+      confirmPassword: "Pass1234" as Password,
+    });
+
+    token = await loginUserTest(app, {
+      username: "testUser" as Username,
+      password: "Pass1234" as Password,
+    });
   });
 
-  const { body: tokenResponse } = await request(app).post("/auth/login").send({
-    username: "testUser",
-    password: "Pass1234",
+  afterAll(async () => {
+    await dataSource.destroy();
   });
 
-  token = tokenResponse.data;
-});
-
-afterAll(async () => {});
-
-describe.skip("Edit Profile", () => {
   it("should fail if user is not logged in.", async () => {
     await request(app).patch("/users/profile").send().expect(401);
   });
@@ -35,13 +43,15 @@ describe.skip("Edit Profile", () => {
     last_name: "Tahamtan",
     bio: "This bio expresses me.",
   };
+
   it("should update profile info.", async () => {
     await request(app)
       .patch("/users/profile")
-      .set({
-        authorization: `Bearer ${token}`,
-      })
       .send(updateInfo)
+      .set("Accept", "application/json")
+      .set({
+        Authorization: `Bearer ${token}`,
+      })
       .expect(200);
   });
 
@@ -52,6 +62,7 @@ describe.skip("Edit Profile", () => {
         username: "testUser",
         password: "Pass1234",
       })
+      .set("Accept", "application/json")
       .expect(200);
 
     token = tokenResponse.data;
@@ -60,13 +71,15 @@ describe.skip("Edit Profile", () => {
   it("should update password", async () => {
     await request(app)
       .patch("/users/profile")
+      .set("Accept", "application/json")
       .set({
-        authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       })
       .send({
         password: "Garsh1234",
         confirmPassword: "Garsh1234",
       })
+      .set("Accept", "application/json")
       .expect(200);
   });
 
@@ -77,6 +90,7 @@ describe.skip("Edit Profile", () => {
         username: "testUser",
         password: "Garsh1234",
       })
+      .set("Accept", "application/json")
       .expect(200);
 
     token = tokenResponse.data;
@@ -85,8 +99,9 @@ describe.skip("Edit Profile", () => {
   it("updated info should be correct.", async () => {
     const { body: userInfo } = await request(app)
       .get("/users/profile")
+      .set("Accept", "application/json")
       .set({
-        authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       })
       .expect(200);
 

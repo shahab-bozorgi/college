@@ -1,3 +1,4 @@
+import { PaginatedResult, paginationInfo } from "../../../data/pagination";
 import { NotFound } from "../../../utilities/http-error";
 import { UserService } from "../../user/user.service";
 import { PostService } from "../post.service";
@@ -45,7 +46,7 @@ export class CommentService {
     dto: GetCommentsDto,
     userService: UserService,
     postService: PostService
-  ) {
+  ): Promise<PaginatedResult<{ comments: Comment[] }>> {
     if ((await postService.findPostById(dto.postId)) === null) {
       throw new NotFound("Post is not found");
     }
@@ -79,6 +80,18 @@ export class CommentService {
       });
     }
 
-    return { comments: parentComments };
+    const { nextPage, totalPages } = paginationInfo(
+      await this.commentRepo.countComments(dto.postId),
+      {
+        page: dto.page,
+        limit: dto.limit,
+      }
+    );
+
+    return {
+      comments: parentComments,
+      nextPage,
+      totalPages,
+    };
   }
 }

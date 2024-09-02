@@ -131,7 +131,7 @@ export const makePostRouter = (
       {
         postId: req.params.postId,
         page: req.query.page,
-        take: req.query.take,
+        limit: req.query.limit,
       },
       GetCommentsSchema
     );

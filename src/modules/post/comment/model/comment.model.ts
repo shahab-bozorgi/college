@@ -11,6 +11,7 @@ export interface Comment {
   description: NoneEmptyString;
   createdAt: Date;
   replies: Comment[];
+  likeCommentsCount: number;
 }
 
 export interface CreateComment {

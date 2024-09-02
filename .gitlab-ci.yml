@@ -6,8 +6,6 @@ stages:
 build:
   stage: build
   image: docker:latest
-  services:
-    - docker:dind
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build -t $CI_REGISTRY_IMAGE:latest .
@@ -24,7 +22,7 @@ test:
     - echo "Wants to test later"
     # - yarn test
   only:
-    - main
+    - backend
 
 deploy:
   stage: deploy
@@ -33,4 +31,4 @@ deploy:
     - apk add --no-cache openssh-client
     - ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST 'docker pull $CI_REGISTRY_IMAGE:latest && docker-compose -f ./docker-compose.yml up -d'
   only:
-    - main
+    - backend

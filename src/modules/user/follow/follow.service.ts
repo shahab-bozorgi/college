@@ -1,3 +1,4 @@
+import { PaginatedResult, paginationInfo } from "../../../data/pagination";
 import {
   BadRequest,
   DuplicatedRecord,
@@ -40,10 +41,24 @@ export class FollowService {
       throw new DuplicatedRecord("Follow record is duplicated!");
     }
 
+    if (following.is_private !== true) {
+      await this.flwRepo.create({
+        followerId: follower.id,
+        followingId: following.id,
+        requestStatus: "accepted",
+      });
+
+      return await this.flwRepo.update({
+        followerId: follower.id,
+        followingId: following.id,
+        requestStatus: "accepted",
+      });
+    }
+
     return await this.flwRepo.create({
       followerId: follower.id,
       followingId: following.id,
-      requestStatus: following.is_private === true ? "pending" : "accepted",
+      requestStatus: "pending",
     });
   }
 
@@ -56,12 +71,10 @@ export class FollowService {
 
   async getFollowers(
     dto: GetFollowerListsDto
-  ): Promise<{ followers: Follower[] }> {
+  ): Promise<PaginatedResult<{ followers: Follower[] }>> {
     const followersEntities = await this.flwRepo.findFollowersByUser(dto);
     const followersUsers: Follower[] = await Promise.all(
       followersEntities.map(async (followerEntity) => {
-        const followersCount = await this.getcountFollowers(followerEntity.id);
-
         return {
           id: followerEntity.id,
           avatar: followerEntity.avatar ? followerEntity.avatar.path : null,
@@ -69,12 +82,24 @@ export class FollowService {
           first_name: followerEntity.first_name,
           last_name: followerEntity.last_name,
           bio: followerEntity.bio,
-          followersCount: followersCount,
+          followersCount: followerEntity.followersCount,
         };
       })
     );
 
-    return { followers: followersUsers };
+    const { nextPage, totalPages } = paginationInfo(
+      await this.flwRepo.countFollowing(dto.followingId),
+      {
+        page: dto.page,
+        limit: dto.limit,
+      }
+    );
+
+    return {
+      followers: followersUsers,
+      nextPage,
+      totalPages,
+    };
   }
 
   async getcountFollowers(followerId: UserId): Promise<number> {
@@ -87,13 +112,11 @@ export class FollowService {
 
   async getFollowings(
     dto: GetFollowingListsDto
-  ): Promise<{ followings: Following[] }> {
+  ): Promise<PaginatedResult<{ followings: Following[] }>> {
     const followingEntities = await this.flwRepo.findFollowingByUser(dto);
 
     const followingUsers = await Promise.all(
       followingEntities.map(async (followingEntity) => {
-        const followersCount = await this.getcountFollowers(followingEntity.id);
-
         return {
           id: followingEntity.id,
           avatar: followingEntity.avatar ? followingEntity.avatar.path : null,
@@ -101,12 +124,24 @@ export class FollowService {
           first_name: followingEntity.first_name,
           last_name: followingEntity.last_name,
           bio: followingEntity.bio,
-          followersCount: followersCount,
+          followersCount: followingEntity.followersCount,
         };
       })
     );
 
-    return { followings: followingUsers };
+    const { nextPage, totalPages } = paginationInfo(
+      await this.flwRepo.countFollowing(dto.followerId),
+      {
+        page: dto.page,
+        limit: dto.limit,
+      }
+    );
+
+    return {
+      followings: followingUsers,
+      nextPage,
+      totalPages,
+    };
   }
 
   async unfollowUser(

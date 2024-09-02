@@ -31,7 +31,7 @@ export interface IFollowRepository {
 export class FollowRepository implements IFollowRepository {
   private flwrepo: Repository<FollowEntity>;
 
-  constructor(dataSource: DataSource) {
+  constructor(private dataSource: DataSource) {
     this.flwrepo = dataSource.getRepository(FollowEntity);
   }
 
@@ -71,18 +71,20 @@ export class FollowRepository implements IFollowRepository {
   async findFollowersByUser(dto: GetFollowerListsDto): Promise<UserEntity[]> {
     const followers = await this.flwrepo.find({
       where: { following: { id: dto.followingId } },
-      relations: ["follower"],
+      relations: ["follower", "follower.avatar"],
     });
+
     return followers.map((follow) => follow.follower);
   }
 
   async findFollowingByUser(dto: GetFollowingListsDto): Promise<UserEntity[]> {
     const followings = await this.flwrepo.find({
       where: { follower: { id: dto.followerId } },
-      relations: ["following"],
+      relations: ["following", "following.avatar"],
       take: dto.limit,
       skip: (dto.page - 1) * dto.limit,
     });
+
     return followings.map((follow) => follow.following);
   }
 
@@ -91,23 +93,79 @@ export class FollowRepository implements IFollowRepository {
   }
 
   async delete(follow: DeleteFollow): Promise<boolean> {
-    return Boolean(
-      (
-        await this.flwrepo.delete({
-          followerId: follow.followerId,
-          followingId: follow.followingId,
-        })
-      ).affected
-    );
+    const queryRunner = this.dataSource.createQueryRunner();
+    const followManagerRepo = queryRunner.manager.getRepository(FollowEntity);
+    const userManagerRepo = queryRunner.manager.getRepository(UserEntity);
+
+    await queryRunner.startTransaction();
+
+    try {
+      await followManagerRepo.delete({
+        followerId: follow.followerId,
+        followingId: follow.followingId,
+      });
+
+      await userManagerRepo.decrement(
+        { id: follow.followerId },
+        "followingsCount",
+        1
+      );
+      await userManagerRepo.decrement(
+        { id: follow.followingId },
+        "followersCount",
+        1
+      );
+
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      console.error("Transaction failed:", err);
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+
+    return true;
   }
 
   async update(follow: UpdateFollow): Promise<Follow> {
-    return await this.flwrepo.save({
-      requestStatus: follow.requestStatus,
-      where: {
-        followerId: follow.followerId,
-        followingId: follow.followingId,
-      },
-    });
+    const queryRunner = this.dataSource.createQueryRunner();
+    const followManagerRepo = queryRunner.manager.getRepository(FollowEntity);
+    const userManagerRepo = queryRunner.manager.getRepository(UserEntity);
+
+    await queryRunner.startTransaction();
+
+    try {
+      await followManagerRepo.update(
+        {
+          followerId: follow.followerId,
+          followingId: follow.followingId,
+        },
+        {
+          requestStatus: follow.requestStatus,
+        }
+      );
+
+      await userManagerRepo.increment(
+        { id: follow.followerId },
+        "followingsCount",
+        1
+      );
+      await userManagerRepo.increment(
+        { id: follow.followingId },
+        "followersCount",
+        1
+      );
+
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      console.error("Transaction failed:", err);
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+
+    return follow;
   }
 }

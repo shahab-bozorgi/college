@@ -46,6 +46,12 @@ export class UserEntity {
   @Column({ default: false })
   is_private!: boolean;
 
+  @Column({ default: 0 })
+  followersCount!: number;
+
+  @Column({ default: 0 })
+  followingsCount!: number;
+
   @OneToMany(() => PostEntity, (post) => post.author)
   posts!: PostEntity[];
 

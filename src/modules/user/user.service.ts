@@ -137,8 +137,18 @@ export class UserService {
         authenticatedUser.id,
         user.id
       );
-      userProfile.followingStatus = Boolean(followingStatus);
+
+      if (followingStatus?.requestStatus === "accepted") {
+        userProfile.followingStatus = "Followed";
+      } else if (followingStatus?.requestStatus === "pending") {
+        userProfile.followingStatus = "PendingApproval";
+      } else {
+        userProfile.followingStatus = "NotFollowed";
+      }
+    } else {
+      userProfile.followingStatus = "Followed";
     }
+
     return userProfile;
   }
 

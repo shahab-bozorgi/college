@@ -3,6 +3,8 @@ import { UserId } from "./user-user-id";
 import { Username } from "./user-username";
 import { Media } from "../../media/media.model";
 
+export type FollowingStatus = "Followed" | "NotFollowed" | "PendingApproval";
+
 export interface User {
   id: UserId;
   first_name?: string;
@@ -49,5 +51,5 @@ export interface UserProfile {
   followersCount: number;
   postsCount: number;
   bio?: string;
-  followingStatus?: boolean;
+  followingStatus?: FollowingStatus;
 }

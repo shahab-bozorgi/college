@@ -8,6 +8,8 @@ services:
     depends_on:
       - db
     environment:
+      - DB_PORT="3307"
+      - DB_HOST="127.0.0.1"
       - DB_NAME="collegegram_dev"
       - DB_USERNAME="college_admin"
       - DB_PASS="eAA<4v|15iX"

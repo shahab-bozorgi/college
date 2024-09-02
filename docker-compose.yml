@@ -8,15 +8,15 @@ services:
     depends_on:
       - db
     environment:
-      - DB_NAME=collegegram_dev
-      - DB_USERNAME=college_admin
+      - DB_NAME="collegegram_dev"
+      - DB_USERNAME="college_admin"
       - DB_PASS="eAA<4v|15iX"
-      - SECRET_KEY=fBB>5w&26jY
-      - CLIENT_URL=http://5.34.194.155
-      - API_URL=http://5.34.194.155:4000
+      - SECRET_KEY="fBB>5w&26jY"
+      - CLIENT_URL="http://5.34.194.155"
+      - API_URL="http://5.34.194.155:4000"
       - PORT=4000
-      - MAIL_HOST=smtp.gmail.com
-      - MAIL_USERNAME=collegegram.cherryring@gmail.com
+      - MAIL_HOST="smtp.gmail.com"
+      - MAIL_USERNAME="collegegram.cherryring@gmail.com"
       - MAIL_PASS="pirc itsz ljco cdhj"
 
     volumes:

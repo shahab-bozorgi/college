@@ -12,4 +12,4 @@ RUN yarn tsc
 
 EXPOSE 4000
 
-CMD [ "node", "dist/app.js" ]
+CMD [ "yarn", "start" ]

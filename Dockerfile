@@ -8,7 +8,7 @@ RUN yarn install
 
 COPY . .
 
-RUN yarn tsc
+RUN tsc
 
 RUN [ -d dist ] || (echo "Build directory not found!" && exit 1)
 

@@ -23,7 +23,7 @@ services:
 
     volumes:
       - .:app
-      - /var/www/collegegram/frontend/uploads:app/uploads
+      - '/var/www/collegegram/frontend/uploads:/app/uploads:rw'
 
     restart: on-failure
 

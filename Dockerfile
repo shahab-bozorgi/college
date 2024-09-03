@@ -10,6 +10,8 @@ COPY . .
 
 RUN yarn tsc
 
+COPY /usr/src/app/dist ./dist
+
 EXPOSE 4000
 
 CMD [ "yarn", "start" ]

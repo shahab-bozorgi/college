@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  PrimaryColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
@@ -13,13 +14,10 @@ import { CommentEntity } from "../../entity/comment.entity";
 
 @Entity("like_comments")
 export class LikeCommentEntity {
-  @PrimaryGeneratedColumn("increment")
-  id!: number;
-
-  @Column()
+  @PrimaryColumn()
   userId!: UserId;
 
-  @Column()
+  @PrimaryColumn()
   commentId!: CommentId;
 
   @ManyToOne(() => UserEntity, (user) => user.likeComments, {

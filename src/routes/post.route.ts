@@ -162,7 +162,7 @@ export const makePostRouter = (
       LikeCommentSchema
     );
     handleExpress(res, () =>
-      likeCommentService.createLikeComment(dto, userService, commentService)
+      likeCommentService.deleteLikeComment(dto, userService, commentService)
     );
   });
 

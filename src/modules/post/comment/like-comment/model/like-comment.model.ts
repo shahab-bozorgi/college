@@ -12,6 +12,11 @@ export interface CreateLikeComment {
   commentId: CommentId;
 }
 
+export interface GetLikeComment {
+  userId: UserId;
+  commentId: CommentId;
+}
+
 export interface DeleteLikeComment {
   userId: UserId;
   commentId: CommentId;

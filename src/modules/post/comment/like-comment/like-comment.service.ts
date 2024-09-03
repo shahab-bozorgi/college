@@ -1,4 +1,4 @@
-import { NotFound } from "../../../../utilities/http-error";
+import { DuplicatedRecord, NotFound } from "../../../../utilities/http-error";
 import { UserService } from "../../../user/user.service";
 import { CommentService } from "../comment.service";
 import { LikeCommentDto } from "./dto/like-comment.dto";
@@ -13,6 +13,15 @@ export class LikeCommentService {
     userService: UserService,
     commentService: CommentService
   ) {
+    if (
+      (await this.likeCommentRepo.getLikeComment({
+        userId: dto.userId,
+        commentId: dto.commentId,
+      })) !== null
+    ) {
+      throw new DuplicatedRecord("This comment liked by this user");
+    }
+
     if ((await commentService.getCommentById(dto.commentId)) === null) {
       throw new NotFound("Comment is not found");
     }
@@ -32,6 +41,16 @@ export class LikeCommentService {
     userService: UserService,
     commentService: CommentService
   ) {
+
+    if (
+      (await this.likeCommentRepo.getLikeComment({
+        userId: dto.userId,
+        commentId: dto.commentId,
+      })) === null
+    ) {
+      throw new NotFound("This comment did not like by this user");
+    }
+
     if ((await commentService.getCommentById(dto.commentId)) === null) {
       throw new NotFound("Comment is not found");
     }

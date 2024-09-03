@@ -2,14 +2,15 @@ import { DataSource, Repository } from "typeorm";
 import {
   CreateLikeComment,
   DeleteLikeComment,
+  GetLikeComment,
   LikeComment,
 } from "./model/like-comment.model";
 import { LikeCommentEntity } from "./entity/like-comment.entity";
-import { v4 } from "uuid";
 import { CommentEntity } from "../entity/comment.entity";
 
 export interface ILikeCommentRepository {
   create(likeComment: CreateLikeComment): Promise<LikeComment>;
+  getLikeComment(likeComment: GetLikeComment): Promise<LikeComment | null>;
   delete(likeComment: DeleteLikeComment): Promise<boolean>;
 }
 
@@ -48,6 +49,15 @@ export class LikeCommentRepository implements ILikeCommentRepository {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async getLikeComment(
+    likeComment: GetLikeComment
+  ): Promise<LikeComment | null> {
+    return await this.repo.findOneBy({
+      userId: likeComment.userId,
+      commentId: likeComment.commentId,
+    });
   }
 
   async delete(likeComment: DeleteLikeComment) {

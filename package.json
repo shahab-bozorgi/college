@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "cross-env NODE_ENV=production node dist/src/app.js",
+    "start": "cross-env NODE_ENV=production node dist/app.js",
     "start:dev": "cross-env NODE_ENV=development ts-node src/app.ts",
     "test": "cross-env NODE_ENV=test jest --testMatch='**/src/tests/unit/**/*.spec.ts'",
     "test:e2e": "cross-env NODE_ENV=test jest --testMatch='**/src/tests/e2e/**/*.spec.ts'"

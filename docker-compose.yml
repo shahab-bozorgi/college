@@ -22,10 +22,8 @@ services:
       - MAIL_PASS="pirc itsz ljco cdhj"
 
     volumes:
-      - .:app
-      - type: bind
-        source: ./uploads
-        target: /var/www/collegegram/frontend/uploads
+      - ./src:/src
+      - /var/www/collegegram/frontend/uploads:/uploads
 
     restart: on-failure
 

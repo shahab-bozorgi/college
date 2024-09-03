@@ -6,9 +6,9 @@ COPY package.json yarn.lock ./
 
 RUN yarn install
 
-RUN yarn tsc
-
 COPY . .
+
+RUN yarn tsc
 
 EXPOSE 4000
 

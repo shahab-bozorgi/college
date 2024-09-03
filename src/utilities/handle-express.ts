@@ -7,6 +7,7 @@ export const handleExpress = async <T>(res: Response, cb: () => Promise<T>) => {
     const data = await cb();
     res.status(200).json({ ok: true, data });
   } catch (error) {
+    console.log(error);
     if (error instanceof HttpError) {
       res.status(error.code).json({
         ok: false,
@@ -29,6 +30,7 @@ export const expressHandler = async <T>(
     const data = await cb();
     res.status(200).json({ ok: true, data });
   } catch (error) {
+    console.log(error);
     errorHandler(error, req, res, () => {});
   }
 };

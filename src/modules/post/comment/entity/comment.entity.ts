@@ -56,7 +56,7 @@ export class CommentEntity {
   @OneToMany(() => LikeCommentEntity, (likeComment) => likeComment.comment)
   likeComments!: LikeCommentEntity[];
 
-  @Column()
+  @Column({ default: 0 })
   likeCommentsCount!: number;
 
   @CreateDateColumn()

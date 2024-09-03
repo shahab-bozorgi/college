@@ -1,6 +1,6 @@
 FROM hub.hamdocker.ir/node:18-alpine
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 COPY package.json yarn.lock ./
 

@@ -22,7 +22,9 @@ services:
       - MAIL_PASS="pirc itsz ljco cdhj"
 
     volumes:
-      - .:/usr/src/app
+      - .:/app
+      - /uploads:/app/uploads
+
     restart: on-failure
 
   db:

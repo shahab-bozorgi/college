@@ -8,9 +8,7 @@ RUN yarn install
 
 COPY . .
 
-RUN tsc
-
-RUN [ -d dist ] || (echo "Build directory not found!" && exit 1)
+RUN npx tsc
 
 EXPOSE 4000
 

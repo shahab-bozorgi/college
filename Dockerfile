@@ -10,7 +10,7 @@ COPY . .
 
 RUN yarn tsc
 
-COPY /usr/src/app/dist ./dist
+RUN [ -d dist ] || (echo "Build directory not found!" && exit 1)
 
 EXPOSE 4000
 

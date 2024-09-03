@@ -20,8 +20,9 @@ export class MediaEntity {
   @Column()
   path!: string;
 
+  url!: string;
   @AfterLoad()
   setUrl() {
-    this.path = `${process.env.API_URL}/${this.path}`;
+    this.url = `${process.env.API_URL}/${this.path}`;
   }
 }

@@ -1,4 +1,3 @@
-import { NoneEmptyString } from "../../../data/non-empty-string";
 import { Media } from "../../media/media.model";
 import { Tag } from "../../tag/tag.model";
 import { UserId } from "../../user/model/user-user-id";
@@ -10,7 +9,7 @@ import { Bookmark } from "../bookmark/model/bookmark.model";
 
 export interface Post {
   id: PostId;
-  caption: NoneEmptyString;
+  caption: string;
   authorId: UserId;
   createdAt: Date;
 }
@@ -28,21 +27,21 @@ export type PostSelectedRelations<R extends Array<keyof PostRelations>> = {
 };
 
 export interface CreatePost
-  extends Partial<PostSelectedRelations<["tags", "mentions"]>> {
-  caption: NoneEmptyString;
-  author: User;
-  media: Media[];
+  extends Partial<
+    PostSelectedRelations<["tags", "mentions", "media", "author"]>
+  > {
+  caption: string;
 }
 
 export interface UpdatePost
   extends Partial<PostSelectedRelations<["tags", "mentions", "media"]>> {
   id: PostId;
-  caption?: NoneEmptyString;
+  caption: string;
 }
 
 export interface ShowPost {
   id: PostId;
-  caption: NoneEmptyString;
+  caption: string;
   author: {
     first_name?: string;
     last_name?: string;

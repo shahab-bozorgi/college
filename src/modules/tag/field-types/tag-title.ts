@@ -2,7 +2,7 @@ import { Brand } from "../../../utilities/brand";
 
 export type TagTitle = Brand<string, "TagTitle">;
 
-const tagPattern = /#([\w\u0600-\u06FF]+)(?=\s|#|$)/g;
+const tagPattern = /#([\w\u0600-\u06FF]+)/g;
 
 export const extractTag = (value: string): TagTitle[] => {
   return [...value.matchAll(tagPattern)]

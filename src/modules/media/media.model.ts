@@ -8,6 +8,7 @@ export interface Media {
   mime: MIME;
   size: number;
   path: string;
+  url: string;
 }
 
 export interface CreateMedia {

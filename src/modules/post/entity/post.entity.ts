@@ -11,7 +11,6 @@ import {
 import { PostId } from "../model/post-id";
 import { UserEntity } from "../../user/entity/user.entity";
 import { MediaEntity } from "../../media/media.entity";
-import { NoneEmptyString } from "../../../data/non-empty-string";
 import { TagEntity } from "../../tag/tag.entity";
 import { UserId } from "../../user/model/user-user-id";
 import { CommentEntity } from "../comment/entity/comment.entity";
@@ -29,8 +28,8 @@ export class PostEntity {
   @ManyToOne(() => UserEntity, (author) => author.posts, { nullable: false })
   author!: UserEntity;
 
-  @Column("text")
-  caption!: NoneEmptyString;
+  @Column("text", { nullable: true })
+  caption!: string;
 
   @CreateDateColumn()
   createdAt!: Date;

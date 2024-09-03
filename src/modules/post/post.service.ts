@@ -67,9 +67,11 @@ export class PostService {
     );
 
     let tags: Tag[] = [];
-    const extractedTags = extractTag(dto.caption);
-    if (extractedTags.length) {
-      tags = await tagService.insert(extractedTags);
+    if (dto.caption) {
+      const extractedTags = extractTag(dto.caption);
+      if (extractedTags.length) {
+        tags = await tagService.insert(extractedTags);
+      }
     }
 
     await this.postRepo.create({
@@ -119,7 +121,7 @@ export class PostService {
 
   async update(
     postId: PostId,
-    authorId: UserId,
+    loggedInUserId: UserId,
     dto: UpdatePostDto,
     userService: UserService,
     tagService: TagService,
@@ -134,12 +136,8 @@ export class PostService {
 
     if (!post) throw new NotFound("Post not found");
 
-    if (post.author.id !== authorId) throw new Forbidden("Access Forbidden");
-
-    if (dto.caption) {
-      post.caption = dto.caption;
-      post.tags = await tagService.insert(extractTag(dto.caption));
-    }
+    if (post.author.id !== loggedInUserId)
+      throw new Forbidden("Access Forbidden");
 
     if (!dto.mentions) {
       post.mentions = [];
@@ -150,19 +148,31 @@ export class PostService {
     }
 
     const deletedMedia = dto.deletedMedia;
-    if (deletedMedia) {
-      const postMediaIds = post.media.map((md) => md.id);
-      if (deletedMedia.find((dm) => !postMediaIds.includes(dm)))
+    if (deletedMedia && deletedMedia.length) {
+      if (
+        deletedMedia.find(
+          (deletedId) => !post.media.some((media) => media.id === deletedId)
+        )
+      )
         throw new BadRequest("Wrong media ids to delete.");
 
       const remainingMedia = post.media.filter(
-        (md) => !deletedMedia.includes(md.id)
+        (media) => !deletedMedia.includes(media.id)
       );
       if (!remainingMedia.length && (!files || (files && !files.length)))
         throw new BadRequest("You cannot delete all of the post's media.");
 
       await this.mediaService.delete(deletedMedia);
       post.media = remainingMedia;
+    }
+
+    post.caption = dto.caption;
+    post.tags = [];
+    if (dto.caption) {
+      const extractedTags = extractTag(dto.caption);
+      if (extractedTags.length) {
+        post.tags = await tagService.insert(extractedTags);
+      }
     }
 
     if (files && files.length) {
@@ -207,5 +217,4 @@ export class PostService {
   async findPostById(id: PostId): Promise<Post | null> {
     return await this.postRepo.findById(id);
   }
-
 }

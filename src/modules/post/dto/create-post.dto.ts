@@ -1,10 +1,9 @@
 import { z } from "zod";
-import { isNoneEmptyString } from "../../../data/non-empty-string";
-import { zodMention } from "../model/mention";
+import { zodMentionString } from "../model/mention";
 
 export const CreatePostSchema = z.object({
-  caption: z.string().refine(isNoneEmptyString),
-  mentions: zodMention.nullish(),
+  caption: z.string(),
+  mentions: zodMentionString,
 });
 
 export type CreatePostDto = z.infer<typeof CreatePostSchema>;

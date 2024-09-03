@@ -23,7 +23,9 @@ services:
 
     volumes:
       - .:app
-      - '/var/www/collegegram/frontend/uploads:/app/uploads:rw'
+      - type: bind
+        source: ./uploads
+        target: /var/www/collegegram/frontend/uploads
 
     restart: on-failure
 

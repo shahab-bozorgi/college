@@ -130,7 +130,7 @@ export class FollowService {
     );
 
     const { nextPage, totalPages } = paginationInfo(
-      await this.flwRepo.countFollowing(dto.followerId),
+      await this.flwRepo.countFollowers(dto.followerId),
       {
         page: dto.page,
         limit: dto.limit,

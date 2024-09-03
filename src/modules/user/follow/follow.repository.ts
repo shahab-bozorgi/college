@@ -10,6 +10,7 @@ import {
 import { UserEntity } from "../entity/user.entity";
 import { GetFollowerListsDto } from "./dto/get-followers.dto";
 import { GetFollowingListsDto } from "./dto/get-followings.dto";
+import { paginationSkip } from "../../../data/pagination";
 
 export interface IFollowRepository {
   findFollowing(user: UserEntity): Promise<Follow[]>;
@@ -72,6 +73,8 @@ export class FollowRepository implements IFollowRepository {
     const followers = await this.flwrepo.find({
       where: { following: { id: dto.followingId } },
       relations: ["follower", "follower.avatar"],
+      skip: paginationSkip({ page: dto.page, limit: dto.limit }),
+      take: dto.limit,
     });
 
     return followers.map((follow) => follow.follower);
@@ -81,8 +84,8 @@ export class FollowRepository implements IFollowRepository {
     const followings = await this.flwrepo.find({
       where: { follower: { id: dto.followerId } },
       relations: ["following", "following.avatar"],
+      skip: paginationSkip({ page: dto.page, limit: dto.limit }),
       take: dto.limit,
-      skip: (dto.page - 1) * dto.limit,
     });
 
     return followings.map((follow) => follow.following);

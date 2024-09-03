@@ -23,6 +23,7 @@ services:
 
     volumes:
       - .:/usr/src/app
+    restart: on-failure
 
   db:
     image: hub.hamdocker.ir/mysql:8.0
@@ -35,6 +36,7 @@ services:
       - 3306:3306
     volumes:
       - mysql_data:/var/lib/mysql
+    restart: always
 
 volumes:
   mysql_data:

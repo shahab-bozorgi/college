@@ -54,26 +54,26 @@
  *                          "description": "This is a nice post",
  *                          "replies": [
  *                              {
-        *                          "id": "adc5cadf-5c67-7d26-9dd4-996381a2bdc1",
-        *                          "postId": "365028a0-4562-9dd4-8a62-3fdeb4801b1c",
-        *                          "parentId": "781d31da-5c67-406b-9dd4-996381a2bdc1",
-        *                          "likeCommentsCount": 10,
-        *                          "description": "Thanks",                
-        *                          "createdAt": "2024-08-25T08:37:19.860Z",
-        *                          "user": {
-              *                          "id": "d9ae9bd5-abf8-4dc6-ade2-9b23f71615ff",
-              *                          "first_name": "john",
-              *                          "last_name": "Doe",
-              *                          "username": "johndoe"
-        *                          },
-        *                      }
- *                          ],               
+ *                          "id": "adc5cadf-5c67-7d26-9dd4-996381a2bdc1",
+ *                          "postId": "365028a0-4562-9dd4-8a62-3fdeb4801b1c",
+ *                          "parentId": "781d31da-5c67-406b-9dd4-996381a2bdc1",
+ *                          "likeCommentsCount": 10,
+ *                          "description": "Thanks",
+ *                          "createdAt": "2024-08-25T08:37:19.860Z",
+ *                          "user": {
+ *                          "id": "d9ae9bd5-abf8-4dc6-ade2-9b23f71615ff",
+ *                          "firstName": "john",
+ *                          "lastName": "Doe",
+ *                          "username": "johndoe"
+ *                          },
+ *                      }
+ *                          ],
  *                          "createdAt": "2024-08-24T02:37:19.860Z",
  *                          "user": {
-       *                          "id": "d9ae9bd5-abf8-4dc6-ade2-9b23f71615ff",
-       *                          "first_name": "john",
-       *                          "last_name": "Doe",
-       *                          "username": "johndoe"
+ *                          "id": "d9ae9bd5-abf8-4dc6-ade2-9b23f71615ff",
+ *                          "firstName": "john",
+ *                          "lastName": "Doe",
+ *                          "username": "johndoe"
  *                          },
  *                      },
  *                      {
@@ -81,13 +81,13 @@
  *                          "postId": "365028a0-4562-9dd4-8a62-3dkie4801b1c",
  *                          "parentId": null,
  *                          "likeCommentsCount": 0,
- *                          "description": "Thanks",                
+ *                          "description": "Thanks",
  *                          "createdAt": "2024-08-25T08:37:19.860Z",
  *                          "user": {
-       *                          "id": "d9ae9bd5-abf8-4dc6-ade2-9b23f71615ff",
-       *                          "first_name": "john",
-       *                          "last_name": "Doe",
-       *                          "username": "johndoe"
+ *                          "id": "d9ae9bd5-abf8-4dc6-ade2-9b23f71615ff",
+ *                          "firstName": "john",
+ *                          "lastName": "Doe",
+ *                          "username": "johndoe"
  *                          },
  *                      }
  *                  ]

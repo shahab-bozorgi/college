@@ -29,8 +29,8 @@ export interface ShowComment {
   user: {
     id: UserId;
     username: Username;
-    first_name: string;
-    last_name: string;
+    firstName: string;
+    lastName: string;
   };
   parentId: CommentId | null;
   description: NoneEmptyString;

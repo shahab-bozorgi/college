@@ -44,8 +44,8 @@ export class CommentRepository implements ICommentRepository {
         user: {
           id: true,
           username: true,
-          first_name: true,
-          last_name: true,
+          firstName: true,
+          lastName: true,
         },
       },
       take: query.limit,

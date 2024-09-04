@@ -49,7 +49,6 @@
  *                      {
  *                          "id": "781d31da-5c67-406b-9dd4-996381a2bdc1",
  *                          "postId": "365028a0-4562-9dd4-8a62-3fdeb4801b1c",
- *                          "userId": "2a657f79-cb50-49d5-9aa5-eb4faf773b66",
  *                          "parentId": null,
  *                          "likeCommentsCount": 2,
  *                          "description": "This is a nice post",
@@ -57,23 +56,39 @@
  *                              {
         *                          "id": "adc5cadf-5c67-7d26-9dd4-996381a2bdc1",
         *                          "postId": "365028a0-4562-9dd4-8a62-3fdeb4801b1c",
-        *                          "userId": "144028a0-ac7e-46c3-afcc-3379984c577f",
         *                          "parentId": "781d31da-5c67-406b-9dd4-996381a2bdc1",
         *                          "likeCommentsCount": 10,
         *                          "description": "Thanks",                
         *                          "createdAt": "2024-08-25T08:37:19.860Z",
+        *                          "user": {
+              *                          "id": "d9ae9bd5-abf8-4dc6-ade2-9b23f71615ff",
+              *                          "first_name": "john",
+              *                          "last_name": "Doe",
+              *                          "username": "johndoe"
+        *                          },
         *                      }
  *                          ],               
  *                          "createdAt": "2024-08-24T02:37:19.860Z",
+ *                          "user": {
+       *                          "id": "d9ae9bd5-abf8-4dc6-ade2-9b23f71615ff",
+       *                          "first_name": "john",
+       *                          "last_name": "Doe",
+       *                          "username": "johndoe"
+ *                          },
  *                      },
  *                      {
  *                          "id": "kis5cadf-5c67-7d26-9dd4-996381a2duj1",
  *                          "postId": "365028a0-4562-9dd4-8a62-3dkie4801b1c",
- *                          "userId": "462938a0-ac7e-46c3-afcc-3379984c928y",
  *                          "parentId": null,
  *                          "likeCommentsCount": 0,
  *                          "description": "Thanks",                
  *                          "createdAt": "2024-08-25T08:37:19.860Z",
+ *                          "user": {
+       *                          "id": "d9ae9bd5-abf8-4dc6-ade2-9b23f71615ff",
+       *                          "first_name": "john",
+       *                          "last_name": "Doe",
+       *                          "username": "johndoe"
+ *                          },
  *                      }
  *                  ]
  *               }

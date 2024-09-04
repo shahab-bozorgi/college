@@ -40,7 +40,7 @@ export class FollowService {
       throw new DuplicatedRecord("Follow record is duplicated!");
     }
 
-    if (following.is_private !== true) {
+    if (following.isPrivate !== true) {
       await this.flwRepo.create({
         followerId: follower.id,
         followingId: following.id,

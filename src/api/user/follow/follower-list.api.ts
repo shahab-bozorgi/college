@@ -65,10 +65,10 @@
  *                           username:
  *                             type: string
  *                             description: Username of the follower
- *                           first_name:
+ *                           firstName:
  *                             type: string
  *                             description: First name of the follower
- *                           last_name:
+ *                           lastName:
  *                             type: string
  *                             description: Last name of the follower
  *                           bio:

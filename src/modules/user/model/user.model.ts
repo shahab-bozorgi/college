@@ -7,14 +7,14 @@ export type FollowingStatus = "Followed" | "NotFollowed" | "PendingApproval";
 
 export interface User {
   id: UserId;
-  first_name?: string;
-  last_name?: string;
+  firstName?: string;
+  lastName?: string;
   avatar?: Media;
   bio?: string;
   username: Username;
   password: string;
   email: Email;
-  is_private?: boolean;
+  isPrivate?: boolean;
   followersCount?: number;
   followingsCount?: number;
 }
@@ -26,12 +26,12 @@ export interface CreateUser {
 }
 
 export interface UpdateUser {
-  first_name?: string;
-  last_name?: string;
+  firstName?: string;
+  lastName?: string;
   bio?: string;
   password?: string;
   email?: Email;
-  is_private?: boolean;
+  isPrivate?: boolean;
   avatar?: Media;
 }
 

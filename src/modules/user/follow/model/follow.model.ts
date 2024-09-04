@@ -29,8 +29,8 @@ export interface UpdateFollow {
 
 interface UserInFollowList {
   id: UserId;
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
   username: Username;
   avatar: Media;
   followersCount: number;

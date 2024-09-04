@@ -43,8 +43,8 @@ export interface ShowPost {
   id: PostId;
   caption: string;
   author: {
-    first_name?: string;
-    last_name?: string;
+    firstName?: string;
+    lastName?: string;
     username: Username;
     avatar?: Media;
   };

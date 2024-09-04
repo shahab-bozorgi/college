@@ -39,8 +39,8 @@ describe("Edit Profile", () => {
   });
 
   const updateInfo = {
-    first_name: "Garshasb",
-    last_name: "Tahamtan",
+    firstName: "Garshasb",
+    lastName: "Tahamtan",
     bio: "This bio expresses me.",
   };
 
@@ -105,11 +105,11 @@ describe("Edit Profile", () => {
       })
       .expect(200);
 
-    expect(userInfo.data.first_name).toBe(updateInfo.first_name);
-    expect(userInfo.data.last_name).toBe(updateInfo.last_name);
+    expect(userInfo.data.firstName).toBe(updateInfo.firstName);
+    expect(userInfo.data.lastName).toBe(updateInfo.lastName);
     expect(userInfo.data.bio).toBe(updateInfo.bio);
     expect(userInfo.data.username).toBe("testUser");
     expect(userInfo.data.email).toBe("abc@g.com");
-    expect(userInfo.data.is_private).toBe(false);
+    expect(userInfo.data.isPrivate).toBe(false);
   });
 });

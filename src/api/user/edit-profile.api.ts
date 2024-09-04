@@ -24,11 +24,11 @@
  *           schema:
  *             type: object
  *             properties:
- *               first_name:
+ *               firstName:
  *                 type: string
  *                 description: User's first name
  *                 example: john
- *               last_name:
+ *               lastName:
  *                 type: string
  *                 description: User's last name
  *                 example: Doe
@@ -36,7 +36,7 @@
  *                 type: string
  *                 description: User's biography
  *                 example: I am John Doe. A fictional character.
- *               is_private:
+ *               isPrivate:
  *                 type: boolean
  *                 description: Specifies privacy setting on user's profile
  *                 example: true

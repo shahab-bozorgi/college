@@ -26,10 +26,10 @@ export class UserEntity {
   id!: UserId;
 
   @Column({ nullable: true })
-  first_name!: string;
+  firstName!: string;
 
   @Column({ nullable: true })
-  last_name!: string;
+  lastName!: string;
 
   @Column({ unique: true })
   email!: Email;
@@ -44,7 +44,7 @@ export class UserEntity {
   bio!: string;
 
   @Column({ default: false })
-  is_private!: boolean;
+  isPrivate!: boolean;
 
   @Column({ default: 0 })
   followersCount!: number;

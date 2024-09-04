@@ -5,8 +5,8 @@ export interface Following {
   id: UserId;
   avatar: string | null;
   username: Username;
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
   bio: string;
   followersCount: number;
 }

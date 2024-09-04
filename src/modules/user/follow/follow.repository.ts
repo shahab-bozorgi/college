@@ -100,8 +100,8 @@ export class FollowRepository implements IFollowRepository {
       followers: result[0].map((rs) => {
         return {
           id: rs.follower.id,
-          first_name: rs.follower.first_name,
-          last_name: rs.follower.last_name,
+          firstName: rs.follower.firstName,
+          lastName: rs.follower.lastName,
           username: rs.follower.username,
           avatar: rs.follower.avatar,
           followersCount: rs.follower.followersCount,
@@ -128,8 +128,8 @@ export class FollowRepository implements IFollowRepository {
       followings: result[0].map((rs) => {
         return {
           id: rs.following.id,
-          first_name: rs.following.first_name,
-          last_name: rs.following.last_name,
+          firstName: rs.following.firstName,
+          lastName: rs.following.lastName,
           username: rs.following.username,
           avatar: rs.following.avatar,
           followersCount: rs.following.followersCount,

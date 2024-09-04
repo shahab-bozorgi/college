@@ -66,10 +66,10 @@
  *                           username:
  *                             type: string
  *                             description: Username of the followed user
- *                           first_name:
+ *                           firstName:
  *                             type: string
  *                             description: First name of the followed user
- *                           last_name:
+ *                           lastName:
  *                             type: string
  *                             description: Last name of the followed user
  *                           bio:

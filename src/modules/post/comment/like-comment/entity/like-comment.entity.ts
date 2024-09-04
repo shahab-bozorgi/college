@@ -1,10 +1,8 @@
 import {
-  Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
   PrimaryColumn,
-  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
 import { CommentId } from "../../model/comment-id";

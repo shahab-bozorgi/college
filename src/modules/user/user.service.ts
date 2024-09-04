@@ -104,11 +104,11 @@ export class UserService {
 
     return await this.userRepo.update({
       ...user,
-      first_name: dto.first_name,
-      last_name: dto.last_name,
+      firstName: dto.firstName,
+      lastName: dto.lastName,
       bio: dto.bio,
       email: dto.email,
-      is_private: dto.is_private,
+      isPrivate: dto.isPrivate,
     });
   }
 
@@ -127,10 +127,10 @@ export class UserService {
       id: user.id,
       avatar: user.avatar,
       username: user.username,
-      firstName: user.first_name,
-      lastName: user.last_name,
+      firstName: user.firstName,
+      lastName: user.lastName,
       bio: user.bio,
-      isPrivate: user.is_private,
+      isPrivate: user.isPrivate,
       followingsCount: user.followingsCount,
       followersCount: user.followersCount,
       postsCount: await postService.getPostsCount(user),

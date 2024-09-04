@@ -37,8 +37,8 @@
  *                "id": "781d31da-5c67-406b-9dd4-996381a2bdc1",
  *                "caption": "some caption",
  *                "author": {
- *                    "first_name": "name",
- *                    "last_name": "lname",
+ *                    "firstName": "name",
+ *                    "lastName": "lname",
  *                    "username": "username",
  *                    "avatar": {
  *                        "id": "b17b5225-4b0c-4236-9119-aeed0c9534f5",

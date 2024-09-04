@@ -28,7 +28,7 @@ describe("Update user", () => {
     username: "newUsername" as Username,
     password: "newPassword" as Password,
     bio: "newBio",
-    is_private: true,
+    isPrivate: true,
   };
 
   it("Should return true if update was done.", async () => {
@@ -37,6 +37,6 @@ describe("Update user", () => {
     expect(updatedUser?.username).toBe(newInfo.username);
     expect(updatedUser?.password).toBe(newInfo.password);
     expect(updatedUser?.bio).toBe(newInfo.bio);
-    expect(updatedUser?.is_private).toBe(newInfo.is_private);
+    expect(updatedUser?.isPrivate).toBe(newInfo.isPrivate);
   });
 });

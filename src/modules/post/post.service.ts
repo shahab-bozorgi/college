@@ -103,8 +103,8 @@ export class PostService {
       id: post.id,
       caption: post.caption,
       author: {
-        first_name: post.author.first_name,
-        last_name: post.author.last_name,
+        firstName: post.author.firstName,
+        lastName: post.author.lastName,
         username: post.author.username,
         avatar,
       },

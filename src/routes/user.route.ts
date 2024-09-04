@@ -90,6 +90,19 @@ export const makeUserRouter = (
     });
   });
 
+  app.delete("/followers/:followerId/delete", (req, res) => {
+    const dto = parseDtoWithSchema(
+      {
+        followerId: req.params.followerId,
+        followingId: req.user.id,
+      },
+      UnFollowDto
+    );
+    expressHandler(req, res, () =>
+      followService.unfollowUser(dto.followerId, dto.followingId, userService)
+    );
+  });
+
   app.get("/:userId/followers", async (req, res) => {
     const dto = parseDtoWithSchema(
       {

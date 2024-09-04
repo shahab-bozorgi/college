@@ -6,7 +6,7 @@ import { ICommentRepository } from "./comment.repository";
 import { CreateCommentDto } from "./dto/create-comment.dto";
 import { GetCommentsDto } from "./dto/get-comments.dto";
 import { CommentId } from "./model/comment-id";
-import { Comment } from "./model/comment.model";
+import { Comment, ShowComment } from "./model/comment.model";
 
 export class CommentService {
   constructor(private commentRepo: ICommentRepository) {}
@@ -46,14 +46,14 @@ export class CommentService {
     dto: GetCommentsDto,
     userService: UserService,
     postService: PostService
-  ): Promise<PaginatedResult<{ comments: Comment[] }>> {
+  ): Promise<PaginatedResult<{ comments: ShowComment[] }>> {
     if ((await postService.findPostById(dto.postId)) === null) {
       throw new NotFound("Post is not found");
     }
 
     const comments = await this.commentRepo.getAll(dto);
 
-    let parentComments: Comment[] = [];
+    let parentComments: ShowComment[] = [];
 
     if (comments !== null) {
       parentComments = comments.filter((comment) => comment.parentId === null);

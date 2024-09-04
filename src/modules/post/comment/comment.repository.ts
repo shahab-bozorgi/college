@@ -1,6 +1,6 @@
 import { DataSource, Repository } from "typeorm";
 import { CreateCommentDto } from "./dto/create-comment.dto";
-import { Comment } from "./model/comment.model";
+import { Comment, ShowComment } from "./model/comment.model";
 import { v4 } from "uuid";
 import { CommentEntity } from "./entity/comment.entity";
 import { GetCommentsDto } from "./dto/get-comments.dto";
@@ -10,7 +10,7 @@ import { PostId } from "../model/post-id";
 export interface ICommentRepository {
   create(comment: CreateCommentDto): Promise<Comment>;
   findById(id: CommentId): Promise<Comment | null>;
-  getAll(query: GetCommentsDto): Promise<Comment[] | null>;
+  getAll(query: GetCommentsDto): Promise<ShowComment[] | null>;
   countComments(postId: PostId): Promise<number>;
 }
 
@@ -30,10 +30,24 @@ export class CommentRepository implements ICommentRepository {
       where: { id },
     });
   }
-  async getAll(query: GetCommentsDto): Promise<Comment[] | null> {
+  async getAll(query: GetCommentsDto): Promise<ShowComment[] | null> {
     return await this.repo.find({
       where: { postId: query.postId },
       order: { createdAt: "DESC" },
+      relations: ["user"],
+      select: {
+        id: true,
+        postId: true,
+        description: true,
+        createdAt: true,
+        parentId: true,
+        user: {
+          id: true,
+          username: true,
+          first_name: true,
+          last_name: true,
+        },
+      },
       take: query.limit,
       skip: (query.page - 1) * query.limit,
     });

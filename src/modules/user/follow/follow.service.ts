@@ -5,6 +5,7 @@ import {
   NotFound,
 } from "../../../utilities/http-error";
 import { UserId } from "../model/user-user-id";
+import { FollowingStatus } from "../model/user.model";
 import { UserService } from "../user.service";
 import { GetFollowerListsDto } from "./dto/get-followers.dto";
 import { GetFollowingListsDto } from "./dto/get-followings.dto";
@@ -180,5 +181,24 @@ export class FollowService {
         followingId: followEntity.followingId,
       }),
     };
+  }
+
+  async getFollowingStatus(
+    followingId: UserId,
+    followerId: UserId
+  ): Promise<FollowingStatus> {
+    const record = await this.flwRepo.findByFollowerAndFollowing(
+      followerId,
+      followingId
+    );
+
+    if (!record) return "NotFollowed";
+
+    switch (record.requestStatus) {
+      case "accepted":
+        return "Followed";
+      case "pending":
+        return "PendingApproval";
+    }
   }
 }

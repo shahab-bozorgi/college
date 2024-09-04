@@ -7,7 +7,12 @@ import {
   UnAuthorized,
 } from "../../utilities/http-error";
 import { SignUpDto } from "./dto/create-user.dto";
-import { User, UserProfile } from "./model/user.model";
+import {
+  AuthenticatedUserProfile,
+  BaseProfile,
+  OtherUserProfile,
+  User,
+} from "./model/user.model";
 import { IUserRepository } from "./user.repository";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { EditProfileDto } from "./dto/edit-profile.dto";
@@ -112,44 +117,36 @@ export class UserService {
     authenticatedUser: User,
     postService: PostService,
     followService: FollowService
-  ): Promise<Partial<UserProfile> | undefined> {
+  ): Promise<AuthenticatedUserProfile | OtherUserProfile> {
     const user = await this.userRepo.findByUsername(username, ["avatar"]);
     if (!user) {
       throw new NotFound("User not found");
     }
 
-    const userProfile: UserProfile = {
+    const baseProfile: BaseProfile = {
       id: user.id,
       avatar: user.avatar,
       username: user.username,
-      first_name: user.first_name,
-      last_name: user.last_name,
+      firstName: user.first_name,
+      lastName: user.last_name,
       bio: user.bio,
-      email: user.email,
-      is_private: user.is_private,
-      followingCount: await followService.getcountFollowing(user.id),
-      followersCount: await followService.getcountFollowers(user.id),
+      isPrivate: user.is_private,
+      followingsCount: user.followingsCount,
+      followersCount: user.followersCount,
       postsCount: await postService.getPostsCount(user),
     };
 
-    if (user.id !== authenticatedUser.id) {
-      const followingStatus = await followService.getFollow(
-        authenticatedUser.id,
-        user.id
-      );
-
-      if (followingStatus?.requestStatus === "accepted") {
-        userProfile.followingStatus = "Followed";
-      } else if (followingStatus?.requestStatus === "pending") {
-        userProfile.followingStatus = "PendingApproval";
-      } else {
-        userProfile.followingStatus = "NotFollowed";
-      }
-    } else {
-      userProfile.followingStatus = "Followed";
+    if (user.id === authenticatedUser.id) {
+      return { ...baseProfile, email: user.email };
     }
 
-    return userProfile;
+    return {
+      ...baseProfile,
+      followingStatus: await followService.getFollowingStatus(
+        user.id,
+        authenticatedUser.id
+      ),
+    };
   }
 
   async getUserBy(

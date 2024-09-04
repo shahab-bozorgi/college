@@ -41,17 +41,23 @@ export interface ResetPassword {
   dateTime: Date;
 }
 
-export interface UserProfile {
+export interface BaseProfile {
   id: UserId;
   avatar?: Media;
   username: Username;
-  email: Email;
-  is_private?: boolean;
-  first_name?: string;
-  last_name?: string;
-  followingCount: number;
-  followersCount: number;
+  isPrivate?: boolean;
+  firstName?: string;
+  lastName?: string;
+  followingsCount?: number;
+  followersCount?: number;
   postsCount: number;
   bio?: string;
-  followingStatus?: FollowingStatus;
+}
+
+export interface AuthenticatedUserProfile extends BaseProfile {
+  email: Email;
+}
+
+export interface OtherUserProfile extends BaseProfile {
+  followingStatus: FollowingStatus;
 }

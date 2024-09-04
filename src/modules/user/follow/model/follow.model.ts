@@ -1,4 +1,6 @@
+import { Media } from "../../../media/media.model";
 import { UserId } from "../../model/user-user-id";
+import { Username } from "../../model/user-username";
 
 export type RequestStatus = "pending" | "accepted";
 
@@ -23,4 +25,21 @@ export interface UpdateFollow {
   followerId: UserId;
   followingId: UserId;
   requestStatus: RequestStatus;
+}
+
+interface UserInFollowList {
+  id: UserId;
+  first_name: string;
+  last_name: string;
+  username: Username;
+  avatar: Media;
+  followersCount: number;
+}
+
+export interface FollowingsList {
+  followings: UserInFollowList[];
+}
+
+export interface FollowersList {
+  followers: UserInFollowList[];
 }

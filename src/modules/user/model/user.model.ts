@@ -15,6 +15,8 @@ export interface User {
   password: string;
   email: Email;
   is_private?: boolean;
+  followersCount?: number;
+  followingsCount?: number;
 }
 
 export interface CreateUser {

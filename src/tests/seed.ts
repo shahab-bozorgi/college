@@ -1,9 +1,7 @@
 import { v4 } from "uuid";
 import { hash } from "bcrypt";
-import request from "supertest";
-import { Express } from "express";
 import { UserEntity } from "../modules/user/entity/user.entity";
-import { isUserId, UserId } from "../modules/user/model/user-user-id";
+import { UserId } from "../modules/user/model/user-user-id";
 import { Username } from "../modules/user/model/user-username";
 import { DataSource } from "typeorm";
 import { User } from "../modules/user/model/user.model";

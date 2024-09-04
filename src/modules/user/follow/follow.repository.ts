@@ -5,20 +5,31 @@ import {
   CreateFollow,
   DeleteFollow,
   Follow,
+  FollowersList,
+  FollowingsList,
   UpdateFollow,
 } from "./model/follow.model";
 import { UserEntity } from "../entity/user.entity";
-import { GetFollowerListsDto } from "./dto/get-followers.dto";
-import { GetFollowingListsDto } from "./dto/get-followings.dto";
-import { paginationSkip } from "../../../data/pagination";
+import {
+  PaginatedResult,
+  PaginationDto,
+  paginationInfo,
+  paginationSkip,
+} from "../../../data/pagination";
 
 export interface IFollowRepository {
   findFollowing(user: UserEntity): Promise<Follow[]>;
-  findFollowingByUser(dto: GetFollowingListsDto): Promise<UserEntity[]>;
+  userFollowings(
+    followerId: UserId,
+    pagination: PaginationDto
+  ): Promise<PaginatedResult<FollowingsList>>;
+  userFollowers(
+    followingId: UserId,
+    pagination: PaginationDto
+  ): Promise<PaginatedResult<FollowersList>>;
   findFollowers(user: UserEntity): Promise<Follow[]>;
-  findFollowersByUser(dto: GetFollowerListsDto): Promise<UserEntity[]>;
-  countFollowing(followingId: UserId): Promise<number>;
-  countFollowers(followerId: UserId): Promise<number>;
+  countFollowings(followerId: UserId): Promise<number>;
+  countFollowers(followingId: UserId): Promise<number>;
   delete(follow: DeleteFollow): Promise<boolean>;
   update(follow: UpdateFollow): Promise<Follow>;
   create(follow: CreateFollow): Promise<Follow>;
@@ -50,12 +61,16 @@ export class FollowRepository implements IFollowRepository {
     });
   }
 
-  async countFollowers(followerId: UserId): Promise<number> {
-    return this.flwrepo.countBy({ followerId: followerId });
+  async countFollowers(followingId: UserId): Promise<number> {
+    return this.flwrepo.count({
+      where: { followingId, requestStatus: "accepted" },
+    });
   }
 
-  async countFollowing(followingId: UserId): Promise<number> {
-    return this.flwrepo.countBy({ followingId: followingId });
+  async countFollowings(followerId: UserId): Promise<number> {
+    return this.flwrepo.count({
+      where: { followerId, requestStatus: "accepted" },
+    });
   }
 
   async findByFollowerAndFollowing(
@@ -69,26 +84,60 @@ export class FollowRepository implements IFollowRepository {
       },
     });
   }
-  async findFollowersByUser(dto: GetFollowerListsDto): Promise<UserEntity[]> {
-    const followers = await this.flwrepo.find({
-      where: { following: { id: dto.followingId } },
-      relations: ["follower", "follower.avatar"],
-      skip: paginationSkip({ page: dto.page, limit: dto.limit }),
-      take: dto.limit,
+  async userFollowers(
+    followingId: UserId,
+    pagination: PaginationDto
+  ): Promise<PaginatedResult<FollowersList>> {
+    const result = await this.flwrepo.findAndCount({
+      where: { followingId, requestStatus: "accepted" },
+      relations: { follower: { avatar: true } },
+      skip: paginationSkip(pagination),
+      take: pagination.limit,
     });
+    const { nextPage, totalPages } = paginationInfo(result[1], pagination);
 
-    return followers.map((follow) => follow.follower);
+    return {
+      followers: result[0].map((rs) => {
+        return {
+          id: rs.follower.id,
+          first_name: rs.follower.first_name,
+          last_name: rs.follower.last_name,
+          username: rs.follower.username,
+          avatar: rs.follower.avatar,
+          followersCount: rs.follower.followersCount,
+        };
+      }),
+      nextPage,
+      totalPages,
+    };
   }
 
-  async findFollowingByUser(dto: GetFollowingListsDto): Promise<UserEntity[]> {
-    const followings = await this.flwrepo.find({
-      where: { follower: { id: dto.followerId } },
-      relations: ["following", "following.avatar"],
-      skip: paginationSkip({ page: dto.page, limit: dto.limit }),
-      take: dto.limit,
+  async userFollowings(
+    followerId: UserId,
+    pagination: PaginationDto
+  ): Promise<PaginatedResult<FollowingsList>> {
+    const result = await this.flwrepo.findAndCount({
+      where: { followerId, requestStatus: "accepted" },
+      relations: { following: { avatar: true } },
+      skip: paginationSkip(pagination),
+      take: pagination.limit,
     });
+    const { nextPage, totalPages } = paginationInfo(result[1], pagination);
 
-    return followings.map((follow) => follow.following);
+    return {
+      followings: result[0].map((rs) => {
+        return {
+          id: rs.following.id,
+          first_name: rs.following.first_name,
+          last_name: rs.following.last_name,
+          username: rs.following.username,
+          avatar: rs.following.avatar,
+          followersCount: rs.following.followersCount,
+        };
+      }),
+      nextPage,
+      totalPages,
+    };
   }
 
   async create(follow: CreateFollow): Promise<Follow> {

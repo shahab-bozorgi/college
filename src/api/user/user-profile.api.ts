@@ -41,16 +41,22 @@
  *                 username:
  *                   type: string
  *                   description: Username of the user
- *                 first_name:
+ *                 email:
+ *                   type: string
+ *                   description: Email of the user. only provided in authenticated user's profile.
+ *                 firstName:
  *                   type: string
  *                   description: User's first name
- *                 last_name:
+ *                 lastName:
  *                   type: string
  *                   description: User's last name
  *                 bio:
  *                   type: string
  *                   description: Bio of the user
- *                 followingCount:
+ *                 isPrivate:
+ *                   type: boolean
+ *                   description: Whether profile is public or private.
+ *                 followingsCount:
  *                   type: integer
  *                   description: Number of users the profile is following
  *                 followersCount:
@@ -60,8 +66,30 @@
  *                   type: integer
  *                   description: Number of posts made by the user
  *                 followingStatus:
- *                   type: boolean
- *                   description: true if logged in user follows other user.
+ *                   type: string
+ *                   description: Followed | Pending | NotFollowed. only provided when viewing other users profiles.
+ *             example:
+ *               ok: true
+ *               data: {
+ *                 "id": "5bca304c-2e79-4045-b165-2b704fb2bbc4",
+ *                 "avatar": {
+ *                   "id": "b17b5225-4b0c-4236-9119-aeed0c9534f5",
+ *                   "name": "99a183dc-e1db-461f-8484-b6aaa8b55a12.jpg",
+ *                   "mime": "image/jpeg",
+ *                   "size": 1842302,
+ *                   "path": "uploads/users/avatar/99a183dc-e1db-461f-8484-b6aaa8b55a12.jpg"
+ *                 },
+ *                 "username": "test",
+ *                 "email": "test@gmail.com",
+ *                 "firstName": "test",
+ *                 "lastName": "testy",
+ *                 "bio": "test bio.",
+ *                 "followingsCount": 5,
+ *                 "followersCount": 6,
+ *                 "postsCount": 7,
+ *                 "isPrivate": true,
+ *                 "followingStatus": "NotFollowed",
+ *               }
  *       '400':
  *         description: Bad request, possibly incorrect data
  *       '401':

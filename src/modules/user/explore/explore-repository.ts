@@ -12,6 +12,7 @@ import { Explore } from "./model/explore-model";
 export interface IExploreRepository {
   findPostsByUserIds(
     followingIds: UserId[],
+    followerId: UserId,
     pagination: PaginationDto
   ): Promise<PaginatedResult<Explore>>;
 }
@@ -26,6 +27,7 @@ export class ExploreRepository
 
   async findPostsByUserIds(
     followingIds: UserId[],
+    followerId: UserId,
     pagination: PaginationDto
   ): Promise<PaginatedResult<Explore>> {
     const result = await this.createQueryBuilder("post")
@@ -59,7 +61,9 @@ export class ExploreRepository
         },
         media: post.media.map((media) => media.url),
         likesCount: post.likes.length,
+        isLiked: post.likes.some((like) => like.userId === followerId),
         bookmarksCount: post.bookmarks.length,
+        isBookmarked: post.bookmarks.some((bk) => bk.userId === followerId),
         commentsCount: post.comments.length,
       })),
       nextPage,

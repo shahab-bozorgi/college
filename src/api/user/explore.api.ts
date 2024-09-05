@@ -60,7 +60,9 @@
  *                      "http://localhost:4000/uploads/posts/imageName_2.jpg"
  *                    ],
  *                    "likesCount": 1,
+ *                    "isLiked": true,
  *                    "bookmarksCount": 1,
+ *                    "isBookmarked": false,
  *                    "commentsCount": 1
  *                  }
  *                ],

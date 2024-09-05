@@ -16,7 +16,9 @@ export interface Explore {
     };
     media: string[];
     likesCount: number;
+    isLiked: boolean;
     bookmarksCount: number;
+    isBookmarked: boolean;
     commentsCount: number;
   }>;
 }

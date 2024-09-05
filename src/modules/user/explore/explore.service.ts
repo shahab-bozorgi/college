@@ -16,7 +16,7 @@ export class ExploreService {
       (following) => following.followingId
     );
 
-    return await this.exploreRepo.findPostsByUserIds(followingIds, {
+    return await this.exploreRepo.findPostsByUserIds(followingIds, followerId, {
       page: dto.page,
       limit: dto.limit,
     });

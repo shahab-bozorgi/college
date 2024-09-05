@@ -18,7 +18,6 @@ import {
 } from "../../../data/pagination";
 
 export interface IFollowRepository {
-  findFollowing(user: UserEntity): Promise<Follow[]>;
   userFollowings(
     followerId: UserId,
     pagination: PaginationDto
@@ -28,6 +27,7 @@ export interface IFollowRepository {
     pagination: PaginationDto
   ): Promise<PaginatedResult<FollowersList>>;
   findFollowers(user: UserEntity): Promise<Follow[]>;
+  findFollowings(followerId: UserId): Promise<Follow[]>;
   countFollowings(followerId: UserId): Promise<number>;
   countFollowers(followingId: UserId): Promise<number>;
   delete(follow: DeleteFollow): Promise<boolean>;
@@ -54,10 +54,9 @@ export class FollowRepository implements IFollowRepository {
     });
   }
 
-  async findFollowing(user: UserEntity): Promise<Follow[]> {
-    return this.flwrepo.find({
-      where: { follower: user },
-      relations: ["following"],
+  async findFollowings(followerId: UserId): Promise<Follow[]> {
+    return await this.flwrepo.find({
+      where: { followerId, requestStatus: "accepted" },
     });
   }
 

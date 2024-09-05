@@ -94,6 +94,10 @@ export class FollowService {
     return await this.flwRepo.countFollowings(followingId);
   }
 
+  async findFollowings(followerId: UserId): Promise<Follow[]> {
+    return await this.flwRepo.findFollowings(followerId);
+  }
+
   async unfollowUser(
     followerId: UserId,
     followingId: UserId,

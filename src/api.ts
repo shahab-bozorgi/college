@@ -31,6 +31,8 @@ import { LikePostService } from "./modules/post/like-post/like-post.service";
 import { LikePostRepository } from "./modules/post/like-post/like-post-repository";
 import { BookmarkRepository } from "./modules/post/bookmark/bookmark.repository";
 import { BookmarkService } from "./modules/post/bookmark/bookmark.service";
+import { ExploreRepository } from "./modules/user/explore/explore-repository";
+import { ExploreService } from "./modules/user/explore/explore.service";
 
 export const makeApp = (dataSource: DataSource) => {
   const app = express();
@@ -75,12 +77,21 @@ export const makeApp = (dataSource: DataSource) => {
   const likePostService = new LikePostService(likePostRepository);
   const bookmarkRepository = new BookmarkRepository(dataSource);
   const bookmarkService = new BookmarkService(bookmarkRepository);
+  const exploreRepository = new ExploreRepository(dataSource);
+  const exploreService = new ExploreService(exploreRepository, followService);
 
   app.use("/auth", makeAuthRouter(userService, passwordResetService));
   app.use(
     "/users",
     authMiddleware(userService),
-    makeUserRouter(userService, followService, mediaService, postService)
+
+    makeUserRouter(
+      userService,
+      followService,
+      mediaService,
+      postService,
+      exploreService
+    )
   );
   app.use(
     "/posts",

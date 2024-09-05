@@ -15,12 +15,15 @@ import { UnFollowDto } from "../modules/user/follow/dto/unfollow.dto";
 import { GetFollowingListsSchema } from "../modules/user/follow/dto/get-followings.dto";
 import { GetFollowerListsSchema } from "../modules/user/follow/dto/get-followers.dto";
 import { FollowRequestDto } from "../modules/user/follow/dto/follow-request.dto";
+import { exploreSchema } from "../modules/user/explore/dto/explore-dto";
+import { ExploreService } from "../modules/user/explore/explore.service";
 
 export const makeUserRouter = (
   userService: UserService,
   followService: FollowService,
   mediaService: MediaService,
-  postService: PostService
+  postService: PostService,
+  exploreService: ExploreService
 ) => {
   const app = Router();
 
@@ -48,6 +51,18 @@ export const makeUserRouter = (
     handleExpress(res, () =>
       userService.userProfile(username, req.user, postService, followService)
     );
+  });
+
+  app.get("/explore", (req, res) => {
+    const dto = parseDtoWithSchema(
+      {
+        page: req.query.page,
+        limit: req.query.limit,
+      },
+      exploreSchema
+    );
+
+    expressHandler(req, res, () => exploreService.explore(req.user.id, dto));
   });
 
   app.get("/:username", (req, res) => {

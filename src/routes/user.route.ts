@@ -10,13 +10,16 @@ import { expressHandler, handleExpress } from "../utilities/handle-express";
 import { PostService } from "../modules/post/post.service";
 import { FollowService } from "../modules/user/follow/follow.service";
 import { parseDtoWithSchema } from "../utilities/parse-dto-handler";
-import { FollowDto } from "../modules/user/follow/dto/follow.dto";
-import { UnFollowDto } from "../modules/user/follow/dto/unfollow.dto";
+import { followSchema } from "../modules/user/follow/dto/follow.dto";
+import { unfollowSchema } from "../modules/user/follow/dto/unfollow.dto";
 import { GetFollowingListsSchema } from "../modules/user/follow/dto/get-followings.dto";
 import { GetFollowerListsSchema } from "../modules/user/follow/dto/get-followers.dto";
-import { FollowRequestDto } from "../modules/user/follow/dto/follow-request.dto";
+import { followRequestSchema } from "../modules/user/follow/dto/follow-request.dto";
 import { exploreSchema } from "../modules/user/explore/dto/explore-dto";
 import { ExploreService } from "../modules/user/explore/explore.service";
+import { blockUserSchema } from "../modules/user/follow/dto/block-user.dto";
+import { unblockUserSchema } from "../modules/user/follow/dto/unblock-user.dto";
+import { paginationSchema } from "../data/pagination";
 
 export const makeUserRouter = (
   userService: UserService,
@@ -65,40 +68,35 @@ export const makeUserRouter = (
     expressHandler(req, res, () => exploreService.explore(req.user.id, dto));
   });
 
+  app.get("/blacklist", (req, res) => {
+    const paginationDto = parseDtoWithSchema(req.query, paginationSchema);
+    expressHandler(req, res, () =>
+      followService.getBlackList(req.user.id, paginationDto)
+    );
+  });
+
   app.get("/:username", (req, res) => {
     const username: Username = toUsername(req.params.username);
     const user = userService.findByUsername(username);
     res.status(200).send(user);
   });
 
-  app.post("/follow/:followingId", async (req, res, next) => {
-    const dto = parseDtoWithSchema(
-      {
-        followerId: req.user.id,
-        followingId: req.params.followingId,
-      },
-      FollowDto
-    );
+  app.post("/follow/:followingId", (req, res) => {
+    const dto = parseDtoWithSchema(req.params, followSchema);
     expressHandler(req, res, () => {
       return followService.followUser(
-        dto.followerId,
+        req.user.id,
         dto.followingId,
         userService
       );
     });
   });
 
-  app.delete("/unfollow/:followingId", async (req, res, next) => {
-    const dto = parseDtoWithSchema(
-      {
-        followerId: req.user.id,
-        followingId: req.params.followingId,
-      },
-      UnFollowDto
-    );
+  app.delete("/unfollow/:followingId", (req, res) => {
+    const dto = parseDtoWithSchema(req.params, unfollowSchema);
     expressHandler(req, res, () => {
       return followService.unfollowUser(
-        dto.followerId,
+        req.user.id,
         dto.followingId,
         userService
       );
@@ -106,15 +104,9 @@ export const makeUserRouter = (
   });
 
   app.delete("/followers/:followerId/delete", (req, res) => {
-    const dto = parseDtoWithSchema(
-      {
-        followerId: req.params.followerId,
-        followingId: req.user.id,
-      },
-      UnFollowDto
-    );
+    const dto = parseDtoWithSchema(req.params, unfollowSchema);
     expressHandler(req, res, () =>
-      followService.unfollowUser(dto.followerId, dto.followingId, userService)
+      followService.unfollowUser(dto.followerId, req.user.id, userService)
     );
   });
 
@@ -143,37 +135,35 @@ export const makeUserRouter = (
   });
 
   app.patch("/follow/:followerId/request/accept", async (req, res) => {
-    const dto = parseDtoWithSchema(
-      {
-        followerId: req.params.followerId,
-        followingId: req.user.id,
-      },
-      FollowRequestDto
-    );
+    const dto = parseDtoWithSchema(req.params, followRequestSchema);
     expressHandler(req, res, () => {
       return followService.acceptFollowUser(
+        req.user.id,
         dto.followerId,
-        dto.followingId,
         userService
       );
     });
   });
 
   app.delete("/follow/:followerId/request/reject", async (req, res) => {
-    const dto = parseDtoWithSchema(
-      {
-        followerId: req.params.followerId,
-        followingId: req.user.id,
-      },
-      FollowRequestDto
-    );
+    const dto = parseDtoWithSchema(req.params, followRequestSchema);
     expressHandler(req, res, () => {
       return followService.rejectFollowUser(
+        req.user.id,
         dto.followerId,
-        dto.followingId,
         userService
       );
     });
+  });
+
+  app.post("/:userId/block", (req, res) => {
+    const dto = parseDtoWithSchema(req.params, blockUserSchema);
+    expressHandler(req, res, () => followService.blockUser(req.user.id, dto));
+  });
+
+  app.delete("/:userId/unblock", (req, res) => {
+    const dto = parseDtoWithSchema(req.params, unblockUserSchema);
+    expressHandler(req, res, () => followService.unblockUser(req.user.id, dto));
   });
 
   return app;

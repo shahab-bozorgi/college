@@ -8,6 +8,7 @@ import {
   paginationSkip,
 } from "../../../data/pagination";
 import { Explore } from "./model/explore-model";
+import { FOLLOWING } from "../follow/model/follow.model";
 
 export interface IExploreRepository {
   findPostsByUserIds(
@@ -38,7 +39,7 @@ export class ExploreRepository
       .leftJoinAndSelect("post.comments", "comments")
       .leftJoinAndSelect("author.avatar", "avatar")
       .leftJoinAndSelect("author.followers", "followers")
-      .where("followers.requestStatus=:status", { status: "accepted" })
+      .where("followers.followingStatus=:FOLLOWING", { FOLLOWING })
       .andWhere("post.authorId IN (:...followingIds)", {
         followingIds: followingIds.length ? followingIds : [-1],
       })

@@ -103,7 +103,8 @@ export const makeApp = (dataSource: DataSource) => {
       commentService,
       likeCommentService,
       likePostService,
-      bookmarkService
+      bookmarkService,
+      followService
     )
   );
 

@@ -2,10 +2,12 @@ import { DataSource, Repository } from "typeorm";
 import { UserId } from "../model/user-user-id";
 import { FollowEntity } from "./entity/follow.entity";
 import {
+  BLOCKED,
   CreateFollow,
   DeleteFollow,
   Follow,
   FollowersList,
+  FOLLOWING,
   FollowingsList,
   UpdateFollow,
 } from "./model/follow.model";
@@ -16,6 +18,7 @@ import {
   paginationInfo,
   paginationSkip,
 } from "../../../data/pagination";
+import { Blacklist } from "./model/blacklist.model";
 
 export interface IFollowRepository {
   userFollowings(
@@ -26,6 +29,10 @@ export interface IFollowRepository {
     followingId: UserId,
     pagination: PaginationDto
   ): Promise<PaginatedResult<FollowersList>>;
+  userBlackList(
+    followingId: UserId,
+    pagination: PaginationDto
+  ): Promise<PaginatedResult<Blacklist>>;
   findFollowers(user: UserEntity): Promise<Follow[]>;
   findFollowings(followerId: UserId): Promise<Follow[]>;
   countFollowings(followerId: UserId): Promise<number>;
@@ -33,7 +40,6 @@ export interface IFollowRepository {
   delete(follow: DeleteFollow): Promise<boolean>;
   update(follow: UpdateFollow): Promise<Follow>;
   create(follow: CreateFollow): Promise<Follow>;
-
   findByFollowerAndFollowing(
     followerId: UserId,
     followingId: UserId
@@ -56,19 +62,19 @@ export class FollowRepository implements IFollowRepository {
 
   async findFollowings(followerId: UserId): Promise<Follow[]> {
     return await this.flwrepo.find({
-      where: { followerId, requestStatus: "accepted" },
+      where: { followerId, followingStatus: FOLLOWING },
     });
   }
 
   async countFollowers(followingId: UserId): Promise<number> {
     return this.flwrepo.count({
-      where: { followingId, requestStatus: "accepted" },
+      where: { followingId, followingStatus: FOLLOWING },
     });
   }
 
   async countFollowings(followerId: UserId): Promise<number> {
     return this.flwrepo.count({
-      where: { followerId, requestStatus: "accepted" },
+      where: { followerId, followingStatus: FOLLOWING },
     });
   }
 
@@ -88,8 +94,10 @@ export class FollowRepository implements IFollowRepository {
     pagination: PaginationDto
   ): Promise<PaginatedResult<FollowersList>> {
     const result = await this.flwrepo.findAndCount({
-      where: { followingId, requestStatus: "accepted" },
-      relations: { follower: { avatar: true } },
+      where: { followingId, followingStatus: FOLLOWING },
+      relations: {
+        follower: { avatar: true, followers: true },
+      },
       skip: paginationSkip(pagination),
       take: pagination.limit,
     });
@@ -103,7 +111,9 @@ export class FollowRepository implements IFollowRepository {
           lastName: rs.follower.lastName,
           username: rs.follower.username,
           avatar: rs.follower.avatar,
-          followersCount: rs.follower.followersCount,
+          followersCount: rs.follower.followers.filter(
+            (follower) => follower.followingStatus === FOLLOWING
+          ).length,
         };
       }),
       nextPage,
@@ -116,8 +126,8 @@ export class FollowRepository implements IFollowRepository {
     pagination: PaginationDto
   ): Promise<PaginatedResult<FollowingsList>> {
     const result = await this.flwrepo.findAndCount({
-      where: { followerId, requestStatus: "accepted" },
-      relations: { following: { avatar: true } },
+      where: { followerId, followingStatus: FOLLOWING },
+      relations: { following: { avatar: true, followers: true } },
       skip: paginationSkip(pagination),
       take: pagination.limit,
     });
@@ -131,7 +141,39 @@ export class FollowRepository implements IFollowRepository {
           lastName: rs.following.lastName,
           username: rs.following.username,
           avatar: rs.following.avatar,
-          followersCount: rs.following.followersCount,
+          followersCount: rs.following.followers.filter(
+            (follower) => follower.followingStatus === FOLLOWING
+          ).length,
+        };
+      }),
+      nextPage,
+      totalPages,
+    };
+  }
+
+  async userBlackList(
+    followingId: UserId,
+    pagination: PaginationDto
+  ): Promise<PaginatedResult<Blacklist>> {
+    const result = await this.flwrepo.findAndCount({
+      where: { followingId, followingStatus: BLOCKED },
+      relations: { follower: { avatar: true, followers: true } },
+      skip: paginationSkip(pagination),
+      take: pagination.limit,
+    });
+    const { nextPage, totalPages } = paginationInfo(result[1], pagination);
+
+    return {
+      users: result[0].map((rs) => {
+        return {
+          id: rs.follower.id,
+          firstName: rs.follower.firstName,
+          lastName: rs.follower.lastName,
+          username: rs.follower.username,
+          avatar: rs.follower.avatar,
+          followersCount: rs.follower.followers.filter(
+            (follower) => follower.followingStatus === FOLLOWING
+          ).length,
         };
       }),
       nextPage,
@@ -144,79 +186,10 @@ export class FollowRepository implements IFollowRepository {
   }
 
   async delete(follow: DeleteFollow): Promise<boolean> {
-    const queryRunner = this.dataSource.createQueryRunner();
-    const followManagerRepo = queryRunner.manager.getRepository(FollowEntity);
-    const userManagerRepo = queryRunner.manager.getRepository(UserEntity);
-
-    await queryRunner.startTransaction();
-
-    try {
-      await followManagerRepo.delete({
-        followerId: follow.followerId,
-        followingId: follow.followingId,
-      });
-
-      await userManagerRepo.decrement(
-        { id: follow.followerId },
-        "followingsCount",
-        1
-      );
-      await userManagerRepo.decrement(
-        { id: follow.followingId },
-        "followersCount",
-        1
-      );
-
-      await queryRunner.commitTransaction();
-    } catch (err) {
-      console.error("Transaction failed:", err);
-      await queryRunner.rollbackTransaction();
-      throw err;
-    } finally {
-      await queryRunner.release();
-    }
-
-    return true;
+    return Boolean(await this.flwrepo.delete(follow));
   }
 
   async update(follow: UpdateFollow): Promise<Follow> {
-    const queryRunner = this.dataSource.createQueryRunner();
-    const followManagerRepo = queryRunner.manager.getRepository(FollowEntity);
-    const userManagerRepo = queryRunner.manager.getRepository(UserEntity);
-
-    await queryRunner.startTransaction();
-
-    try {
-      await followManagerRepo.update(
-        {
-          followerId: follow.followerId,
-          followingId: follow.followingId,
-        },
-        {
-          requestStatus: follow.requestStatus,
-        }
-      );
-
-      await userManagerRepo.increment(
-        { id: follow.followerId },
-        "followingsCount",
-        1
-      );
-      await userManagerRepo.increment(
-        { id: follow.followingId },
-        "followersCount",
-        1
-      );
-
-      await queryRunner.commitTransaction();
-    } catch (err) {
-      console.error("Transaction failed:", err);
-      await queryRunner.rollbackTransaction();
-      throw err;
-    } finally {
-      await queryRunner.release();
-    }
-
-    return follow;
+    return await this.flwrepo.save(follow);
   }
 }

@@ -2,8 +2,7 @@ import { Email } from "../../../data/email";
 import { UserId } from "./user-user-id";
 import { Username } from "./user-username";
 import { Media } from "../../media/media.model";
-
-export type FollowingStatus = "Followed" | "NotFollowed" | "PendingApproval";
+import { FollowingStatus } from "../follow/model/follow.model";
 
 export interface User {
   id: UserId;
@@ -15,8 +14,6 @@ export interface User {
   password: string;
   email: Email;
   isPrivate?: boolean;
-  followersCount?: number;
-  followingsCount?: number;
 }
 
 export interface CreateUser {

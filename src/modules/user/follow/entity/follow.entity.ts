@@ -10,7 +10,7 @@ import {
 } from "typeorm";
 import { UserEntity } from "../../entity/user.entity";
 import { UserId } from "../../model/user-user-id";
-import { RequestStatus } from "../model/follow.model";
+import { DbFollowingStatus } from "../model/follow.model";
 
 @Entity("follows")
 @Unique(["followerId", "followingId"])
@@ -22,7 +22,7 @@ export class FollowEntity {
   followingId!: UserId;
 
   @Column()
-  requestStatus!: RequestStatus;
+  followingStatus!: DbFollowingStatus;
 
   @ManyToOne(() => UserEntity, (user) => user.following)
   @JoinColumn()

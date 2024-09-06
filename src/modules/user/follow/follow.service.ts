@@ -1,63 +1,97 @@
-import { PaginatedResult, paginationInfo } from "../../../data/pagination";
-import {
-  BadRequest,
-  DuplicatedRecord,
-  NotFound,
-} from "../../../utilities/http-error";
+import { PaginatedResult, PaginationDto } from "../../../data/pagination";
+import { BadRequest, NotFound } from "../../../utilities/http-error";
 import { UserId } from "../model/user-user-id";
-import { FollowingStatus } from "../model/user.model";
 import { UserService } from "../user.service";
+import { BlockUserDto } from "./dto/block-user.dto";
 import { GetFollowerListsDto } from "./dto/get-followers.dto";
 import { GetFollowingListsDto } from "./dto/get-followings.dto";
+import { UnblockUserDto } from "./dto/unblock-user.dto";
 import { IFollowRepository } from "./follow.repository";
-import { Follow, FollowersList, FollowingsList } from "./model/follow.model";
+import { Blacklist } from "./model/blacklist.model";
+import {
+  Follow,
+  FollowersList,
+  FollowingsList,
+  FollowingStatus,
+  NOT_FOLLOWING,
+  FOLLOWING,
+  PENDING,
+  BLOCKED,
+} from "./model/follow.model";
 
 export class FollowService {
   constructor(private flwRepo: IFollowRepository) {}
 
   async followUser(
-    followerId: UserId,
+    meId: UserId,
     followingId: UserId,
     userService: UserService
-  ): Promise<Follow> {
-    if (followerId == followingId) {
-      throw new BadRequest("Dont follow yourself!");
+  ): Promise<void> {
+    if (meId === followingId) {
+      throw new BadRequest("Don't follow yourself!");
     }
 
-    const follower = await userService.getUserBy(followerId);
     const following = await userService.getUserBy(followingId);
-
     if (!following) {
-      throw new NotFound("Following not found!");
+      throw new NotFound("User not found!");
     }
 
-    if (!follower) {
-      throw new NotFound("Follower not found!");
+    if ((await this.getFollowingStatus(meId, followingId)) === BLOCKED)
+      throw new BadRequest(
+        "You can't follow a user whom is in your blacklist."
+      );
+
+    const followingStatus = await this.getFollowingStatus(followingId, meId);
+
+    switch (followingStatus) {
+      case BLOCKED:
+        throw new BadRequest("You can't follow this user.");
+      case PENDING:
+        throw new BadRequest(
+          "Your prior follow request is pending user's approval."
+        );
+      case FOLLOWING:
+        throw new BadRequest("You have already followed this user.");
     }
 
-    const followEntity = await this.getFollow(follower.id, following.id);
-    if (followEntity) {
-      throw new DuplicatedRecord("Follow record is duplicated!");
-    }
-
-    if (following.isPrivate !== true) {
+    if (following.isPrivate) {
       await this.flwRepo.create({
-        followerId: follower.id,
+        followerId: meId,
         followingId: following.id,
-        requestStatus: "accepted",
+        followingStatus: PENDING,
       });
-
-      return await this.flwRepo.update({
-        followerId: follower.id,
+    } else {
+      await this.flwRepo.create({
+        followerId: meId,
         followingId: following.id,
-        requestStatus: "accepted",
+        followingStatus: FOLLOWING,
       });
     }
+  }
 
-    return await this.flwRepo.create({
-      followerId: follower.id,
+  async unfollowUser(
+    meId: UserId,
+    followingId: UserId,
+    userService: UserService
+  ): Promise<void> {
+    if (meId === followingId)
+      throw new BadRequest("I'm sure you couldn't have followed yourself.");
+
+    const following = await userService.getUserBy(followingId);
+    if (!following) {
+      throw new NotFound("User not found!");
+    }
+
+    const followingStatus = await this.getFollowingStatus(followingId, meId);
+    switch (followingStatus) {
+      case BLOCKED:
+      case NOT_FOLLOWING:
+        throw new BadRequest("You haven't followed this user.");
+    }
+
+    await this.flwRepo.delete({
+      followerId: meId,
       followingId: following.id,
-      requestStatus: "pending",
     });
   }
 
@@ -98,93 +132,49 @@ export class FollowService {
     return await this.flwRepo.findFollowings(followerId);
   }
 
-  async unfollowUser(
-    followerId: UserId,
-    followingId: UserId,
-    userService: UserService
-  ): Promise<{ unfollowStatus: boolean }> {
-    const follower = await userService.getUserBy(followerId);
-    const following = await userService.getUserBy(followingId);
-
-    if (!following) {
-      throw new NotFound("Following not found!");
-    }
-
-    if (!follower) {
-      throw new NotFound("Follower not found!");
-    }
-
-    const followEntity = await this.getFollow(follower.id, following.id);
-
-    if (!followEntity) {
-      throw new NotFound("Follow not found!");
-    }
-
-    return {
-      unfollowStatus: await this.flwRepo.delete({
-        followerId: followEntity.followerId,
-        followingId: followEntity.followingId,
-      }),
-    };
-  }
-
   async acceptFollowUser(
+    meId: UserId,
     followerId: UserId,
-    followingId: UserId,
     userService: UserService
-  ): Promise<Follow> {
+  ): Promise<void> {
+    if (followerId === meId)
+      throw new BadRequest(
+        "I'm sure you couldn't have requested to follow yourself."
+      );
+
     const follower = await userService.getUserBy(followerId);
-    const following = await userService.getUserBy(followingId);
-
-    if (!following) {
-      throw new NotFound("Following not found!");
-    }
-
     if (!follower) {
-      throw new NotFound("Follower not found!");
+      throw new NotFound("User not found!");
     }
+    const followingStatus = await this.getFollowingStatus(meId, followerId);
+    if (followingStatus !== PENDING)
+      throw new BadRequest("Follow request not found.");
 
-    const followEntity = await this.getFollow(follower.id, following.id);
-
-    if (!followEntity) {
-      throw new NotFound("Follow not found!");
-    }
-
-    return await this.flwRepo.update({
-      followerId: followEntity.followerId,
-      followingId: followEntity.followingId,
-      requestStatus: "accepted",
+    await this.flwRepo.update({
+      followerId: follower.id,
+      followingId: meId,
+      followingStatus: FOLLOWING,
     });
   }
 
   async rejectFollowUser(
+    meId: UserId,
     followerId: UserId,
-    followingId: UserId,
     userService: UserService
-  ): Promise<{ rejectStatus: boolean }> {
+  ): Promise<void> {
     const follower = await userService.getUserBy(followerId);
-    const following = await userService.getUserBy(followingId);
-
-    if (!following) {
-      throw new NotFound("Following not found!");
-    }
-
     if (!follower) {
-      throw new NotFound("Follower not found!");
+      throw new NotFound("User not found!");
     }
 
-    const followEntity = await this.getFollow(follower.id, following.id);
+    const followingStatus = await this.getFollowingStatus(meId, followerId);
+    if (followingStatus !== PENDING)
+      throw new NotFound("Follow request not found.");
 
-    if (!followEntity) {
-      throw new NotFound("Follow not found!");
-    }
-
-    return {
-      rejectStatus: await this.flwRepo.delete({
-        followerId: followEntity.followerId,
-        followingId: followEntity.followingId,
-      }),
-    };
+    await this.flwRepo.delete({
+      followerId: followerId,
+      followingId: meId,
+    });
   }
 
   async getFollowingStatus(
@@ -196,13 +186,59 @@ export class FollowService {
       followingId
     );
 
-    if (!record) return "NotFollowed";
+    return record ? record.followingStatus : NOT_FOLLOWING;
+  }
 
-    switch (record.requestStatus) {
-      case "accepted":
-        return "Followed";
-      case "pending":
-        return "PendingApproval";
+  async blockUser(meId: UserId, dto: BlockUserDto): Promise<void> {
+    if (meId === dto.userId)
+      throw new BadRequest("Please don't block yourself, will you?");
+
+    const blockedUserStatus = await this.getFollowingStatus(meId, dto.userId);
+
+    if (blockedUserStatus === BLOCKED)
+      throw new BadRequest("User is already blocked.");
+
+    if (blockedUserStatus === NOT_FOLLOWING) {
+      await this.flwRepo.create({
+        followingId: meId,
+        followerId: dto.userId,
+        followingStatus: BLOCKED,
+      });
+    } else {
+      await this.flwRepo.update({
+        followingId: meId,
+        followerId: dto.userId,
+        followingStatus: BLOCKED,
+      });
     }
+
+    const meStatus = await this.getFollowingStatus(dto.userId, meId);
+    if (meStatus !== BLOCKED) {
+      await this.flwRepo.delete({
+        followingId: dto.userId,
+        followerId: meId,
+      });
+    }
+  }
+
+  async unblockUser(meId: UserId, dto: UnblockUserDto): Promise<void> {
+    if (meId === dto.userId)
+      throw new BadRequest("I'm sure you couldn't have blocked yourself.");
+
+    const blockedUserStatus = await this.getFollowingStatus(meId, dto.userId);
+    if (blockedUserStatus !== BLOCKED)
+      throw new BadRequest("You haven't blocked this user.");
+
+    await this.flwRepo.delete({
+      followingId: meId,
+      followerId: dto.userId,
+    });
+  }
+
+  async getBlackList(
+    meId: UserId,
+    pagination: PaginationDto
+  ): Promise<PaginatedResult<Blacklist>> {
+    return await this.flwRepo.userBlackList(meId, pagination);
   }
 }

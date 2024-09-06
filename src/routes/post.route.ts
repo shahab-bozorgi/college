@@ -20,6 +20,7 @@ import { BookmarkService } from "../modules/post/bookmark/bookmark.service";
 import { getPostsSchema } from "../modules/post/dto/get-posts.dto";
 import { LikePostSchema } from "../modules/post/like-post/dto/like-post-dto";
 import { LikePostService } from "../modules/post/like-post/like-post.service";
+import { FollowService } from "../modules/user/follow/follow.service";
 
 export const makePostRouter = (
   postService: PostService,
@@ -28,7 +29,8 @@ export const makePostRouter = (
   commentService: CommentService,
   likeCommentService: LikeCommentService,
   likePostService: LikePostService,
-  bookmarkService: BookmarkService
+  bookmarkService: BookmarkService,
+  followService: FollowService
 ) => {
   const app = Router();
   const uploadPath = "/posts";
@@ -44,8 +46,10 @@ export const makePostRouter = (
         ok: true,
         data: await postService.getPosts(
           username,
+          req.user,
           { page, limit },
-          userService
+          userService,
+          followService
         ),
       });
     } catch (e) {
@@ -80,7 +84,7 @@ export const makePostRouter = (
 
   app.get("/:id", (req, res) => {
     handleExpress(res, () =>
-      postService.getPost(req.params.id, req.user, userService)
+      postService.getPost(req.params.id, req.user, userService, followService)
     );
   });
 

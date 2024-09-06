@@ -131,8 +131,8 @@ export class UserService {
       lastName: user.lastName,
       bio: user.bio,
       isPrivate: user.isPrivate,
-      followingsCount: user.followingsCount,
-      followersCount: user.followersCount,
+      followingsCount: await followService.getcountFollowing(user.id),
+      followersCount: await followService.getcountFollowers(user.id),
       postsCount: await postService.getPostsCount(user),
     };
 

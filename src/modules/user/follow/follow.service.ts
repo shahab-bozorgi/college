@@ -57,13 +57,13 @@ export class FollowService {
     if (following.isPrivate) {
       await this.flwRepo.create({
         followerId: meId,
-        followingId: following.id,
+        followingId,
         followingStatus: PENDING,
       });
     } else {
       await this.flwRepo.create({
         followerId: meId,
-        followingId: following.id,
+        followingId,
         followingStatus: FOLLOWING,
       });
     }
@@ -91,7 +91,30 @@ export class FollowService {
 
     await this.flwRepo.delete({
       followerId: meId,
-      followingId: following.id,
+      followingId,
+    });
+  }
+
+  async deleteFollower(
+    meId: UserId,
+    followerId: UserId,
+    userService: UserService
+  ): Promise<void> {
+    if (meId === followerId)
+      throw new BadRequest("I'm sure you couldn't have followed yourself.");
+
+    const follower = await userService.getUserBy(followerId);
+    if (!follower) {
+      throw new NotFound("User not found!");
+    }
+
+    const followingStatus = await this.getFollowingStatus(meId, followerId);
+    if (followingStatus !== FOLLOWING)
+      throw new BadRequest("User is not following you.");
+
+    await this.flwRepo.delete({
+      followerId,
+      followingId: meId,
     });
   }
 
@@ -151,7 +174,7 @@ export class FollowService {
       throw new BadRequest("Follow request not found.");
 
     await this.flwRepo.update({
-      followerId: follower.id,
+      followerId,
       followingId: meId,
       followingStatus: FOLLOWING,
     });
@@ -172,7 +195,7 @@ export class FollowService {
       throw new NotFound("Follow request not found.");
 
     await this.flwRepo.delete({
-      followerId: followerId,
+      followerId,
       followingId: meId,
     });
   }

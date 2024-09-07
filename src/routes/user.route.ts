@@ -57,28 +57,8 @@ export const makeUserRouter = (
   });
 
   app.get("/explore", (req, res) => {
-    const dto = parseDtoWithSchema(
-      {
-        page: req.query.page,
-        limit: req.query.limit,
-      },
-      exploreSchema
-    );
-
+    const dto = parseDtoWithSchema(req.query, exploreSchema);
     expressHandler(req, res, () => exploreService.explore(req.user.id, dto));
-  });
-
-  app.get("/blacklist", (req, res) => {
-    const paginationDto = parseDtoWithSchema(req.query, paginationSchema);
-    expressHandler(req, res, () =>
-      followService.getBlackList(req.user.id, paginationDto)
-    );
-  });
-
-  app.get("/:username", (req, res) => {
-    const username: Username = toUsername(req.params.username);
-    const user = userService.findByUsername(username);
-    res.status(200).send(user);
   });
 
   app.post("/follow/:followingId", (req, res) => {
@@ -106,7 +86,7 @@ export const makeUserRouter = (
   app.delete("/followers/:followerId/delete", (req, res) => {
     const dto = parseDtoWithSchema(req.params, unfollowSchema);
     expressHandler(req, res, () =>
-      followService.unfollowUser(dto.followerId, req.user.id, userService)
+      followService.deleteFollower(req.user.id, dto.followerId, userService)
     );
   });
 
@@ -164,6 +144,19 @@ export const makeUserRouter = (
   app.delete("/:userId/unblock", (req, res) => {
     const dto = parseDtoWithSchema(req.params, unblockUserSchema);
     expressHandler(req, res, () => followService.unblockUser(req.user.id, dto));
+  });
+
+  app.get("/blacklist", (req, res) => {
+    const paginationDto = parseDtoWithSchema(req.query, paginationSchema);
+    expressHandler(req, res, () =>
+      followService.getBlackList(req.user.id, paginationDto)
+    );
+  });
+
+  app.get("/:username", (req, res) => {
+    const username: Username = toUsername(req.params.username);
+    const user = userService.findByUsername(username);
+    res.status(200).send(user);
   });
 
   return app;

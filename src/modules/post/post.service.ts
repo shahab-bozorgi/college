@@ -22,7 +22,7 @@ import { UserId } from "../user/model/user-user-id";
 import { Post, ShowPost, ShowPosts } from "./model/post.model";
 import { PaginatedResult, PaginationDto } from "../../data/pagination";
 import { FollowService } from "../user/follow/follow.service";
-import { FOLLOWING } from "../user/follow/model/follow.model";
+import { BLOCKED, FOLLOWING } from "../user/follow/model/follow.model";
 
 export class PostService {
   constructor(
@@ -39,12 +39,17 @@ export class PostService {
   ): Promise<PaginatedResult<ShowPosts>> {
     const author = await userService.getUserBy(username);
     if (!author) throw new NotFound("User not found");
-    if (
-      author.id !== viewer.id &&
-      (await followService.getFollowingStatus(author.id, viewer.id)) !==
-        FOLLOWING
-    ) {
-      throw new Forbidden("You cannot access this data.");
+    if (author.id !== viewer.id) {
+      const followingStatus = await followService.getFollowingStatus(
+        author.id,
+        viewer.id
+      );
+      if (
+        (author.isPrivate && followingStatus !== FOLLOWING) ||
+        followingStatus === BLOCKED
+      ) {
+        throw new Forbidden("You cannot access this data.");
+      }
     }
     return await this.postRepo.authorPosts(author.id, paginationDto);
   }
@@ -110,12 +115,17 @@ export class PostService {
       "likes",
     ]);
     if (!post) throw new NotFound("Post not found");
-    if (
-      post.authorId !== viewer.id &&
-      (await followService.getFollowingStatus(post.authorId, viewer.id)) !==
-        FOLLOWING
-    ) {
-      throw new Forbidden("You cannot access this data.");
+    if (post.authorId !== viewer.id) {
+      const followingStatus = await followService.getFollowingStatus(
+        post.authorId,
+        viewer.id
+      );
+      if (
+        (post.author.isPrivate && followingStatus !== FOLLOWING) ||
+        followingStatus === BLOCKED
+      ) {
+        throw new Forbidden("You cannot access this data.");
+      }
     }
     const avatar = (await userService.getUserBy(post.authorId, ["avatar"]))
       ?.avatar;

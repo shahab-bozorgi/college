@@ -26,7 +26,7 @@
  *         description: The ID of the user to remove.
  *     responses:
  *       200:
- *         description: Successfully unfollowed the user
+ *         description: Successfully removed the user from followers.
  *         content:
  *          application/json:
  *            example:
@@ -49,7 +49,6 @@
  *                message: "Check validation key of this object!"
  *                validation: {
  *                      "followerId": "invalid | required",
- *                      "followingId": "invalid | required",
  *                }
  *       500:
  *         description: Internal server error

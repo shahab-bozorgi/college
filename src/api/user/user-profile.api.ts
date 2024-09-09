@@ -89,6 +89,7 @@
  *                 "postsCount": 7,
  *                 "isPrivate": true,
  *                 "followingStatus": "NotFollowed",
+ *                 "hasBlocked": true,
  *               }
  *       '400':
  *         description: Bad request, possibly incorrect data

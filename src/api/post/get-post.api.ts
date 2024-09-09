@@ -75,6 +75,7 @@
  *                "bookmarksCount": 0,
  *                "likesCount": 0,
  *                "commentsCount": 0,
+ *                "closeFriendsOnly": boolean,
  *                "createdAt": 2024-08-24T02:37:15.664Z
  *            }
  *       '400':

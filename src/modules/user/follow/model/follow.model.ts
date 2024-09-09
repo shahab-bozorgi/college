@@ -7,7 +7,10 @@ export const BLOCKED = "Blocked";
 export const FOLLOWING = "Following";
 export const NOT_FOLLOWING = "NotFollowing";
 const FOLLOWING_STATUS = [PENDING, BLOCKED, FOLLOWING, NOT_FOLLOWING] as const;
-export type FollowingStatus = (typeof FOLLOWING_STATUS)[number];
+export type FollowingStatus = {
+  status: (typeof FOLLOWING_STATUS)[number];
+  isCloseFriend: boolean;
+};
 
 const DB_FOLLOWING_STATUS = [PENDING, BLOCKED, FOLLOWING] as const;
 export type DbFollowingStatus = (typeof DB_FOLLOWING_STATUS)[number];
@@ -16,6 +19,7 @@ export interface Follow {
   followerId: UserId;
   followingId: UserId;
   followingStatus: DbFollowingStatus;
+  isCloseFriend: boolean;
 }
 
 export interface CreateFollow {
@@ -32,7 +36,8 @@ export interface DeleteFollow {
 export interface UpdateFollow {
   followerId: UserId;
   followingId: UserId;
-  followingStatus: DbFollowingStatus;
+  followingStatus?: DbFollowingStatus;
+  isCloseFriend?: boolean;
 }
 
 export interface UserInFollowList {

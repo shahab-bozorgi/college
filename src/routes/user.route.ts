@@ -20,6 +20,7 @@ import { ExploreService } from "../modules/user/explore/explore.service";
 import { blockUserSchema } from "../modules/user/follow/dto/block-user.dto";
 import { unblockUserSchema } from "../modules/user/follow/dto/unblock-user.dto";
 import { paginationSchema } from "../data/pagination";
+import { zodUserId } from "../modules/user/model/user-user-id";
 
 export const makeUserRouter = (
   userService: UserService,
@@ -149,7 +150,28 @@ export const makeUserRouter = (
   app.get("/blacklist", (req, res) => {
     const paginationDto = parseDtoWithSchema(req.query, paginationSchema);
     expressHandler(req, res, () =>
-      followService.getBlackList(req.user.id, paginationDto)
+      followService.getBlacklist(req.user.id, paginationDto)
+    );
+  });
+
+  app.patch("/close-friends/:followerId/add", (req, res) => {
+    const followerId = zodUserId.parse(req.params.followerId);
+    expressHandler(req, res, () =>
+      followService.addCloseFriend(followerId, req.user.id)
+    );
+  });
+
+  app.patch("/close-friends/:followerId/remove", (req, res) => {
+    const followerId = zodUserId.parse(req.params.followerId);
+    expressHandler(req, res, () =>
+      followService.removeCloseFriend(followerId, req.user.id)
+    );
+  });
+
+  app.get("/close-friends", (req, res) => {
+    const paginationDto = parseDtoWithSchema(req.query, paginationSchema);
+    expressHandler(req, res, () =>
+      followService.getCloseFriends(req.user.id, paginationDto)
     );
   });
 

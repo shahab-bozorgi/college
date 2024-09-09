@@ -13,6 +13,7 @@ export interface Post {
   caption: string;
   authorId: UserId;
   createdAt: Date;
+  closeFriendsOnly: boolean;
 }
 
 export interface PostRelations {
@@ -33,12 +34,14 @@ export interface CreatePost
     PostSelectedRelations<["tags", "mentions", "media", "author"]>
   > {
   caption: string;
+  closeFriendsOnly: boolean;
 }
 
 export interface UpdatePost
   extends Partial<PostSelectedRelations<["tags", "mentions", "media"]>> {
   id: PostId;
   caption: string;
+  closeFriendsOnly: boolean;
 }
 
 export interface ShowPost {
@@ -62,5 +65,10 @@ export interface ShowPost {
 }
 
 export interface ShowPosts {
-  posts: Array<{ id: PostId; createdAt: Date; media: Media[] }>;
+  posts: Array<{
+    id: PostId;
+    createdAt: Date;
+    media: Media[];
+    closeFriendsOnly: boolean;
+  }>;
 }

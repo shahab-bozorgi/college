@@ -24,6 +24,9 @@ export class FollowEntity {
   @Column()
   followingStatus!: DbFollowingStatus;
 
+  @Column({ default: false })
+  isCloseFriend!: boolean;
+
   @ManyToOne(() => UserEntity, (user) => user.following)
   @JoinColumn()
   follower!: UserEntity;

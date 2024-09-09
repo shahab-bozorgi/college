@@ -29,6 +29,7 @@ export interface IPostRepository {
   findById(id: PostId, relations?: undefined): Promise<Post | null>;
   authorPosts(
     authorId: UserId,
+    closeFriendsOnly: boolean,
     pagination: PaginationDto
   ): Promise<PaginatedResult<ShowPosts>>;
   create(fields: CreatePost): Promise<Post | null>;
@@ -62,12 +63,16 @@ export class PostRepository implements IPostRepository {
 
   async authorPosts(
     authorId: UserId,
+    closeFriendsOnly: boolean,
     pagination: PaginationDto
   ): Promise<PaginatedResult<ShowPosts>> {
     const result = await this.repo.findAndCount({
-      select: ["id", "createdAt"],
-      where: { authorId },
-      relations: ["media"],
+      select: { id: true, createdAt: true, closeFriendsOnly: true },
+      where: [
+        { authorId, closeFriendsOnly: false },
+        { authorId, closeFriendsOnly },
+      ],
+      relations: { media: true },
       order: { createdAt: "DESC" },
       skip: paginationSkip(pagination),
       take: pagination.limit,

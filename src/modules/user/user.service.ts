@@ -141,17 +141,19 @@ export class UserService {
       return { ...baseProfile, email: user.email };
     }
 
+    const followingStatus = await followService.getFollowingStatus(
+      user.id,
+      authenticatedUser.id
+    );
+    const authenticatedStatus = await followService.getFollowingStatus(
+      authenticatedUser.id,
+      user.id
+    );
     return {
       ...baseProfile,
-      followingStatus: await followService.getFollowingStatus(
-        user.id,
-        authenticatedUser.id
-      ),
-      isBlocked:
-        (await followService.getFollowingStatus(
-          authenticatedUser.id,
-          user.id
-        )) === BLOCKED,
+      followingStatus: followingStatus.status,
+      isBlocked: authenticatedStatus.status === BLOCKED,
+      isCloseFriend: authenticatedStatus.isCloseFriend,
     };
   }
 

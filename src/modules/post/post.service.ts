@@ -45,13 +45,18 @@ export class PostService {
         viewer.id
       );
       if (
-        (author.isPrivate && followingStatus !== FOLLOWING) ||
-        followingStatus === BLOCKED
+        (author.isPrivate && followingStatus.status !== FOLLOWING) ||
+        followingStatus.status === BLOCKED
       ) {
         throw new Forbidden("You cannot access this data.");
       }
+      return await this.postRepo.authorPosts(
+        author.id,
+        followingStatus.isCloseFriend,
+        paginationDto
+      );
     }
-    return await this.postRepo.authorPosts(author.id, paginationDto);
+    return await this.postRepo.authorPosts(author.id, true, paginationDto);
   }
 
   async create(
@@ -96,6 +101,7 @@ export class PostService {
       media,
       mentions,
       tags,
+      closeFriendsOnly: dto.closeFriendsOnly,
     });
   }
 
@@ -121,8 +127,9 @@ export class PostService {
         viewer.id
       );
       if (
-        (post.author.isPrivate && followingStatus !== FOLLOWING) ||
-        followingStatus === BLOCKED
+        (post.author.isPrivate && followingStatus.status !== FOLLOWING) ||
+        followingStatus.status === BLOCKED ||
+        (post.closeFriendsOnly && !followingStatus.isCloseFriend)
       ) {
         throw new Forbidden("You cannot access this data.");
       }
@@ -220,6 +227,8 @@ export class PostService {
         )
       );
     }
+
+    post.closeFriendsOnly = dto.closeFriendsOnly;
 
     await this.postRepo.update(post);
   }

@@ -19,6 +19,7 @@ import {
   paginationSkip,
 } from "../../../data/pagination";
 import { Blacklist } from "./model/blacklist.model";
+import { CloseFriends } from "./model/close-friend.model";
 
 export interface IFollowRepository {
   userFollowings(
@@ -29,10 +30,14 @@ export interface IFollowRepository {
     followingId: UserId,
     pagination: PaginationDto
   ): Promise<PaginatedResult<FollowersList>>;
-  userBlackList(
+  userBlacklist(
     followingId: UserId,
     pagination: PaginationDto
   ): Promise<PaginatedResult<Blacklist>>;
+  userCloseFriends(
+    followingId: UserId,
+    pagination: PaginationDto
+  ): Promise<PaginatedResult<CloseFriends>>;
   findFollowers(user: UserEntity): Promise<Follow[]>;
   findFollowings(followerId: UserId): Promise<Follow[]>;
   countFollowings(followerId: UserId): Promise<number>;
@@ -151,12 +156,42 @@ export class FollowRepository implements IFollowRepository {
     };
   }
 
-  async userBlackList(
+  async userBlacklist(
     followingId: UserId,
     pagination: PaginationDto
   ): Promise<PaginatedResult<Blacklist>> {
     const result = await this.flwrepo.findAndCount({
       where: { followingId, followingStatus: BLOCKED },
+      relations: { follower: { avatar: true, followers: true } },
+      skip: paginationSkip(pagination),
+      take: pagination.limit,
+    });
+    const { nextPage, totalPages } = paginationInfo(result[1], pagination);
+
+    return {
+      users: result[0].map((rs) => {
+        return {
+          id: rs.follower.id,
+          firstName: rs.follower.firstName,
+          lastName: rs.follower.lastName,
+          username: rs.follower.username,
+          avatar: rs.follower.avatar,
+          followersCount: rs.follower.followers.filter(
+            (follower) => follower.followingStatus === FOLLOWING
+          ).length,
+        };
+      }),
+      nextPage,
+      totalPages,
+    };
+  }
+
+  async userCloseFriends(
+    followingId: UserId,
+    pagination: PaginationDto
+  ): Promise<PaginatedResult<CloseFriends>> {
+    const result = await this.flwrepo.findAndCount({
+      where: { followingId, followingStatus: FOLLOWING, isCloseFriend: true },
       relations: { follower: { avatar: true, followers: true } },
       skip: paginationSkip(pagination),
       take: pagination.limit,

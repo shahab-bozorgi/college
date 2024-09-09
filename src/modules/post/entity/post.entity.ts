@@ -31,6 +31,9 @@ export class PostEntity {
   @Column("text", { nullable: true })
   caption!: string;
 
+  @Column()
+  closeFriendsOnly!: boolean;
+
   @CreateDateColumn()
   createdAt!: Date;
 

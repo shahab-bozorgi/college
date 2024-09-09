@@ -21,6 +21,8 @@ import { blockUserSchema } from "../modules/user/follow/dto/block-user.dto";
 import { unblockUserSchema } from "../modules/user/follow/dto/unblock-user.dto";
 import { paginationSchema } from "../data/pagination";
 import { zodUserId } from "../modules/user/model/user-user-id";
+import { z } from "zod";
+import { addAndRemveCloseFriendSchema } from "../modules/user/follow/dto/add-close-friends.dto";
 
 export const makeUserRouter = (
   userService: UserService,
@@ -155,16 +157,16 @@ export const makeUserRouter = (
   });
 
   app.patch("/close-friends/:followerId/add", (req, res) => {
-    const followerId = zodUserId.parse(req.params.followerId);
+    const dto = parseDtoWithSchema(req.params, addAndRemveCloseFriendSchema);
     expressHandler(req, res, () =>
-      followService.addCloseFriend(followerId, req.user.id)
+      followService.addCloseFriend(dto.followerId, req.user.id)
     );
   });
 
   app.patch("/close-friends/:followerId/remove", (req, res) => {
-    const followerId = zodUserId.parse(req.params.followerId);
+    const dto = parseDtoWithSchema(req.params, addAndRemveCloseFriendSchema);
     expressHandler(req, res, () =>
-      followService.removeCloseFriend(followerId, req.user.id)
+      followService.removeCloseFriend(dto.followerId, req.user.id)
     );
   });
 

@@ -7,7 +7,7 @@ export const UpdatePostSchema = z.object({
   caption: z.string(),
   mentions: zodMentionString,
   deletedMedia: zodDeletedMedia.nullish(),
-  closeFriendsOnly: zodBoolean,
+  closeFriendsOnly: zodBoolean.optional(),
 });
 
 export type UpdatePostDto = z.infer<typeof UpdatePostSchema>;

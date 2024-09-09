@@ -61,6 +61,7 @@ export interface ShowPost {
   likesCount: number;
   isLiked: boolean;
   commentsCount: number;
+  closeFriendsOnly: boolean;
   createdAt: Date;
 }
 

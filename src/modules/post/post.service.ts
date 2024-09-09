@@ -153,6 +153,7 @@ export class PostService {
       likesCount: post.likes.length,
       isLiked: post.likes.some((like) => like.userId === viewer.id),
       commentsCount: 0,
+      closeFriendsOnly: post.closeFriendsOnly,
       createdAt: post.createdAt,
     };
   }
@@ -228,7 +229,7 @@ export class PostService {
       );
     }
 
-    post.closeFriendsOnly = dto.closeFriendsOnly;
+    // post.closeFriendsOnly = dto.closeFriendsOnly;
 
     await this.postRepo.update(post);
   }

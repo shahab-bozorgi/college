@@ -147,7 +147,7 @@ export class UserService {
         user.id,
         authenticatedUser.id
       ),
-      hasBlocked:
+      isBlocked:
         (await followService.getFollowingStatus(
           authenticatedUser.id,
           user.id

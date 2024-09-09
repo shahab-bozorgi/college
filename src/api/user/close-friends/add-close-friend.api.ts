@@ -10,7 +10,7 @@
  * security:
  *   - bearerAuth: []
  * /users/close-friends/{followerId}/add:
- *   post:
+ *   patch:
  *     summary: Add a user to close friends.
  *     description: Allows users to add other users to their close friends.
  *     security:

@@ -32,6 +32,10 @@
  *                 type: string
  *                 description: User's to be mentioned in the post.
  *                 example: "@testUser @someOtherUser"
+ *               closeFriendsOnly:
+ *                 type: boolean
+ *                 description: Should the post be published to close friends only or not.
+ *                 example: true
  *               pictures:
  *                 type: array
  *                 items:

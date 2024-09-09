@@ -57,4 +57,5 @@ export interface AuthenticatedUserProfile extends BaseProfile {
 
 export interface OtherUserProfile extends BaseProfile {
   followingStatus: FollowingStatus;
+  hasBlocked: boolean;
 }

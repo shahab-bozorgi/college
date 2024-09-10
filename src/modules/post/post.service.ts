@@ -23,7 +23,6 @@ import { Post, ShowPost, ShowPosts } from "./model/post.model";
 import { PaginatedResult, PaginationDto } from "../../data/pagination";
 import { FollowService } from "../user/follow/follow.service";
 import { BLOCKED, FOLLOWING } from "../user/follow/model/follow.model";
-import { Comment } from "./comment/model/comment.model";
 
 export class PostService {
   constructor(
@@ -45,9 +44,14 @@ export class PostService {
         author.id,
         viewer.id
       );
+      const viewerStatus = await followService.getFollowingStatus(
+        viewer.id,
+        author.id
+      );
       if (
         (author.isPrivate && followingStatus.status !== FOLLOWING) ||
-        followingStatus.status === BLOCKED
+        followingStatus.status === BLOCKED ||
+        viewerStatus.status === BLOCKED
       ) {
         throw new Forbidden("You cannot access this data.");
       }
@@ -128,17 +132,21 @@ export class PostService {
         post.authorId,
         viewer.id
       );
+      const viewerStatus = await followService.getFollowingStatus(
+        viewer.id,
+        post.author.id
+      );
       if (
         (post.author.isPrivate && followingStatus.status !== FOLLOWING) ||
         followingStatus.status === BLOCKED ||
-        (post.closeFriendsOnly && !followingStatus.isCloseFriend)
+        (post.closeFriendsOnly && !followingStatus.isCloseFriend) ||
+        viewerStatus.status === BLOCKED
       ) {
         throw new Forbidden("You cannot access this data.");
       }
     }
     const avatar = (await userService.getUserBy(post.authorId, ["avatar"]))
       ?.avatar;
-
 
     return {
       id: post.id,

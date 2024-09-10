@@ -67,7 +67,7 @@
  *                   description: Number of posts made by the user
  *                 followingStatus:
  *                   type: string
- *                   description: Followed | Pending | NotFollowed. only provided when viewing other users profiles.
+ *                   description:  Pending | Blocked | Following | NotFollowing. only provided when viewing other users profiles.
  *             example:
  *               ok: true
  *               data: {
@@ -88,8 +88,8 @@
  *                 "followersCount": 6,
  *                 "postsCount": 7,
  *                 "isPrivate": true,
- *                 "followingStatus": "NotFollowed",
- *                 "isBlocked": true,
+ *                 "followingStatus": "NotFollowing",
+ *                 "followedStatus": "Blocked",
  *               }
  *       '400':
  *         description: Bad request, possibly incorrect data

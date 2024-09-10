@@ -327,7 +327,7 @@ export class FollowService {
       );
 
     if (
-      !(await this.getFollowingStatus(followerId, authenticatedId))
+      !(await this.getFollowingStatus(authenticatedId, followerId))
         .isCloseFriend
     )
       throw new BadRequest("User is not in your close frineds.");

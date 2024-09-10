@@ -23,6 +23,7 @@ import { Post, ShowPost, ShowPosts } from "./model/post.model";
 import { PaginatedResult, PaginationDto } from "../../data/pagination";
 import { FollowService } from "../user/follow/follow.service";
 import { BLOCKED, FOLLOWING } from "../user/follow/model/follow.model";
+import { Comment } from "./comment/model/comment.model";
 
 export class PostService {
   constructor(
@@ -119,6 +120,7 @@ export class PostService {
       "author",
       "bookmarks",
       "likes",
+      "comments",
     ]);
     if (!post) throw new NotFound("Post not found");
     if (post.authorId !== viewer.id) {
@@ -136,6 +138,8 @@ export class PostService {
     }
     const avatar = (await userService.getUserBy(post.authorId, ["avatar"]))
       ?.avatar;
+
+
     return {
       id: post.id,
       caption: post.caption,
@@ -152,7 +156,7 @@ export class PostService {
       bookmarksCount: post.bookmarks.length,
       likesCount: post.likes.length,
       isLiked: post.likes.some((like) => like.userId === viewer.id),
-      commentsCount: 0,
+      commentsCount: post.comments.length,
       closeFriendsOnly: post.closeFriendsOnly,
       createdAt: post.createdAt,
     };

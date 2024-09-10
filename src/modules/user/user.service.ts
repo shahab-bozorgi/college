@@ -152,7 +152,7 @@ export class UserService {
     return {
       ...baseProfile,
       followingStatus: followingStatus.status,
-      isBlocked: authenticatedStatus.status === BLOCKED,
+      followedStatus: authenticatedStatus.status,
       isCloseFriend: authenticatedStatus.isCloseFriend,
     };
   }

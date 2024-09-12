@@ -166,7 +166,7 @@ export class FollowService {
   }
 
   async findFollowers(followingId: UserId): Promise<Follow[]> {
-    return await this.flwRepo.findFollowers(followingId);
+    return await this.flwRepo.findFollowers(followingId, FOLLOWING);
   }
 
   async acceptFollowUser(

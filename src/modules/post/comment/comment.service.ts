@@ -1,12 +1,14 @@
 import { PaginatedResult, paginationInfo } from "../../../data/pagination";
 import { NotFound } from "../../../utilities/http-error";
+import { CreateActionDto } from "../../action/dto/create-action.dto";
+import { ActionNotificationService } from "../../common/service/action-notification.service";
 import { UserService } from "../../user/user.service";
 import { PostService } from "../post.service";
 import { ICommentRepository } from "./comment.repository";
 import { CreateCommentDto } from "./dto/create-comment.dto";
 import { GetCommentsDto } from "./dto/get-comments.dto";
 import { CommentId } from "./model/comment-id";
-import { Comment, ShowComment } from "./model/comment.model";
+import { ShowComment } from "./model/comment.model";
 
 export class CommentService {
   constructor(private commentRepo: ICommentRepository) {}
@@ -14,9 +16,12 @@ export class CommentService {
   async createComment(
     dto: CreateCommentDto,
     userService: UserService,
-    postService: PostService
+    postService: PostService,
+    actionNotificationService: ActionNotificationService
   ) {
-    if ((await postService.findPostById(dto.postId)) === null) {
+    const postOfComment = await postService.findPostById(dto.postId);
+
+    if (postOfComment === null) {
       throw new NotFound("Post is not found");
     }
 
@@ -30,12 +35,26 @@ export class CommentService {
       }
     }
 
-    return await this.commentRepo.create({
+    const commentCreated = await this.commentRepo.create({
       userId: dto.userId,
       postId: dto.postId,
       parentId: dto.parentId,
       description: dto.description,
     });
+
+    const actionDto: CreateActionDto = {
+      actorId: commentCreated.userId,
+      type: "comment",
+      entityId: commentCreated.id,
+    };
+
+    await actionNotificationService.createActionWithNotifications(
+      actionDto,
+      postOfComment.authorId,
+      postOfComment.closeFriendsOnly
+    );
+
+    return commentCreated;
   }
 
   async getCommentById(commentId: CommentId) {

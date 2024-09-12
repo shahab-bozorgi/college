@@ -33,6 +33,11 @@ import { BookmarkRepository } from "./modules/post/bookmark/bookmark.repository"
 import { BookmarkService } from "./modules/post/bookmark/bookmark.service";
 import { ExploreRepository } from "./modules/user/explore/explore-repository";
 import { ExploreService } from "./modules/user/explore/explore.service";
+import { ActionNotificationService } from "./modules/common/service/action-notification.service";
+import { ActionNotificationRepository } from "./modules/common/repository/action-notification.repository";
+import { makeNotificationRouter } from "./routes/notifications.route";
+import { NotificationService } from "./modules/action/notification/notification.service";
+import { NotificationRepository } from "./modules/action/notification/notification.repository";
 
 export const makeApp = (dataSource: DataSource) => {
   const app = express();
@@ -79,6 +84,22 @@ export const makeApp = (dataSource: DataSource) => {
   const bookmarkService = new BookmarkService(bookmarkRepository);
   const exploreRepository = new ExploreRepository(dataSource);
   const exploreService = new ExploreService(exploreRepository, followService);
+  const actionNotificationRepository = new ActionNotificationRepository(
+    dataSource
+  );
+  const actionNotificationService = new ActionNotificationService(
+    actionNotificationRepository,
+    followService,
+    userService
+  );
+  const notificationRepository = new NotificationRepository(dataSource);
+  const notificationService = new NotificationService(
+    notificationRepository,
+    userService,
+    followService,
+    postService,
+    commentService
+  );
 
   app.use("/auth", makeAuthRouter(userService, passwordResetService));
   app.use(
@@ -104,8 +125,15 @@ export const makeApp = (dataSource: DataSource) => {
       likeCommentService,
       likePostService,
       bookmarkService,
-      followService
+      followService,
+      actionNotificationService
     )
+  );
+
+  app.use(
+    "/notifications",
+    authMiddleware(userService),
+    makeNotificationRouter(notificationService)
   );
 
   app.use((req, res) => {
@@ -116,4 +144,3 @@ export const makeApp = (dataSource: DataSource) => {
 
   return app;
 };
-

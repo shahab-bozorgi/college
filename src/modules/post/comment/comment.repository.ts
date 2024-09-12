@@ -1,6 +1,10 @@
 import { DataSource, Repository } from "typeorm";
 import { CreateCommentDto } from "./dto/create-comment.dto";
-import { Comment, ShowComment } from "./model/comment.model";
+import {
+  Comment,
+  CommentNotification,
+  ShowComment,
+} from "./model/comment.model";
 import { v4 } from "uuid";
 import { CommentEntity } from "./entity/comment.entity";
 import { GetCommentsDto } from "./dto/get-comments.dto";
@@ -10,6 +14,9 @@ import { PostId } from "../model/post-id";
 export interface ICommentRepository {
   create(comment: CreateCommentDto): Promise<Comment>;
   findById(id: CommentId): Promise<Comment | null>;
+  getCommentForNotificationById(
+    id: CommentId
+  ): Promise<CommentNotification | null>;
   getAll(query: GetCommentsDto): Promise<ShowComment[] | null>;
   countComments(postId: PostId): Promise<number>;
 }
@@ -17,7 +24,7 @@ export interface ICommentRepository {
 export class CommentRepository implements ICommentRepository {
   private repo: Repository<CommentEntity>;
 
-  constructor(dataSource: DataSource) {
+  constructor(private dataSource: DataSource) {
     this.repo = dataSource.getRepository(CommentEntity);
   }
 
@@ -30,6 +37,19 @@ export class CommentRepository implements ICommentRepository {
       where: { id },
     });
   }
+
+  async getCommentForNotificationById(
+    id: CommentId
+  ): Promise<CommentNotification | null> {
+    return await this.repo
+      .createQueryBuilder("comment")
+      .leftJoinAndSelect("comment.post", "post")
+      .leftJoinAndSelect("post.media", "media")
+      .select(["comment.id", "comment.description", "post.id", "media"])
+      .where("comment.id = :id", { id })
+      .getOne();
+  }
+
   async getAll(query: GetCommentsDto): Promise<ShowComment[] | null> {
     return await this.repo.find({
       where: { postId: query.postId },

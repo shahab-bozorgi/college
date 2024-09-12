@@ -19,6 +19,10 @@ import { CommentEntity } from "../../post/comment/entity/comment.entity";
 import { LikeCommentEntity } from "../../post/comment/like-comment/entity/like-comment.entity";
 import { BookmarkEntity } from "../../post/bookmark/entity/bookmark.entity";
 import { LikePostEntity } from "../../post/like-post/entity/like-post-entity";
+import { ActionEntity } from "../../action/entity/action.entity";
+import { Action } from "../../action/model/action.model";
+import { Notification } from "../../action/notification/model/notification.model";
+import { NotificationEntity } from "../../action/notification/entity/notification.entity";
 
 @Entity("users")
 export class UserEntity {
@@ -76,4 +80,10 @@ export class UserEntity {
 
   @OneToMany(() => BookmarkEntity, (bookmark) => bookmark.post)
   bookmarks!: BookmarkEntity[];
+
+  @OneToMany(() => ActionEntity, (action) => action.actor)
+  actions!: Action[];
+
+  @OneToMany(() => NotificationEntity, (notification) => notification.receiver)
+  notifications!: Notification[];
 }

@@ -21,6 +21,7 @@ import { getPostsSchema } from "../modules/post/dto/get-posts.dto";
 import { LikePostSchema } from "../modules/post/like-post/dto/like-post-dto";
 import { LikePostService } from "../modules/post/like-post/like-post.service";
 import { FollowService } from "../modules/user/follow/follow.service";
+import { ActionNotificationService } from "../modules/common/service/action-notification.service";
 
 export const makePostRouter = (
   postService: PostService,
@@ -30,7 +31,8 @@ export const makePostRouter = (
   likeCommentService: LikeCommentService,
   likePostService: LikePostService,
   bookmarkService: BookmarkService,
-  followService: FollowService
+  followService: FollowService,
+  actionNotificationService: ActionNotificationService
 ) => {
   const app = Router();
   const uploadPath = "/posts";
@@ -126,7 +128,12 @@ export const makePostRouter = (
     );
 
     handleExpress(res, () =>
-      commentService.createComment(dto, userService, postService)
+      commentService.createComment(
+        dto,
+        userService,
+        postService,
+        actionNotificationService
+      )
     );
   });
 

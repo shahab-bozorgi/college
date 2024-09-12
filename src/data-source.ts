@@ -12,6 +12,8 @@ import { LikeCommentEntity } from "./modules/post/comment/like-comment/entity/li
 import { CommentEntity } from "./modules/post/comment/entity/comment.entity";
 import { BookmarkEntity } from "./modules/post/bookmark/entity/bookmark.entity";
 import { LikePostEntity } from "./modules/post/like-post/entity/like-post-entity";
+import { ActionEntity } from "./modules/action/entity/action.entity";
+import { NotificationEntity } from "./modules/action/notification/entity/notification.entity";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -33,6 +35,8 @@ export const AppDataSource = new DataSource({
     LikeCommentEntity,
     LikePostEntity,
     BookmarkEntity,
+    ActionEntity,
+    NotificationEntity,
   ],
   migrations: [],
   subscribers: [],

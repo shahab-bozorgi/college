@@ -38,7 +38,7 @@ export interface IFollowRepository {
     followingId: UserId,
     pagination: PaginationDto
   ): Promise<PaginatedResult<CloseFriends>>;
-  findFollowers(user: UserEntity): Promise<Follow[]>;
+  findFollowers(followingId: UserId): Promise<Follow[]>;
   findFollowings(followerId: UserId): Promise<Follow[]>;
   countFollowings(followerId: UserId): Promise<number>;
   countFollowers(followingId: UserId): Promise<number>;
@@ -58,10 +58,9 @@ export class FollowRepository implements IFollowRepository {
     this.flwrepo = dataSource.getRepository(FollowEntity);
   }
 
-  async findFollowers(user: UserEntity): Promise<Follow[]> {
-    return this.flwrepo.find({
-      where: { following: user },
-      relations: ["follower"],
+  async findFollowers(followingId: UserId): Promise<Follow[]> {
+    return await this.flwrepo.find({
+      where: { followingId, followingStatus: FOLLOWING },
     });
   }
 

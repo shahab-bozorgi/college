@@ -8,7 +8,6 @@ import { User } from "../user/model/user.model";
 import { CreatePostDto } from "./dto/create-post.dto";
 import { IPostRepository } from "./post.repository";
 import { MediaService } from "../media/media.service";
-import { parseMention } from "./model/mention";
 import { UserService } from "../user/user.service";
 import { Username } from "../user/model/user-username";
 import { extractTag } from "../tag/field-types/tag-title";
@@ -23,28 +22,30 @@ import { Post, ShowPost, ShowPosts } from "./model/post.model";
 import { PaginatedResult, PaginationDto } from "../../data/pagination";
 import { FollowService } from "../user/follow/follow.service";
 import { BLOCKED, FOLLOWING } from "../user/follow/model/follow.model";
+import { MentionService } from "./mention/mention.service";
 
 export class PostService {
   constructor(
     private postRepo: IPostRepository,
-    private mediaService: MediaService
+    private mediaService: MediaService,
+    private followService: FollowService,
+    private mentionService: MentionService
   ) {}
 
   async getPosts(
     username: Username,
     viewer: User,
     paginationDto: PaginationDto,
-    userService: UserService,
-    followService: FollowService
+    userService: UserService
   ): Promise<PaginatedResult<ShowPosts>> {
     const author = await userService.getUserBy(username);
     if (!author) throw new NotFound("User not found");
     if (author.id !== viewer.id) {
-      const followingStatus = await followService.getFollowingStatus(
+      const followingStatus = await this.followService.getFollowingStatus(
         author.id,
         viewer.id
       );
-      const viewerStatus = await followService.getFollowingStatus(
+      const viewerStatus = await this.followService.getFollowingStatus(
         viewer.id,
         author.id
       );
@@ -68,17 +69,17 @@ export class PostService {
     author: User,
     files: any,
     dto: CreatePostDto,
-    userService: UserService,
     tagService: TagService
   ): Promise<void> {
     if (!Array.isArray(files) || (Array.isArray(files) && !files.length))
       throw new HttpError(400, "Post must include at least one picture");
 
-    let mentions: User[] = [];
+    let mentionedUsers: User[] = [];
     if (dto.mentions) {
-      const mentionedUsers = parseMention(dto.mentions);
-      mentions = await userService.whereUsernameIn(mentionedUsers);
-      this.validateMentions(mentionedUsers, author, mentions);
+      mentionedUsers = await this.mentionService.validateMentions(
+        dto.mentions,
+        author
+      );
     }
 
     const media = await this.mediaService.insert(
@@ -100,21 +101,22 @@ export class PostService {
       }
     }
 
-    await this.postRepo.create({
+    const post = await this.postRepo.create({
       author,
       caption: dto.caption,
       media,
-      mentions,
       tags,
       closeFriendsOnly: dto.closeFriendsOnly,
     });
+
+    if (mentionedUsers.length)
+      await this.mentionService.insert(post.id, mentionedUsers);
   }
 
   async getPost(
     postId: string,
     viewer: User,
-    userService: UserService,
-    followService: FollowService
+    userService: UserService
   ): Promise<ShowPost> {
     if (!isPostId(postId)) throw new BadRequest("Invalid post ID.");
     const post = await this.postRepo.findById(postId, [
@@ -128,11 +130,11 @@ export class PostService {
     ]);
     if (!post) throw new NotFound("Post not found");
     if (post.authorId !== viewer.id) {
-      const followingStatus = await followService.getFollowingStatus(
+      const followingStatus = await this.followService.getFollowingStatus(
         post.authorId,
         viewer.id
       );
-      const viewerStatus = await followService.getFollowingStatus(
+      const viewerStatus = await this.followService.getFollowingStatus(
         viewer.id,
         post.author.id
       );
@@ -172,9 +174,8 @@ export class PostService {
 
   async update(
     postId: PostId,
-    loggedInUserId: UserId,
+    authenticatedId: UserId,
     dto: UpdatePostDto,
-    userService: UserService,
     tagService: TagService,
     files?: Express.Multer.File[]
   ): Promise<void> {
@@ -187,15 +188,22 @@ export class PostService {
 
     if (!post) throw new NotFound("Post not found");
 
-    if (post.author.id !== loggedInUserId)
+    if (post.author.id !== authenticatedId)
       throw new Forbidden("Access Forbidden");
 
+    let mentionedUsers: User[] = [];
     if (!dto.mentions) {
-      post.mentions = [];
+      await this.mentionService.deleteMentions(post.mentions);
     } else {
-      const mentionedUsers = parseMention(dto.mentions);
-      post.mentions = await userService.whereUsernameIn(mentionedUsers);
-      this.validateMentions(mentionedUsers, post.author, post.mentions);
+      mentionedUsers = await this.mentionService.validateMentions(
+        dto.mentions,
+        post.author
+      );
+      const deletedMentions = post.mentions.filter(
+        (mention) => !mentionedUsers.find((user) => mention.userId === user.id)
+      );
+      if (deletedMentions.length)
+        await this.mentionService.deleteMentions(deletedMentions);
     }
 
     const deletedMedia = dto.deletedMedia;
@@ -241,26 +249,19 @@ export class PostService {
       );
     }
 
+    if (mentionedUsers.length) {
+      await this.mentionService.insert(post.id, mentionedUsers);
+    }
+
     // post.closeFriendsOnly = dto.closeFriendsOnly;
 
-    await this.postRepo.update(post);
-  }
-
-  private validateMentions(
-    mentions: Username[],
-    author: User,
-    users: User[]
-  ): void {
-    if (mentions.includes(author.username.toLowerCase() as Username))
-      throw new HttpError(400, "You cannot mention yourself.");
-    if (users.length !== mentions.length) {
-      const foundUsers = users.map((user) => user.username.toLowerCase());
-      const notFound = mentions
-        .filter((mention) => !foundUsers.includes(mention))
-        .map((mention) => `@${mention}`)
-        .join(" ");
-      throw new NotFound(`No users were found by ${notFound}`);
-    }
+    await this.postRepo.update({
+      id: post.id,
+      caption: post.caption,
+      tags: post.tags,
+      media: post.media,
+      closeFriendsOnly: post.closeFriendsOnly,
+    });
   }
 
   async getPostsCount(author: User): Promise<number> {

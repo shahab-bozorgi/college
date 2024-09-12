@@ -4,6 +4,7 @@ import { FollowEntity } from "./entity/follow.entity";
 import {
   BLOCKED,
   CreateFollow,
+  DbFollowingStatus,
   DeleteFollow,
   Follow,
   FollowersList,
@@ -38,8 +39,16 @@ export interface IFollowRepository {
     followingId: UserId,
     pagination: PaginationDto
   ): Promise<PaginatedResult<CloseFriends>>;
-  findFollowers(followingId: UserId): Promise<Follow[]>;
-  findFollowings(followerId: UserId): Promise<Follow[]>;
+  findFollowers(
+    followingId: UserId,
+    followingStatus: DbFollowingStatus,
+    relations?: string[]
+  ): Promise<Follow[]>;
+  findFollowings(
+    followerId: UserId,
+    followingStatus: DbFollowingStatus,
+    relations?: string[]
+  ): Promise<Follow[]>;
   countFollowings(followerId: UserId): Promise<number>;
   countFollowers(followingId: UserId): Promise<number>;
   delete(follow: DeleteFollow): Promise<boolean>;
@@ -58,15 +67,31 @@ export class FollowRepository implements IFollowRepository {
     this.flwrepo = dataSource.getRepository(FollowEntity);
   }
 
-  async findFollowers(followingId: UserId): Promise<Follow[]> {
+  async findFollowers(
+    followingId: UserId,
+    followingStatus: DbFollowingStatus,
+    relations?: string[]
+  ): Promise<Follow[]> {
     return await this.flwrepo.find({
-      where: { followingId, followingStatus: FOLLOWING },
+      where: {
+        followingId,
+        followingStatus,
+      },
+      relations,
     });
   }
 
-  async findFollowings(followerId: UserId): Promise<Follow[]> {
+  async findFollowings(
+    followerId: UserId,
+    followingStatus: DbFollowingStatus,
+    relations?: string[]
+  ): Promise<Follow[]> {
     return await this.flwrepo.find({
-      where: { followerId, followingStatus: FOLLOWING },
+      where: {
+        followerId,
+        followingStatus,
+      },
+      relations,
     });
   }
 

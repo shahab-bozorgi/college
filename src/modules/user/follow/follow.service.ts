@@ -162,7 +162,7 @@ export class FollowService {
   }
 
   async findFollowings(followerId: UserId): Promise<Follow[]> {
-    return await this.flwRepo.findFollowings(followerId);
+    return await this.flwRepo.findFollowings(followerId, FOLLOWING);
   }
 
   async findFollowers(followingId: UserId): Promise<Follow[]> {
@@ -293,6 +293,14 @@ export class FollowService {
     pagination: PaginationDto
   ): Promise<PaginatedResult<Blacklist>> {
     return await this.flwRepo.userBlacklist(authenticatedId, pagination);
+  }
+
+  async findWhereUserIsBlocked(followerId: UserId): Promise<Follow[]> {
+    return await this.flwRepo.findFollowings(followerId, BLOCKED);
+  }
+
+  async findWhereUserHasBlocked(followingId: UserId): Promise<Follow[]> {
+    return await this.flwRepo.findFollowers(followingId, BLOCKED);
   }
 
   async addCloseFriend(

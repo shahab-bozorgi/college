@@ -16,6 +16,7 @@ import { UserId } from "../../user/model/user-user-id";
 import { CommentEntity } from "../comment/entity/comment.entity";
 import { BookmarkEntity } from "../bookmark/entity/bookmark.entity";
 import { LikePostEntity } from "../like-post/entity/like-post-entity";
+import { MentionEntity } from "../mention/entity/mention.entity";
 
 @Entity("posts")
 export class PostEntity {
@@ -37,9 +38,8 @@ export class PostEntity {
   @CreateDateColumn()
   createdAt!: Date;
 
-  @ManyToMany(() => UserEntity)
-  @JoinTable()
-  mentions!: UserEntity[];
+  @OneToMany(() => MentionEntity, (mention) => mention.post)
+  mentions!: MentionEntity[];
 
   @OneToMany(() => LikePostEntity, (likepost) => likepost.post)
   likes!: LikePostEntity[];

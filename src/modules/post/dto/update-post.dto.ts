@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { zodMentionString } from "../model/mention";
+import { zodMentionString } from "../mention/dto/mention.dto";
 import { zodDeletedMedia } from "../../media/field-types/media-id";
 import { zodBoolean } from "../../../data/boolean";
 

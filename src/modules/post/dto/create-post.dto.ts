@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { zodMentionString } from "../model/mention";
+import { zodMentionString } from "../mention/dto/mention.dto";
 import { zodBoolean } from "../../../data/boolean";
 
 export const CreatePostSchema = z.object({

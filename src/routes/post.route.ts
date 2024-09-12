@@ -20,7 +20,6 @@ import { BookmarkService } from "../modules/post/bookmark/bookmark.service";
 import { getPostsSchema } from "../modules/post/dto/get-posts.dto";
 import { LikePostSchema } from "../modules/post/like-post/dto/like-post-dto";
 import { LikePostService } from "../modules/post/like-post/like-post.service";
-import { FollowService } from "../modules/user/follow/follow.service";
 import { ActionNotificationService } from "../modules/common/service/action-notification.service";
 
 export const makePostRouter = (
@@ -31,7 +30,6 @@ export const makePostRouter = (
   likeCommentService: LikeCommentService,
   likePostService: LikePostService,
   bookmarkService: BookmarkService,
-  followService: FollowService,
   actionNotificationService: ActionNotificationService
 ) => {
   const app = Router();
@@ -50,8 +48,7 @@ export const makePostRouter = (
           username,
           req.user,
           { page, limit },
-          userService,
-          followService
+          userService
         ),
       });
     } catch (e) {
@@ -70,13 +67,7 @@ export const makePostRouter = (
     async (req, res, next) => {
       try {
         const dto = CreatePostSchema.parse(req.body);
-        await postService.create(
-          req.user,
-          req.files,
-          dto,
-          userService,
-          tagService
-        );
+        await postService.create(req.user, req.files, dto, tagService);
         res.status(201).json({ ok: true, data: {} });
       } catch (e) {
         next(e);
@@ -86,7 +77,7 @@ export const makePostRouter = (
 
   app.get("/:id", (req, res) => {
     handleExpress(res, () =>
-      postService.getPost(req.params.id, req.user, userService, followService)
+      postService.getPost(req.params.id, req.user, userService)
     );
   });
 
@@ -105,7 +96,6 @@ export const makePostRouter = (
           req.params.id as PostId,
           req.user.id,
           dto,
-          userService,
           tagService,
           Array.isArray(req.files) ? req.files : undefined
         );

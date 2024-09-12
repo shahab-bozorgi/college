@@ -27,7 +27,6 @@ import { FollowService } from "./follow/follow.service";
 import { MediaService } from "../media/media.service";
 import { NoneEmptyString } from "../../data/non-empty-string";
 import { MIME } from "../media/field-types/mime";
-import { BLOCKED } from "./follow/model/follow.model";
 
 export class UserService {
   constructor(private userRepo: IUserRepository) {}

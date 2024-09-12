@@ -23,6 +23,7 @@ import { ActionEntity } from "../../action/entity/action.entity";
 import { Action } from "../../action/model/action.model";
 import { Notification } from "../../action/notification/model/notification.model";
 import { NotificationEntity } from "../../action/notification/entity/notification.entity";
+import { MentionEntity } from "../../post/mention/entity/mention.entity";
 
 @Entity("users")
 export class UserEntity {
@@ -65,6 +66,9 @@ export class UserEntity {
   @OneToOne(() => MediaEntity, { onDelete: "SET NULL" })
   @JoinColumn()
   avatar!: MediaEntity;
+
+  @OneToMany(() => MentionEntity, (mention) => mention.user)
+  mentions!: MentionEntity[];
 
   @CreateDateColumn()
   createdAt!: Date;

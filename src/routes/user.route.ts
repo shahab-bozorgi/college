@@ -20,16 +20,16 @@ import { ExploreService } from "../modules/user/explore/explore.service";
 import { blockUserSchema } from "../modules/user/follow/dto/block-user.dto";
 import { unblockUserSchema } from "../modules/user/follow/dto/unblock-user.dto";
 import { paginationSchema } from "../data/pagination";
-import { zodUserId } from "../modules/user/model/user-user-id";
-import { z } from "zod";
 import { addAndRemveCloseFriendSchema } from "../modules/user/follow/dto/add-close-friends.dto";
+import { MentionService } from "../modules/post/mention/mention.service";
 
 export const makeUserRouter = (
   userService: UserService,
   followService: FollowService,
   mediaService: MediaService,
   postService: PostService,
-  exploreService: ExploreService
+  exploreService: ExploreService,
+  mentionService: MentionService
 ) => {
   const app = Router();
 
@@ -174,6 +174,13 @@ export const makeUserRouter = (
     const paginationDto = parseDtoWithSchema(req.query, paginationSchema);
     expressHandler(req, res, () =>
       followService.getCloseFriends(req.user.id, paginationDto)
+    );
+  });
+
+  app.get("/mentions", (req, res) => {
+    const paginationDto = parseDtoWithSchema(req.query, paginationSchema);
+    expressHandler(req, res, () =>
+      mentionService.getPostsMentioningUser(req.user.id, paginationDto)
     );
   });
 

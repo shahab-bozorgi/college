@@ -38,6 +38,8 @@ import { ActionNotificationRepository } from "./modules/common/repository/action
 import { makeNotificationRouter } from "./routes/notifications.route";
 import { NotificationService } from "./modules/action/notification/notification.service";
 import { NotificationRepository } from "./modules/action/notification/notification.repository";
+import { MentionRepository } from "./modules/post/mention/mention.repository";
+import { MentionService } from "./modules/post/mention/mention.service";
 
 export const makeApp = (dataSource: DataSource) => {
   const app = express();
@@ -70,8 +72,19 @@ export const makeApp = (dataSource: DataSource) => {
   const userService = new UserService(userRepository);
   const followRepository = new FollowRepository(dataSource);
   const followService = new FollowService(followRepository);
+  const mentionRepository = new MentionRepository(dataSource);
+  const mentionService = new MentionService(
+    mentionRepository,
+    userService,
+    followService
+  );
   const postRepository = new PostRepository(dataSource);
-  const postService = new PostService(postRepository, mediaService);
+  const postService = new PostService(
+    postRepository,
+    mediaService,
+    followService,
+    mentionService
+  );
   const tagRepository = new TagRepository(dataSource);
   const tagService = new TagService(tagRepository);
   const commentRepository = new CommentRepository(dataSource);
@@ -111,7 +124,8 @@ export const makeApp = (dataSource: DataSource) => {
       followService,
       mediaService,
       postService,
-      exploreService
+      exploreService,
+      mentionService
     )
   );
   app.use(
@@ -125,7 +139,6 @@ export const makeApp = (dataSource: DataSource) => {
       likeCommentService,
       likePostService,
       bookmarkService,
-      followService,
       actionNotificationService
     )
   );

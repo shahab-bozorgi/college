@@ -7,7 +7,8 @@ import { TagTitle } from "../../tag/field-types/tag-title";
 import { Username } from "../../user/model/user-username";
 import { Bookmark } from "../bookmark/model/bookmark.model";
 import { LikePost } from "../like-post/model/like-post-model";
-import { Comment } from "../comment/model/comment.model"; 
+import { Comment } from "../comment/model/comment.model";
+import { Mention } from "../mention/model/mention.model";
 
 export interface Post {
   id: PostId;
@@ -19,7 +20,7 @@ export interface Post {
 
 export interface PostRelations {
   author: User;
-  mentions: User[];
+  mentions: Mention[];
   tags: Tag[];
   media: Media[];
   bookmarks: Bookmark[];
@@ -32,15 +33,13 @@ export type PostSelectedRelations<R extends Array<keyof PostRelations>> = {
 };
 
 export interface CreatePost
-  extends Partial<
-    PostSelectedRelations<["tags", "mentions", "media", "author"]>
-  > {
+  extends Partial<PostSelectedRelations<["tags", "media", "author"]>> {
   caption: string;
   closeFriendsOnly: boolean;
 }
 
 export interface UpdatePost
-  extends Partial<PostSelectedRelations<["tags", "mentions", "media"]>> {
+  extends Partial<PostSelectedRelations<["tags", "media"]>> {
   id: PostId;
   caption: string;
   closeFriendsOnly: boolean;

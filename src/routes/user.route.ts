@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { UserService } from "../modules/user/user.service";
-import { toUsername, Username } from "../modules/user/model/user-username";
+import { Username } from "../modules/user/model/user-username";
 import { EditProfileSchema } from "../modules/user/dto/edit-profile.dto";
 import { MBToBytes, uploadSingleFile } from "../utilities/upload";
 import { PositiveInt } from "../data/int";
@@ -22,6 +22,7 @@ import { unblockUserSchema } from "../modules/user/follow/dto/unblock-user.dto";
 import { paginationSchema } from "../data/pagination";
 import { addAndRemveCloseFriendSchema } from "../modules/user/follow/dto/add-close-friends.dto";
 import { MentionService } from "../modules/post/mention/mention.service";
+import { BookmarkService } from "../modules/post/bookmark/bookmark.service";
 
 export const makeUserRouter = (
   userService: UserService,
@@ -29,7 +30,8 @@ export const makeUserRouter = (
   mediaService: MediaService,
   postService: PostService,
   exploreService: ExploreService,
-  mentionService: MentionService
+  mentionService: MentionService,
+  bookmarkService: BookmarkService
 ) => {
   const app = Router();
 
@@ -184,10 +186,11 @@ export const makeUserRouter = (
     );
   });
 
-  app.get("/:username", (req, res) => {
-    const username: Username = toUsername(req.params.username);
-    const user = userService.findByUsername(username);
-    res.status(200).send(user);
+  app.get("/bookmarks", (req, res) => {
+    const paginationDto = parseDtoWithSchema(req.query, paginationSchema);
+    expressHandler(req, res, () =>
+      bookmarkService.getBookmarks(req.user.id, paginationDto)
+    );
   });
 
   return app;

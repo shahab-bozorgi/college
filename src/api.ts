@@ -125,7 +125,8 @@ export const makeApp = (dataSource: DataSource) => {
       mediaService,
       postService,
       exploreService,
-      mentionService
+      mentionService,
+      bookmarkService
     )
   );
   app.use(

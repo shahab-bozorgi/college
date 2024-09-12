@@ -9,10 +9,10 @@
  *
  * security:
  *   - bearerAuth: []
- * /users/mentions?page=1&limit=10:
+ * /users/bookmarks?page=1&limit=10:
  *   get:
- *     summary: Get mentioned posts.
- *     description: Get posts where user is mentioned in.
+ *     summary: Get bookmarks list.
+ *     description: Get list of posts user has bookmarked.
  *     parameters:
  *       - name: page
  *         in: query
@@ -27,10 +27,10 @@
  *     security:
  *       - bearerAuth: []
  *     tags:
- *       - Mentions
+ *       - Bookmarking
  *     responses:
  *       200:
- *         description: Successfully retrieved posts where user was mentioned in.
+ *         description: Successfully retrieved user's bookmarks list.
  *         content:
  *           application/json:
  *             example:

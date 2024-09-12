@@ -63,7 +63,7 @@ export class MentionRepository implements IMentionRepository {
       .getManyAndCount();
     const { nextPage, totalPages } = paginationInfo(result[1], pagination);
     return {
-      posts: result[0].map((postMention) => postMention.post),
+      posts: result[0].map((mention) => mention.post),
       nextPage,
       totalPages,
     };

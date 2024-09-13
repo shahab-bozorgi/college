@@ -3,6 +3,9 @@ import { parseDtoWithSchema } from "../utilities/parse-dto-handler";
 import { expressHandler } from "../utilities/handle-express";
 import { NotificationService } from "../modules/action/notification/notification.service";
 import { GetNotificationsSchema } from "../modules/action/notification/dto/get-notifications.dto";
+import { array } from "zod";
+import { zodNotificationId } from "../modules/action/notification/model/notification-id";
+import { SeenNotificationsSchema } from "../modules/action/notification/dto/seen-notifications.dto";
 
 export const makeNotificationRouter = (
   notificationService: NotificationService
@@ -39,5 +42,17 @@ export const makeNotificationRouter = (
     });
   });
 
+  app.patch("/seen", async (req, res, next) => {
+    const dto = parseDtoWithSchema(
+      {
+        notificationIds: req.body.notificationIds,
+        receiverId: req.user.id,
+      },
+      SeenNotificationsSchema
+    );
+    expressHandler(req, res, () => {
+      return notificationService.seenNotifications(dto);
+    });
+  });
   return app;
 };

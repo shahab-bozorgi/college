@@ -1,12 +1,15 @@
 import { PaginatedResult } from "../../../data/pagination";
 import { UUID } from "../../../data/uuid";
-import { NotFound } from "../../../utilities/http-error";
+import { BadRequest, NotFound } from "../../../utilities/http-error";
 import { CommentService } from "../../post/comment/comment.service";
 import { PostService } from "../../post/post.service";
 import { FollowService } from "../../user/follow/follow.service";
+import { UserId } from "../../user/model/user-user-id";
 import { UserService } from "../../user/user.service";
 import { ActionType } from "../model/action-type";
 import { GetNotificationsDto } from "./dto/get-notifications.dto";
+import { SeenNotificationsDto } from "./dto/seen-notifications.dto";
+import { NotificationId } from "./model/notification-id";
 import { ShowNotification } from "./model/notification.model";
 import { INotificationRepository } from "./notification.repository";
 
@@ -75,6 +78,32 @@ export class NotificationService {
     }
 
     return { notifications: showNotifications, nextPage, totalPages };
+  }
+
+  async seenNotifications(
+    dto: SeenNotificationsDto
+  ): Promise<{ seenNotificationsStatus: boolean }> {
+    if (
+      await this.isInvalidSeenNotifications(dto.notificationIds, dto.receiverId)
+    ) {
+      throw new BadRequest(
+        "Some notificationsIds are not for authenticated user!"
+      );
+    }
+
+    return await this.notificationRepo.seen(dto);
+  }
+
+  async isInvalidSeenNotifications(
+    notificationIds: NotificationId[],
+    receiverId: UserId
+  ): Promise<boolean> {
+    return Boolean(
+      (await this.notificationRepo.countInvalidSeenNotifications(
+        notificationIds,
+        receiverId
+      )) > 0
+    );
   }
 
   private async getActionEntity(actionType: ActionType, entityId: UUID) {

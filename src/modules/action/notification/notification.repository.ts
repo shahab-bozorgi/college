@@ -1,4 +1,4 @@
-import { DataSource, Repository } from "typeorm";
+import { DataSource, In, Not, Repository } from "typeorm";
 import { NotificationEntity } from "./entity/notification.entity";
 import { GetNotificationsDto } from "./dto/get-notifications.dto";
 import {
@@ -10,7 +10,9 @@ import { CommentRepository } from "../../post/comment/comment.repository";
 import { CommentId } from "../../post/comment/model/comment-id";
 import { ActionType } from "../model/action-type";
 import { UUID } from "../../../data/uuid";
-import { ShowNotification } from "./model/notification.model";
+import { NotificationId } from "./model/notification-id";
+import { SeenNotificationsDto } from "./dto/seen-notifications.dto";
+import { UserId } from "../../user/model/user-user-id";
 
 export interface INotificationRepository {
   getAllWithAction(
@@ -20,6 +22,13 @@ export interface INotificationRepository {
     actionType: ActionType,
     entityId: UUID
   ): Promise<unknown | null>;
+  seen(
+    dto: SeenNotificationsDto
+  ): Promise<{ seenNotificationsStatus: boolean }>;
+  countInvalidSeenNotifications(
+    notificationIds: NotificationId[],
+    receiverId: UserId
+  ): Promise<number>;
 }
 
 export class NotificationRepository implements INotificationRepository {
@@ -75,5 +84,31 @@ export class NotificationRepository implements INotificationRepository {
       default:
         return null;
     }
+  }
+
+  async seen(
+    dto: SeenNotificationsDto
+  ): Promise<{ seenNotificationsStatus: boolean }> {
+    return {
+      seenNotificationsStatus:
+        (
+          await this.repo.update(
+            { id: In(dto.notificationIds), receiverId: dto.receiverId },
+            { isSeen: true }
+          )
+        ).affected === dto.notificationIds.length,
+    };
+  }
+
+  async countInvalidSeenNotifications(
+    notificationIds: NotificationId[],
+    receiverId: UserId
+  ): Promise<number> {
+    return await this.repo.count({
+      where: {
+        id: In(notificationIds),
+        receiverId: Not(receiverId),
+      },
+    });
   }
 }

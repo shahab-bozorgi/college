@@ -6,6 +6,9 @@ import { GetNotificationsSchema } from "../modules/action/notification/dto/get-n
 import { array } from "zod";
 import { zodNotificationId } from "../modules/action/notification/model/notification-id";
 import { SeenNotificationsSchema } from "../modules/action/notification/dto/seen-notifications.dto";
+import { zodUserId } from "../modules/user/model/user-user-id";
+import { zodBoolean } from "../data/boolean";
+import { countNotificationsByTypeSchema } from "../modules/action/notification/dto/count-notifications-by-type.dto";
 
 export const makeNotificationRouter = (
   notificationService: NotificationService
@@ -54,5 +57,26 @@ export const makeNotificationRouter = (
       return notificationService.seenNotifications(dto);
     });
   });
+
+  app.get("/unseen/count", async (req, res, next) => {
+    const receiverId = parseDtoWithSchema(req.user.id, zodUserId);
+    expressHandler(req, res, () => {
+      return notificationService.countUnSeenNotifications(receiverId);
+    });
+  });
+
+  app.get("/unseen/count/:notificationType", async (req, res, next) => {
+    const dto = parseDtoWithSchema(
+      {
+        receiverId: req.user.id,
+        notificationType: req.params.notificationType,
+      },
+      countNotificationsByTypeSchema
+    );
+    expressHandler(req, res, () => {
+      return notificationService.countUnseenNotificationsByType(dto);
+    });
+  });
+
   return app;
 };

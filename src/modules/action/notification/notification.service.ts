@@ -7,9 +7,11 @@ import { FollowService } from "../../user/follow/follow.service";
 import { UserId } from "../../user/model/user-user-id";
 import { UserService } from "../../user/user.service";
 import { ActionType } from "../model/action-type";
+import { countNotificationsByTypeDto } from "./dto/count-notifications-by-type.dto";
 import { GetNotificationsDto } from "./dto/get-notifications.dto";
 import { SeenNotificationsDto } from "./dto/seen-notifications.dto";
 import { NotificationId } from "./model/notification-id";
+import { NotificationType } from "./model/notification-type";
 import { ShowNotification } from "./model/notification.model";
 import { INotificationRepository } from "./notification.repository";
 
@@ -80,6 +82,13 @@ export class NotificationService {
     return { notifications: showNotifications, nextPage, totalPages };
   }
 
+  private async getActionEntity(actionType: ActionType, entityId: UUID) {
+    return await this.notificationRepo.getRelatedEntityByType(
+      actionType,
+      entityId
+    );
+  }
+
   async seenNotifications(
     dto: SeenNotificationsDto
   ): Promise<{ seenNotificationsStatus: boolean }> {
@@ -106,10 +115,26 @@ export class NotificationService {
     );
   }
 
-  private async getActionEntity(actionType: ActionType, entityId: UUID) {
-    return await this.notificationRepo.getRelatedEntityByType(
-      actionType,
-      entityId
-    );
+  async countUnSeenNotifications(receiverId: UserId): Promise<{
+    countUnseenNotifications: number;
+  }> {
+    return {
+      countUnseenNotifications: await this.notificationRepo.countUnseen(
+        receiverId
+      ),
+    };
+  }
+
+  async countUnseenNotificationsByType(
+    dto: countNotificationsByTypeDto
+  ): Promise<{
+    countUnseenNotifications: number;
+  }> {
+    return {
+      countUnseenNotifications: await this.notificationRepo.countUnseenByType(
+        dto.receiverId,
+        dto.notificationType
+      ),
+    };
   }
 }

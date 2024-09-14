@@ -13,6 +13,7 @@ import { UUID } from "../../../data/uuid";
 import { NotificationId } from "./model/notification-id";
 import { SeenNotificationsDto } from "./dto/seen-notifications.dto";
 import { UserId } from "../../user/model/user-user-id";
+import { NotificationType } from "./model/notification-type";
 
 export interface INotificationRepository {
   getAllWithAction(
@@ -28,6 +29,11 @@ export interface INotificationRepository {
   countInvalidSeenNotifications(
     notificationIds: NotificationId[],
     receiverId: UserId
+  ): Promise<number>;
+  countUnseen(receiverId: UserId): Promise<number>;
+  countUnseenByType(
+    receiverId: UserId,
+    notificationType: NotificationType
   ): Promise<number>;
 }
 
@@ -109,6 +115,21 @@ export class NotificationRepository implements INotificationRepository {
         id: In(notificationIds),
         receiverId: Not(receiverId),
       },
+    });
+  }
+
+  async countUnseen(receiverId: UserId): Promise<number> {
+    return await this.repo.count({
+      where: { receiverId, isSeen: false },
+    });
+  }
+
+  async countUnseenByType(
+    receiverId: UserId,
+    notificationType: NotificationType
+  ): Promise<number> {
+    return await this.repo.count({
+      where: { receiverId, notificationType: notificationType },
     });
   }
 }

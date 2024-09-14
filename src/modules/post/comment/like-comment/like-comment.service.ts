@@ -1,9 +1,12 @@
 import { DuplicatedRecord, NotFound } from "../../../../utilities/http-error";
+import { UserId } from "../../../user/model/user-user-id";
 import { UserService } from "../../../user/user.service";
 import { CommentService } from "../comment.service";
+import { CommentId } from "../model/comment-id";
 import { LikeCommentDto } from "./dto/like-comment.dto";
 import { UnLikeCommentDto } from "./dto/unlike-comment.dto";
 import { ILikeCommentRepository } from "./like-comment-repository";
+import { GetLikeComment, LikeComment } from "./model/like-comment.model";
 
 export class LikeCommentService {
   constructor(private likeCommentRepo: ILikeCommentRepository) {}
@@ -41,7 +44,6 @@ export class LikeCommentService {
     userService: UserService,
     commentService: CommentService
   ) {
-
     if (
       (await this.likeCommentRepo.getLikeComment({
         userId: dto.userId,
@@ -60,6 +62,13 @@ export class LikeCommentService {
     }
 
     return await this.likeCommentRepo.delete({
+      userId: dto.userId,
+      commentId: dto.commentId,
+    });
+  }
+
+  async getLikeComment(dto: GetLikeComment): Promise<LikeComment | null> {
+    return await this.likeCommentRepo.getLikeComment({
       userId: dto.userId,
       commentId: dto.commentId,
     });

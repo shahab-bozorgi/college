@@ -7,6 +7,7 @@ import { PostService } from "../post.service";
 import { ICommentRepository } from "./comment.repository";
 import { CreateCommentDto } from "./dto/create-comment.dto";
 import { GetCommentsDto } from "./dto/get-comments.dto";
+import { LikeCommentService } from "./like-comment/like-comment.service";
 import { CommentId } from "./model/comment-id";
 import { ShowComment } from "./model/comment.model";
 
@@ -63,7 +64,7 @@ export class CommentService {
 
   async getComments(
     dto: GetCommentsDto,
-    userService: UserService,
+    likeCommentService: LikeCommentService,
     postService: PostService
   ): Promise<PaginatedResult<{ comments: ShowComment[] }>> {
     if ((await postService.findPostById(dto.postId)) === null) {
@@ -73,13 +74,36 @@ export class CommentService {
     const comments = await this.commentRepo.getAll(dto);
 
     let parentComments: ShowComment[] = [];
+    let childComments: ShowComment[] = [];
 
     if (comments !== null) {
-      parentComments = comments.filter((comment) => comment.parentId === null);
+      for (const comment of comments) {
+        const isLiked =
+          (await likeCommentService.getLikeComment({
+            userId: dto.authenticatedUserId,
+            commentId: comment.id,
+          })) !== null
+            ? true
+            : false;
 
-      const childComments = comments.filter(
-        (comment) => comment.parentId !== null
-      );
+        if (comment.parentId === null) {
+          parentComments.push({ ...comment, isLiked });
+        }
+      }
+
+      for (const comment of comments) {
+        const isLiked =
+          (await likeCommentService.getLikeComment({
+            userId: dto.authenticatedUserId,
+            commentId: comment.id,
+          })) !== null
+            ? true
+            : false;
+
+        if (comment.parentId !== null) {
+          childComments.push({ ...comment, isLiked });
+        }
+      }
 
       parentComments.forEach((parent) => {
         parent.replies = childComments.filter(

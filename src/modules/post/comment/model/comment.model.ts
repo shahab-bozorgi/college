@@ -38,6 +38,7 @@ export interface ShowComment {
   createdAt: Date;
   replies: ShowComment[];
   likeCommentsCount: number;
+  isLiked?: boolean;
 }
 
 export interface CommentNotification {

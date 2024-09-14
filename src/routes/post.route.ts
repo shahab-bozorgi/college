@@ -130,6 +130,7 @@ export const makePostRouter = (
   app.get("/:postId/comments", (req, res) => {
     const dto = parseDtoWithSchema(
       {
+        authenticatedUserId: req.user.id,
         postId: req.params.postId,
         page: req.query.page,
         limit: req.query.limit,
@@ -137,7 +138,7 @@ export const makePostRouter = (
       GetCommentsSchema
     );
     handleExpress(res, () =>
-      commentService.getComments(dto, userService, postService)
+      commentService.getComments(dto, likeCommentService, postService)
     );
   });
 

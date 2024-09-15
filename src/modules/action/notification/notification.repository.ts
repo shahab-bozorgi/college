@@ -129,7 +129,7 @@ export class NotificationRepository implements INotificationRepository {
     notificationType: NotificationType
   ): Promise<number> {
     return await this.repo.count({
-      where: { receiverId, notificationType: notificationType },
+      where: { receiverId, notificationType: notificationType, isSeen: false },
     });
   }
 }

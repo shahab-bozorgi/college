@@ -31,8 +31,6 @@ export class FollowService {
     userService: UserService,
     actionNotificationService: ActionNotificationService
   ): Promise<void> {
-    const authenticatedUser = await userService.getUserBy(authenticatedId);
-
     if (authenticatedId === followingId) {
       throw new BadRequest("Don't follow yourself!");
     }
@@ -65,6 +63,7 @@ export class FollowService {
         throw new BadRequest("You have already followed this user.");
     }
 
+    const authenticatedUser = await userService.getUserBy(authenticatedId);
     const actionMediaId = authenticatedUser?.avatar?.id ?? null;
 
     if (following.isPrivate) {
@@ -87,11 +86,24 @@ export class FollowService {
         followCreated.followingId
       );
     } else {
-      await this.flwRepo.create({
+      const followCreated = await this.flwRepo.create({
         followerId: authenticatedId,
         followingId,
         followingStatus: FOLLOWING,
       });
+
+      const actionDto: CreateActionDto = {
+        actorId: followCreated.followerId,
+        type: "follow",
+        entityId: followCreated.id,
+        actionDate: followCreated.createdAt,
+        mediaId: actionMediaId,
+      };
+
+      await actionNotificationService.createActionWithNotifications(
+        actionDto,
+        followCreated.followingId
+      );
     }
   }
 
@@ -192,7 +204,8 @@ export class FollowService {
   async acceptFollowUser(
     authenticatedId: UserId,
     followerId: UserId,
-    userService: UserService
+    userService: UserService,
+    actionNotificationService: ActionNotificationService
   ): Promise<void> {
     if (followerId === authenticatedId)
       throw new BadRequest(
@@ -209,11 +222,27 @@ export class FollowService {
     if (followingStatus !== PENDING)
       throw new BadRequest("Follow request not found.");
 
-    await this.flwRepo.update({
+    const followUpdated = await this.flwRepo.update({
       followerId,
       followingId: authenticatedId,
       followingStatus: FOLLOWING,
     });
+
+    const authenticatedUser = await userService.getUserBy(authenticatedId);
+    const actionMediaId = authenticatedUser?.avatar?.id ?? null;
+
+    const actionDto: CreateActionDto = {
+      actorId: followUpdated.followerId,
+      type: "acceptFollow",
+      entityId: followUpdated.id,
+      actionDate: followUpdated.updatedAt,
+      mediaId: actionMediaId,
+    };
+
+    await actionNotificationService.createActionWithNotifications(
+      actionDto,
+      followUpdated.followingId
+    );
   }
 
   async rejectFollowUser(

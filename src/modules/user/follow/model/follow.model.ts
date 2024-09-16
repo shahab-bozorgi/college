@@ -23,6 +23,7 @@ export interface Follow {
   followingStatus: DbFollowingStatus;
   isCloseFriend: boolean;
   createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface CreateFollow {
@@ -61,8 +62,10 @@ export interface FollowersList {
 }
 
 export interface FollowNotification {
-  id: UserId;
-  username: Username;
-  firstName: string;
-  lastName: string;
+  following: {
+    id: UserId;
+    username: Username;
+    firstName: string;
+    lastName: string;
+  };
 }

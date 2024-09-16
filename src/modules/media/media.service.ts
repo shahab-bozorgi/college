@@ -29,4 +29,8 @@ export class MediaService {
     }
     throw new HttpError(500, "Internal Server Error!");
   }
+
+  async getMedia(mediaId: MediaId): Promise<Media | null> {
+    return await this.mediaRepo.findById(mediaId);
+  }
 }

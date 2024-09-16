@@ -128,7 +128,8 @@ export const makeUserRouter = (
       return followService.acceptFollowUser(
         req.user.id,
         dto.followerId,
-        userService
+        userService,
+        actionNotificationService
       );
     });
   });

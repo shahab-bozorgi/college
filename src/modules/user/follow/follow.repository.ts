@@ -60,7 +60,9 @@ export interface IFollowRepository {
     followingId: UserId
   ): Promise<Follow | null>;
   findById(id: FollowId): Promise<Follow | null>;
-  getFollowForNotificationById(id: FollowId): Promise<FollowEntity | null>;
+  getFollowForNotificationById(
+    id: FollowId
+  ): Promise<FollowNotification | null>;
 }
 
 export class FollowRepository implements IFollowRepository {
@@ -261,17 +263,22 @@ export class FollowRepository implements IFollowRepository {
 
   async getFollowForNotificationById(
     id: FollowId
-  ): Promise<FollowEntity | null> {
-    return await this.flwrepo
-      .createQueryBuilder("follow")
-      .leftJoinAndSelect("follow.following", "following")
-      .select([
-        "following.id",
-        "following.username",
-        "following.firstName",
-        "following.lastName",
-      ])
-      .where("follow.id = :id", { id })
-      .getOne();
+  ): Promise<FollowNotification | null> {
+    const followRow: FollowNotification | null = await this.flwrepo.findOne({
+      where: { id },
+      relations: ["following"],
+      select: {
+        following: {
+          id: true,
+          username: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+    });
+
+    if (followRow !== null) return { following: followRow.following };
+
+    return followRow;
   }
 }

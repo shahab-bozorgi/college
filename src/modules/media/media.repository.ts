@@ -9,6 +9,7 @@ export interface IMediaRepository {
   insert(fields: CreateMedia[]): Promise<Media[]>;
   delete(id: MediaId | MediaId[]): Promise<boolean>;
   whereIn(ids: MediaId[]): Promise<Media[]>;
+  findById(id: MediaId): Promise<Media | null>;
 }
 
 export class MediaRepository implements IMediaRepository {
@@ -36,5 +37,9 @@ export class MediaRepository implements IMediaRepository {
 
   async whereIn(ids: MediaId[]): Promise<Media[]> {
     return await this.repo.findBy({ id: In(ids) });
+  }
+
+  async findById(id: MediaId): Promise<Media | null> {
+    return await this.repo.findOneBy({ id });
   }
 }

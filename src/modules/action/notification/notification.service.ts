@@ -1,6 +1,7 @@
 import { PaginatedResult } from "../../../data/pagination";
 import { UUID } from "../../../data/uuid";
 import { BadRequest, NotFound } from "../../../utilities/http-error";
+import { MediaService } from "../../media/media.service";
 import { CommentService } from "../../post/comment/comment.service";
 import { PostService } from "../../post/post.service";
 import { FollowService } from "../../user/follow/follow.service";
@@ -11,7 +12,6 @@ import { countNotificationsByTypeDto } from "./dto/count-notifications-by-type.d
 import { GetNotificationsDto } from "./dto/get-notifications.dto";
 import { SeenNotificationsDto } from "./dto/seen-notifications.dto";
 import { NotificationId } from "./model/notification-id";
-import { NotificationType } from "./model/notification-type";
 import { ShowNotification } from "./model/notification.model";
 import { INotificationRepository } from "./notification.repository";
 
@@ -19,7 +19,8 @@ export class NotificationService {
   constructor(
     private notificationRepo: INotificationRepository,
     public userService: UserService,
-    followService: FollowService,
+    public mediaService: MediaService,
+    public followService: FollowService,
     postService: PostService,
     commentService: CommentService
   ) {}
@@ -43,14 +44,27 @@ export class NotificationService {
         throw new NotFound(`Actor of notification ${notif.id} not found`);
       }
 
+      const followingStatus = await this.followService.getFollowingStatus(
+        actor.id,
+        receiver.id
+      );
+
+      let media = null;
+
+      if (notif.action.mediaId !== null) {
+        media = await this.mediaService.getMedia(notif.action.mediaId);
+      }
+
       const showNotif: ShowNotification = {
         id: notif.id,
         actoinType: notif.action.type,
+        media: media,
         actor: {
           id: actor.id,
           username: actor.username,
           firstName: actor.firstName ?? "",
           lastName: actor.lastName ?? "",
+          followingStatus: followingStatus.status,
         },
         isSeen: notif.isSeen,
       };

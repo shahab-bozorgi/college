@@ -109,6 +109,7 @@ export const makeApp = (dataSource: DataSource) => {
   const notificationService = new NotificationService(
     notificationRepository,
     userService,
+    mediaService,
     followService,
     postService,
     commentService

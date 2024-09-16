@@ -52,10 +52,10 @@ export class NotificationRepository implements INotificationRepository {
     const result = await this.repo
       .createQueryBuilder("notification")
       .leftJoinAndSelect("notification.action", "action")
-      .leftJoinAndSelect("notification.media", "media")
+      .leftJoinAndSelect("action.media", "media")
       .select([
         "notification.id",
-        "media",
+        "action.mediaId",
         "action.type",
         "action.actorId",
         "action.entityId",
@@ -84,15 +84,26 @@ export class NotificationRepository implements INotificationRepository {
     actionType: ActionType,
     entityId: UUID
   ): Promise<unknown | null> {
+    const commentRepo = new CommentRepository(this.dataSource);
+    const followRepo = new FollowRepository(this.dataSource);
+
     switch (actionType) {
       case "comment":
-        const commentRepo = new CommentRepository(this.dataSource);
         return await commentRepo.getCommentForNotificationById(
           entityId as CommentId
         );
 
+      case "acceptFollow":
+        return await followRepo.getFollowForNotificationById(
+          entityId as FollowId
+        );
+
+      case "requestFollow":
+        return await followRepo.getFollowForNotificationById(
+          entityId as FollowId
+        );
+
       case "follow":
-        const followRepo = new FollowRepository(this.dataSource);
         return await followRepo.getFollowForNotificationById(
           entityId as FollowId
         );

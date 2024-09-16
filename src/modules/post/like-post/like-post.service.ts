@@ -1,7 +1,7 @@
 import { BadRequest, NotFound } from "../../../utilities/http-error";
-import { UserId } from "../../user/model/user-user-id";
+import { CreateActionDto } from "../../action/dto/create-action.dto";
+import { ActionNotificationService } from "../../common/service/action-notification.service";
 import { UserService } from "../../user/user.service";
-import { PostId } from "../model/post-id";
 import { PostService } from "../post.service";
 import { LikePostDto } from "./dto/like-post-dto";
 import { ILikePostRepository } from "./like-post-repository";
@@ -12,9 +12,12 @@ export class LikePostService {
   async likePost(
     dto: LikePostDto,
     userService: UserService,
-    postService: PostService
+    postService: PostService,
+    actionNotificationService: ActionNotificationService
   ) {
-    if ((await postService.findPostById(dto.postId)) === null) {
+    const postOfComment = await postService.findPostById(dto.postId, ["media"]);
+
+    if (postOfComment === null) {
       throw new NotFound("Post is not found");
     }
 
@@ -31,10 +34,26 @@ export class LikePostService {
       throw new BadRequest("You have already liked this post");
     }
 
-    return await this.likePostRepo.create({
+    const likePostCreated = await this.likePostRepo.create({
       userId: dto.userId,
       postId: dto.postId,
     });
+
+    const actionDto: CreateActionDto = {
+      actorId: likePostCreated.userId,
+      type: "likePost",
+      entityId: likePostCreated.id,
+      actionDate: likePostCreated.createdAt,
+      mediaId: postOfComment.media[0].id ?? null,
+    };
+
+    await actionNotificationService.createActionWithNotifications(
+      actionDto,
+      postOfComment.authorId,
+      postOfComment.closeFriendsOnly
+    );
+
+    return likePostCreated;
   }
 
   async unLikePost(

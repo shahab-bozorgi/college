@@ -181,7 +181,12 @@ export const makePostRouter = (
     );
 
     expressHandler(req, res, async () => {
-      await likePostService.likePost(dto, userService, postService);
+      await likePostService.likePost(
+        dto,
+        userService,
+        postService,
+        actionNotificationService
+      );
       return {};
     });
   });

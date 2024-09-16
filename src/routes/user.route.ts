@@ -6,7 +6,7 @@ import { MBToBytes, uploadSingleFile } from "../utilities/upload";
 import { PositiveInt } from "../data/int";
 import { MediaService } from "../modules/media/media.service";
 import { imageMIMEs } from "../modules/media/model/mime";
-import { expressHandler, handleExpress } from "../utilities/handle-express";
+import { expressHandler } from "../utilities/handle-express";
 import { PostService } from "../modules/post/post.service";
 import { FollowService } from "../modules/user/follow/follow.service";
 import { parseDtoWithSchema } from "../utilities/parse-dto-handler";
@@ -58,7 +58,7 @@ export const makeUserRouter = (
 
   app.get("/profile", (req, res) => {
     const username = (req.query.username as Username) ?? req.user.username;
-    handleExpress(res, () =>
+    expressHandler(req, res, () =>
       userService.userProfile(username, req.user, postService, followService)
     );
   });

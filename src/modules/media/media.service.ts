@@ -1,8 +1,8 @@
 import { HttpError } from "../../utilities/http-error";
-import { MediaId } from "./field-types/media-id";
-import { CreateMedia, Media } from "./media.model";
+import { MediaId } from "./model/media-id";
 import { IMediaRepository } from "./media.repository";
 import fs from "fs";
+import { CreateMedia, Media } from "./model/media.model";
 
 export class MediaService {
   constructor(private mediaRepo: IMediaRepository) {}

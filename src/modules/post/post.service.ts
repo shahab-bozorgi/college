@@ -15,10 +15,10 @@ import { TagService } from "../tag/tag.service";
 import { Tag } from "../tag/tag.model";
 import { isPostId, PostId } from "./model/post-id";
 import { UpdatePostDto } from "./dto/update-post.dto";
-import { MIME } from "../media/field-types/mime";
+import { MIME } from "../media/model/mime";
 import { NoneEmptyString } from "../../data/non-empty-string";
 import { UserId } from "../user/model/user-user-id";
-import { Post, ShowPost, ShowPosts } from "./model/post.model";
+import { Post, PostRelations, ShowPost, ShowPosts } from "./model/post.model";
 import { PaginatedResult, PaginationDto } from "../../data/pagination";
 import { FollowService } from "../user/follow/follow.service";
 import { BLOCKED, FOLLOWING } from "../user/follow/model/follow.model";
@@ -268,7 +268,14 @@ export class PostService {
     return await this.postRepo.postsCount(author);
   }
 
-  async findPostById(id: PostId): Promise<Post | null> {
+  async findPostById<R extends Array<keyof PostRelations>>(
+    id: PostId,
+    relations?: R
+  ): Promise<Post | null> {
+    if (relations !== undefined) {
+      return await this.postRepo.findById(id, relations);
+    }
+
     return await this.postRepo.findById(id);
   }
 }

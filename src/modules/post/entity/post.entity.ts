@@ -10,7 +10,7 @@ import {
 } from "typeorm";
 import { PostId } from "../model/post-id";
 import { UserEntity } from "../../user/entity/user.entity";
-import { MediaEntity } from "../../media/media.entity";
+import { MediaEntity } from "../../media/entity/media.entity";
 import { TagEntity } from "../../tag/tag.entity";
 import { UserId } from "../../user/model/user-user-id";
 import { CommentEntity } from "../comment/entity/comment.entity";

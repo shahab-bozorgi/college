@@ -1,8 +1,8 @@
 import { DataSource, In, Repository } from "typeorm";
-import { CreateMedia, Media } from "./media.model";
-import { MediaEntity } from "./media.entity";
+import { MediaEntity } from "./entity/media.entity";
 import { v4 } from "uuid";
-import { MediaId } from "./field-types/media-id";
+import { MediaId } from "./model/media-id";
+import { CreateMedia, Media } from "./model/media.model";
 
 export interface IMediaRepository {
   create(fields: CreateMedia): Promise<Media>;

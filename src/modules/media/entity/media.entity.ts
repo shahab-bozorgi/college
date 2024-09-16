@@ -1,9 +1,9 @@
 import { AfterLoad, Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
-import { MediaId } from "./field-types/media-id";
-import { NoneEmptyString } from "../../data/non-empty-string";
-import { MIME } from "./field-types/mime";
-import { ActionEntity } from "../action/entity/action.entity";
-import { Action } from "../action/model/action.model";
+import { MediaId } from "../model/media-id";
+import { NoneEmptyString } from "../../../data/non-empty-string";
+import { MIME } from "../model/mime";
+import { ActionEntity } from "../../action/entity/action.entity";
+import { Action } from "../../action/model/action.model";
 
 @Entity("media")
 export class MediaEntity {

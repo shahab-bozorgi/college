@@ -1,4 +1,3 @@
-import { boolean } from "zod";
 import { NotFound } from "../../../utilities/http-error";
 import { CreateActionDto } from "../../action/dto/create-action.dto";
 import { FollowService } from "../../user/follow/follow.service";

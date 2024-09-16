@@ -2,7 +2,7 @@ import { z } from "zod";
 import { isSpecificLengthString } from "../../../data/specific-length-string";
 import { isPassword, Password } from "../../user/model/user-password";
 import { isNoneEmptyString } from "../../../data/non-empty-string";
-import { isPasswordResetToken } from "../type-guard/token";
+import { isPasswordResetToken } from "../model/token";
 
 export const passwordResetSchema = z
   .object({

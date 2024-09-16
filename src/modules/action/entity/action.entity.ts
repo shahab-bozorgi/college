@@ -13,9 +13,10 @@ import { User } from "../../user/model/user.model";
 import { ActionId } from "../model/action-id";
 import { NotificationEntity } from "../notification/entity/notification.entity";
 import { Notification } from "../notification/model/notification.model";
-import { Media } from "../../media/media.model";
-import { MediaEntity } from "../../media/media.entity";
+import { MediaEntity } from "../../media/entity/media.entity";
 import { UUID } from "../../../data/uuid";
+import { MediaId } from "../../media/model/media-id";
+import { Media } from "../../media/model/media.model";
 
 @Entity("actions")
 export class ActionEntity {
@@ -28,8 +29,8 @@ export class ActionEntity {
   @ManyToOne(() => UserEntity, (actor) => actor.actions)
   actor!: User;
 
-  @Column({ default: null })
-  mediaId!: UserId;
+  @Column({ default: null, nullable: true })
+  mediaId!: MediaId | null;
 
   @ManyToOne(() => MediaEntity, (media) => media.actions, {
     onDelete: "SET NULL",

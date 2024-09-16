@@ -5,9 +5,9 @@ import {
   ManyToOne,
   PrimaryColumn,
 } from "typeorm";
-import { UserEntity } from "../user/entity/user.entity";
-import { User } from "../user/model/user.model";
-import { PasswordResetToken } from "./type-guard/token";
+import { PasswordResetToken } from "../model/token";
+import { UserEntity } from "../../user/entity/user.entity";
+import { User } from "../../user/model/user.model";
 
 @Entity("password_resets")
 export class PasswordResetEntity {

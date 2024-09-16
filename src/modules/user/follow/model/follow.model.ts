@@ -1,4 +1,4 @@
-import { Media } from "../../../media/media.model";
+import { Media } from "../../../media/model/media.model";
 import { UserId } from "../../model/user-user-id";
 import { Username } from "../../model/user-username";
 import { FollowId } from "./follow-id.model";

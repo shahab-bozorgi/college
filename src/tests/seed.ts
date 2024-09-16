@@ -8,7 +8,7 @@ import { User } from "../modules/user/model/user.model";
 import { Email } from "../data/email";
 import { PostEntity } from "../modules/post/entity/post.entity";
 import { PostId } from "../modules/post/model/post-id";
-import { MediaEntity } from "../modules/media/media.entity";
+import { MediaEntity } from "../modules/media/entity/media.entity";
 import { TagEntity } from "../modules/tag/tag.entity";
 import { extractTag } from "../modules/tag/field-types/tag-title";
 import { Password } from "../modules/user/model/user-password";

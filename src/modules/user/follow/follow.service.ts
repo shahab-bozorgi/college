@@ -31,6 +31,8 @@ export class FollowService {
     userService: UserService,
     actionNotificationService: ActionNotificationService
   ): Promise<void> {
+    const authenticatedUser = await userService.getUserBy(authenticatedId);
+
     if (authenticatedId === followingId) {
       throw new BadRequest("Don't follow yourself!");
     }
@@ -63,6 +65,8 @@ export class FollowService {
         throw new BadRequest("You have already followed this user.");
     }
 
+    const actionMediaId = authenticatedUser?.avatar?.id ?? null;
+
     if (following.isPrivate) {
       const followCreated = await this.flwRepo.create({
         followerId: authenticatedId,
@@ -75,6 +79,7 @@ export class FollowService {
         type: "requestFollow",
         entityId: followCreated.id,
         actionDate: followCreated.createdAt,
+        mediaId: actionMediaId,
       };
 
       await actionNotificationService.createActionWithNotifications(

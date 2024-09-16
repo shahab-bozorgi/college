@@ -1,5 +1,4 @@
 import { NoneEmptyString } from "../../../../data/non-empty-string";
-import { Media } from "../../../media/media.model";
 import { UserId } from "../../../user/model/user-user-id";
 import { Username } from "../../../user/model/user-username";
 import { PostId } from "../../model/post-id";

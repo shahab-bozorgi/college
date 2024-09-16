@@ -20,7 +20,7 @@ export class CommentService {
     postService: PostService,
     actionNotificationService: ActionNotificationService
   ) {
-    const postOfComment = await postService.findPostById(dto.postId);
+    const postOfComment = await postService.findPostById(dto.postId, ["media"]);
 
     if (postOfComment === null) {
       throw new NotFound("Post is not found");
@@ -48,6 +48,7 @@ export class CommentService {
       type: "comment",
       entityId: commentCreated.id,
       actionDate: commentCreated.createdAt,
+      mediaId: postOfComment.media[0].id ?? null,
     };
 
     await actionNotificationService.createActionWithNotifications(

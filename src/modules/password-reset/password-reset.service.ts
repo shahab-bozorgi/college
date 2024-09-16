@@ -1,9 +1,9 @@
 import { User } from "../user/model/user.model";
 import { IPasswordResetRepository } from "./password-reset.repository";
 import * as crypto from "crypto";
-import { PasswordResetToken } from "./type-guard/token";
-import { PasswordReset } from "./password-reset.model";
+import { PasswordResetToken } from "./model/token";
 import { HttpError } from "../../utilities/http-error";
+import { PasswordReset } from "./model/password-reset.model";
 
 export class PasswordResetService {
   constructor(private passwordResetRepo: IPasswordResetRepository) {}

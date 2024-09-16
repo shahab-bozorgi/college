@@ -3,8 +3,7 @@ dotenv.config();
 import "reflect-metadata";
 import { UserEntity } from "./modules/user/entity/user.entity";
 import { DataSource } from "typeorm";
-import { PasswordResetEntity } from "./modules/password-reset/password-reset.entity";
-import { MediaEntity } from "./modules/media/media.entity";
+import { MediaEntity } from "./modules/media/entity/media.entity";
 import { PostEntity } from "./modules/post/entity/post.entity";
 import { TagEntity } from "./modules/tag/tag.entity";
 import { FollowEntity } from "./modules/user/follow/entity/follow.entity";
@@ -15,6 +14,7 @@ import { LikePostEntity } from "./modules/post/like-post/entity/like-post-entity
 import { ActionEntity } from "./modules/action/entity/action.entity";
 import { NotificationEntity } from "./modules/action/notification/entity/notification.entity";
 import { MentionEntity } from "./modules/post/mention/entity/mention.entity";
+import { PasswordResetEntity } from "./modules/password-reset/entity/password-reset.entity";
 
 export const AppDataSource = new DataSource({
   type: "mysql",

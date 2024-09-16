@@ -13,7 +13,7 @@ import { Username } from "../model/user-username";
 import { Password } from "../model/user-password";
 import { UserId } from "../model/user-user-id";
 import { FollowEntity } from "../follow/entity/follow.entity";
-import { MediaEntity } from "../../media/media.entity";
+import { MediaEntity } from "../../media/entity/media.entity";
 import { PostEntity } from "../../post/entity/post.entity";
 import { CommentEntity } from "../../post/comment/entity/comment.entity";
 import { LikeCommentEntity } from "../../post/comment/like-comment/entity/like-comment.entity";

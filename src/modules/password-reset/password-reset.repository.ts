@@ -1,7 +1,7 @@
 import { DataSource, Repository } from "typeorm";
-import { PasswordReset } from "./password-reset.model";
-import { PasswordResetEntity } from "./password-reset.entity";
-import { PasswordResetToken } from "./type-guard/token";
+import { PasswordResetToken } from "./model/token";
+import { PasswordResetEntity } from "./entity/password-reset.entity";
+import { PasswordReset } from "./model/password-reset.model";
 
 export interface IPasswordResetRepository {
   create(fields: PasswordReset): Promise<PasswordReset | null>;

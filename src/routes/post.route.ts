@@ -3,7 +3,7 @@ import { PostService } from "../modules/post/post.service";
 import { CreatePostSchema } from "../modules/post/dto/create-post.dto";
 import { MBToBytes, uploadMultipleFiles } from "../utilities/upload";
 import { PositiveInt } from "../data/int";
-import { imageMIMEs } from "../modules/media/field-types/mime";
+import { imageMIMEs } from "../modules/media/model/mime";
 import { UserService } from "../modules/user/user.service";
 import { TagService } from "../modules/tag/tag.service";
 import { UpdatePostSchema } from "../modules/post/dto/update-post.dto";

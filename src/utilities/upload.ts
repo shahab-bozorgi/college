@@ -6,7 +6,7 @@ import { v4 } from "uuid";
 import { extname } from "path";
 import fs from "fs";
 import { HttpError } from "./http-error";
-import { MIME } from "../modules/media/field-types/mime";
+import { MIME } from "../modules/media/model/mime";
 
 const uploadPath = "./uploads";
 

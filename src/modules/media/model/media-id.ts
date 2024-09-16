@@ -6,6 +6,8 @@ export type MediaId = Brand<string, "MediaId">;
 
 export const isMediaId = (value: string): value is MediaId => isUUID(value);
 
+export const zodMedia = z.string().refine(isMediaId);
+
 export const zodDeletedMedia = z.array(
   z.string().refine(isMediaId, { message: "Media id is invalid" })
 );

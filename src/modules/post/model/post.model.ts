@@ -1,4 +1,3 @@
-import { Media } from "../../media/media.model";
 import { Tag } from "../../tag/tag.model";
 import { UserId } from "../../user/model/user-user-id";
 import { User } from "../../user/model/user.model";
@@ -9,6 +8,7 @@ import { Bookmark } from "../bookmark/model/bookmark.model";
 import { LikePost } from "../like-post/model/like-post-model";
 import { Comment } from "../comment/model/comment.model";
 import { Mention } from "../mention/model/mention.model";
+import { Media } from "../../media/model/media.model";
 
 export interface Post {
   id: PostId;
@@ -16,6 +16,7 @@ export interface Post {
   authorId: UserId;
   createdAt: Date;
   closeFriendsOnly: boolean;
+  media: Media[];
 }
 
 export interface PostRelations {

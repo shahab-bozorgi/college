@@ -10,7 +10,6 @@ import { UpdatePostSchema } from "../modules/post/dto/update-post.dto";
 import { PostId } from "../modules/post/model/post-id";
 import { CommentService } from "../modules/post/comment/comment.service";
 import { LikeCommentService } from "../modules/post/comment/like-comment/like-comment.service";
-import { handleExpress } from "../utilities/handle-express";
 import { LikeCommentSchema } from "../modules/post/comment/like-comment/dto/like-comment.dto";
 import { GetCommentsSchema } from "../modules/post/comment/dto/get-comments.dto";
 import { CreateCommentSchema } from "../modules/post/comment/dto/create-comment.dto";
@@ -21,6 +20,7 @@ import { getPostsSchema } from "../modules/post/dto/get-posts.dto";
 import { LikePostSchema } from "../modules/post/like-post/dto/like-post-dto";
 import { LikePostService } from "../modules/post/like-post/like-post.service";
 import { ActionNotificationService } from "../modules/common/service/action-notification.service";
+import { expressHandler } from "../utilities/handle-express";
 
 export const makePostRouter = (
   postService: PostService,
@@ -76,7 +76,7 @@ export const makePostRouter = (
   );
 
   app.get("/:id", (req, res) => {
-    handleExpress(res, () =>
+    expressHandler(req, res, () =>
       postService.getPost(req.params.id, req.user, userService)
     );
   });
@@ -117,7 +117,7 @@ export const makePostRouter = (
       CreateCommentSchema
     );
 
-    handleExpress(res, () =>
+    expressHandler(req, res, () =>
       commentService.createComment(
         dto,
         userService,
@@ -137,7 +137,8 @@ export const makePostRouter = (
       },
       GetCommentsSchema
     );
-    handleExpress(res, () =>
+
+    expressHandler(req, res, () =>
       commentService.getComments(dto, likeCommentService, postService)
     );
   });
@@ -150,7 +151,8 @@ export const makePostRouter = (
       },
       LikeCommentSchema
     );
-    handleExpress(res, () =>
+
+    expressHandler(req, res, () =>
       likeCommentService.createLikeComment(dto, userService, commentService)
     );
   });
@@ -163,7 +165,8 @@ export const makePostRouter = (
       },
       LikeCommentSchema
     );
-    handleExpress(res, () =>
+
+    expressHandler(req, res, () =>
       likeCommentService.deleteLikeComment(dto, userService, commentService)
     );
   });
@@ -177,7 +180,7 @@ export const makePostRouter = (
       LikePostSchema
     );
 
-    handleExpress(res, async () => {
+    expressHandler(req, res, async () => {
       await likePostService.likePost(dto, userService, postService);
       return {};
     });
@@ -191,7 +194,8 @@ export const makePostRouter = (
       },
       LikePostSchema
     );
-    handleExpress(res, () =>
+
+    expressHandler(req, res, () =>
       likePostService.unLikePost(dto, userService, postService)
     );
   });

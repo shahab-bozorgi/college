@@ -72,7 +72,7 @@ export class FollowService {
 
       const actionDto: CreateActionDto = {
         actorId: followCreated.followerId,
-        type: "follow",
+        type: "requestFollow",
         entityId: followCreated.id,
         actionDate: followCreated.createdAt,
       };

@@ -3,11 +3,8 @@ import { parseDtoWithSchema } from "../utilities/parse-dto-handler";
 import { expressHandler } from "../utilities/handle-express";
 import { NotificationService } from "../modules/action/notification/notification.service";
 import { GetNotificationsSchema } from "../modules/action/notification/dto/get-notifications.dto";
-import { array } from "zod";
-import { zodNotificationId } from "../modules/action/notification/model/notification-id";
 import { SeenNotificationsSchema } from "../modules/action/notification/dto/seen-notifications.dto";
 import { zodUserId } from "../modules/user/model/user-user-id";
-import { zodBoolean } from "../data/boolean";
 import { countNotificationsByTypeSchema } from "../modules/action/notification/dto/count-notifications-by-type.dto";
 
 export const makeNotificationRouter = (

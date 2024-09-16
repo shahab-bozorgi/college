@@ -45,10 +45,7 @@ export class NotificationService {
 
       const showNotif: ShowNotification = {
         id: notif.id,
-        action: {
-          type: notif.action.type,
-          entityId: notif.action.entityId,
-        },
+        actoinType: notif.action.type,
         actor: {
           id: actor.id,
           username: actor.username,

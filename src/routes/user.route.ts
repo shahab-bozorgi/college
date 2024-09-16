@@ -23,6 +23,7 @@ import { paginationSchema } from "../data/pagination";
 import { addAndRemveCloseFriendSchema } from "../modules/user/follow/dto/add-close-friends.dto";
 import { MentionService } from "../modules/post/mention/mention.service";
 import { BookmarkService } from "../modules/post/bookmark/bookmark.service";
+import { ActionNotificationService } from "../modules/common/service/action-notification.service";
 
 export const makeUserRouter = (
   userService: UserService,
@@ -31,7 +32,8 @@ export const makeUserRouter = (
   postService: PostService,
   exploreService: ExploreService,
   mentionService: MentionService,
-  bookmarkService: BookmarkService
+  bookmarkService: BookmarkService,
+  actionNotificationService: ActionNotificationService
 ) => {
   const app = Router();
 
@@ -72,7 +74,8 @@ export const makeUserRouter = (
       return followService.followUser(
         req.user.id,
         dto.followingId,
-        userService
+        userService,
+        actionNotificationService
       );
     });
   });

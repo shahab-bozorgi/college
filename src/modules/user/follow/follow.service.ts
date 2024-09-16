@@ -1,5 +1,7 @@
 import { PaginatedResult, PaginationDto } from "../../../data/pagination";
 import { BadRequest, NotFound } from "../../../utilities/http-error";
+import { CreateActionDto } from "../../action/dto/create-action.dto";
+import { ActionNotificationService } from "../../common/service/action-notification.service";
 import { UserId } from "../model/user-user-id";
 import { UserService } from "../user.service";
 import { BlockUserDto } from "./dto/block-user.dto";
@@ -26,7 +28,8 @@ export class FollowService {
   async followUser(
     authenticatedId: UserId,
     followingId: UserId,
-    userService: UserService
+    userService: UserService,
+    actionNotificationService: ActionNotificationService
   ): Promise<void> {
     if (authenticatedId === followingId) {
       throw new BadRequest("Don't follow yourself!");
@@ -61,11 +64,23 @@ export class FollowService {
     }
 
     if (following.isPrivate) {
-      await this.flwRepo.create({
+      const followCreated = await this.flwRepo.create({
         followerId: authenticatedId,
         followingId,
         followingStatus: PENDING,
       });
+
+      const actionDto: CreateActionDto = {
+        actorId: followCreated.followerId,
+        type: "follow",
+        entityId: followCreated.id,
+        actionDate: followCreated.createdAt,
+      };
+
+      await actionNotificationService.createActionWithNotifications(
+        actionDto,
+        followCreated.followingId
+      );
     } else {
       await this.flwRepo.create({
         followerId: authenticatedId,

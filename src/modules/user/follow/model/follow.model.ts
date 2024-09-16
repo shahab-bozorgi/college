@@ -1,6 +1,7 @@
 import { Media } from "../../../media/media.model";
 import { UserId } from "../../model/user-user-id";
 import { Username } from "../../model/user-username";
+import { FollowId } from "./follow-id.model";
 
 export const PENDING = "Pending";
 export const BLOCKED = "Blocked";
@@ -16,10 +17,12 @@ const DB_FOLLOWING_STATUS = [PENDING, BLOCKED, FOLLOWING] as const;
 export type DbFollowingStatus = (typeof DB_FOLLOWING_STATUS)[number];
 
 export interface Follow {
+  id: FollowId;
   followerId: UserId;
   followingId: UserId;
   followingStatus: DbFollowingStatus;
   isCloseFriend: boolean;
+  createdAt: Date;
 }
 
 export interface CreateFollow {
@@ -55,4 +58,11 @@ export interface FollowingsList {
 
 export interface FollowersList {
   followers: UserInFollowList[];
+}
+
+export interface FollowNotification {
+  id: UserId;
+  username: Username;
+  firstName: string;
+  lastName: string;
 }

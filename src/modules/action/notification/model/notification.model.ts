@@ -23,10 +23,7 @@ export interface CreateNotification {
 
 export interface ShowNotification {
   id: NotificationId;
-  action: {
-    type: ActionType;
-    entityId: UUID;
-  };
+  actoinType: ActionType;
   actor: {
     id: UserId;
     username: Username;

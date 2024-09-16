@@ -7,6 +7,7 @@ export const CreateSchemaAction = z.object({
   type: zodActionType,
   actorId: zodUserId,
   entityId: zodUUID,
+  actionDate: z.coerce.date(),
 });
 
 export type CreateActionDto = z.infer<typeof CreateSchemaAction>;

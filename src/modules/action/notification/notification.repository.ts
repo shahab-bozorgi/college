@@ -14,6 +14,8 @@ import { NotificationId } from "./model/notification-id";
 import { SeenNotificationsDto } from "./dto/seen-notifications.dto";
 import { UserId } from "../../user/model/user-user-id";
 import { NotificationType } from "./model/notification-type";
+import { FollowRepository } from "../../user/follow/follow.repository";
+import { FollowId } from "../../user/follow/model/follow-id.model";
 
 export interface INotificationRepository {
   getAllWithAction(
@@ -50,8 +52,10 @@ export class NotificationRepository implements INotificationRepository {
     const result = await this.repo
       .createQueryBuilder("notification")
       .leftJoinAndSelect("notification.action", "action")
+      .leftJoinAndSelect("notification.media", "media")
       .select([
         "notification.id",
+        "media",
         "action.type",
         "action.actorId",
         "action.entityId",
@@ -85,6 +89,12 @@ export class NotificationRepository implements INotificationRepository {
         const commentRepo = new CommentRepository(this.dataSource);
         return await commentRepo.getCommentForNotificationById(
           entityId as CommentId
+        );
+
+      case "follow":
+        const followRepo = new FollowRepository(this.dataSource);
+        return await followRepo.getFollowForNotificationById(
+          entityId as FollowId
         );
 
       default:

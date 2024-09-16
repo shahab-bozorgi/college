@@ -10,9 +10,9 @@ import {
   FollowersList,
   FOLLOWING,
   FollowingsList,
+  FollowNotification,
   UpdateFollow,
 } from "./model/follow.model";
-import { UserEntity } from "../entity/user.entity";
 import {
   PaginatedResult,
   PaginationDto,
@@ -21,6 +21,7 @@ import {
 } from "../../../data/pagination";
 import { Blacklist } from "./model/blacklist.model";
 import { CloseFriends } from "./model/close-friend.model";
+import { FollowId } from "./model/follow-id.model";
 
 export interface IFollowRepository {
   userFollowings(
@@ -58,6 +59,8 @@ export interface IFollowRepository {
     followerId: UserId,
     followingId: UserId
   ): Promise<Follow | null>;
+  findById(id: FollowId): Promise<Follow | null>;
+  getFollowForNotificationById(id: FollowId): Promise<FollowEntity | null>;
 }
 
 export class FollowRepository implements IFollowRepository {
@@ -250,5 +253,25 @@ export class FollowRepository implements IFollowRepository {
 
   async update(follow: UpdateFollow): Promise<Follow> {
     return await this.flwrepo.save(follow);
+  }
+
+  async findById(id: FollowId): Promise<Follow | null> {
+    return await this.flwrepo.findOneBy({ id });
+  }
+
+  async getFollowForNotificationById(
+    id: FollowId
+  ): Promise<FollowEntity | null> {
+    return await this.flwrepo
+      .createQueryBuilder("follow")
+      .leftJoinAndSelect("follow.following", "following")
+      .select([
+        "following.id",
+        "following.username",
+        "following.firstName",
+        "following.lastName",
+      ])
+      .where("follow.id = :id", { id })
+      .getOne();
   }
 }

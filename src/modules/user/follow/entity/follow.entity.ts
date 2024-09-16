@@ -7,14 +7,19 @@ import {
   UpdateDateColumn,
   Unique,
   PrimaryColumn,
+  PrimaryGeneratedColumn,
 } from "typeorm";
 import { UserEntity } from "../../entity/user.entity";
 import { UserId } from "../../model/user-user-id";
 import { DbFollowingStatus } from "../model/follow.model";
+import { FollowId } from "../model/follow-id.model";
 
 @Entity("follows")
 @Unique(["followerId", "followingId"])
 export class FollowEntity {
+  @PrimaryGeneratedColumn("uuid")
+  id!: FollowId;
+
   @PrimaryColumn()
   followerId!: UserId;
 

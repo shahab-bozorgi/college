@@ -47,6 +47,7 @@ export class CommentService {
       actorId: commentCreated.userId,
       type: "comment",
       entityId: commentCreated.id,
+      actionDate: commentCreated.createdAt,
     };
 
     await actionNotificationService.createActionWithNotifications(

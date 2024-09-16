@@ -43,9 +43,5 @@ export interface ShowComment {
 
 export interface CommentNotification {
   id: CommentId;
-  post: {
-    id: PostId;
-    media: Media[];
-  };
   description: NoneEmptyString;
 }

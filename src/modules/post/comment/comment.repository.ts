@@ -41,13 +41,10 @@ export class CommentRepository implements ICommentRepository {
   async getCommentForNotificationById(
     id: CommentId
   ): Promise<CommentNotification | null> {
-    return await this.repo
-      .createQueryBuilder("comment")
-      .leftJoinAndSelect("comment.post", "post")
-      .leftJoinAndSelect("post.media", "media")
-      .select(["comment.id", "comment.description", "post.id", "media"])
-      .where("comment.id = :id", { id })
-      .getOne();
+    return await this.repo.findOne({
+      where: { id },
+      select: ["id", "description"],
+    });
   }
 
   async getAll(query: GetCommentsDto): Promise<ShowComment[] | null> {

@@ -94,40 +94,33 @@ export class CommentService {
             : false;
 
         if (comment.parentId === null) {
-          parentComments.push({ ...comment, isLiked });
+          parentComments.push({
+            ...comment,
+            isLiked,
+            replies: this.buildCommentTree(comment, comments),
+          });
         }
       }
 
-      for (const comment of comments) {
-        const isLiked =
-          (await likeCommentService.getLikeComment({
-            userId: dto.authenticatedUserId,
-            commentId: comment.id,
-          })) !== null
-            ? true
-            : false;
-
-        if (comment.parentId !== null) {
-          childComments.push({ ...comment, isLiked });
-        }
-      }
-
-      parentComments.forEach((parent) => {
-        parent.replies = childComments.filter(
-          (child) => child.parentId === parent.id
-        );
-      });
-
-      const orphans = childComments.filter(
+      const orphans = comments.filter(
         (child) => !comments.some((parent) => parent.id === child.parentId)
       );
 
-      orphans.forEach((orph) => {
-        parentComments.push({
-          ...orph,
-          replies: [],
-        });
-      });
+      for (const orphan of orphans) {
+        if (orphan.parentId !== null) {
+          parentComments.push({
+            ...orphan,
+            isLiked:
+              (await likeCommentService.getLikeComment({
+                userId: dto.authenticatedUserId,
+                commentId: orphan.id,
+              })) !== null
+                ? true
+                : false,
+            replies: [],
+          });
+        }
+      }
     }
 
     const { nextPage, totalPages } = paginationInfo(
@@ -143,5 +136,21 @@ export class CommentService {
       nextPage,
       totalPages,
     };
+  }
+
+  private buildCommentTree(
+    parentComment: ShowComment,
+    allComments: ShowComment[]
+  ): ShowComment[] {
+    const children = allComments.filter(
+      (child) => child.parentId === parentComment.id
+    );
+
+    const replies = children.map((child) => ({
+      ...child,
+      replies: this.buildCommentTree(child, allComments),
+    }));
+
+    return replies;
   }
 }

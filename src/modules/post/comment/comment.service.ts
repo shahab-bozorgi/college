@@ -43,12 +43,17 @@ export class CommentService {
       description: dto.description,
     });
 
+    let mediaId = null;
+    if (postOfComment.media.length > 0) {
+      mediaId = postOfComment.media[0].id;
+    }
+
     const actionDto: CreateActionDto = {
       actorId: commentCreated.userId,
       type: "comment",
       entityId: commentCreated.id,
       actionDate: commentCreated.createdAt,
-      mediaId: postOfComment.media[0].id ?? null,
+      mediaId: mediaId,
     };
 
     await actionNotificationService.createActionWithNotifications(

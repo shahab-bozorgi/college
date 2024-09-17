@@ -24,14 +24,16 @@ export interface CreateNotification {
 
 export interface ShowNotification {
   id: NotificationId;
-  actoinType: ActionType;
+  actionType: ActionType;
   media: Media | null;
+  actionDate: Date;
   actor: {
     id: UserId;
     username: Username;
     firstName: string;
     lastName: string;
     followingStatus: "Pending" | "Blocked" | "Following" | "NotFollowing";
+    followedStatus: "Pending" | "Blocked" | "Following" | "NotFollowing";
   };
   receiver?: {
     id: UserId;

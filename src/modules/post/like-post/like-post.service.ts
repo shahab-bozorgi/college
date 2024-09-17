@@ -39,12 +39,17 @@ export class LikePostService {
       postId: dto.postId,
     });
 
+    let mediaId = null;
+    if (postOfComment.media.length > 0) {
+      mediaId = postOfComment.media[0].id;
+    }
+
     const actionDto: CreateActionDto = {
       actorId: likePostCreated.userId,
       type: "likePost",
       entityId: likePostCreated.id,
       actionDate: likePostCreated.createdAt,
-      mediaId: postOfComment.media[0].id ?? null,
+      mediaId: mediaId,
     };
 
     await actionNotificationService.createActionWithNotifications(

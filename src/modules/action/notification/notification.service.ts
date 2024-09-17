@@ -49,6 +49,11 @@ export class NotificationService {
         receiver.id
       );
 
+      const followedStatus = await this.followService.getFollowingStatus(
+        receiver.id,
+        actor.id
+      );
+
       let media = null;
 
       if (notif.action.mediaId !== null) {
@@ -57,14 +62,16 @@ export class NotificationService {
 
       const showNotif: ShowNotification = {
         id: notif.id,
-        actoinType: notif.action.type,
+        actionType: notif.action.type,
         media: media,
+        actionDate: notif.action.actionDate,
         actor: {
           id: actor.id,
           username: actor.username,
           firstName: actor.firstName ?? "",
           lastName: actor.lastName ?? "",
           followingStatus: followingStatus.status,
+          followedStatus: followedStatus.status,
         },
         isSeen: notif.isSeen,
       };

@@ -10,4 +10,5 @@ export interface Action {
   actorId: UserId;
   type: ActionType;
   entityId: UUID;
+  actionDate: Date;
 }

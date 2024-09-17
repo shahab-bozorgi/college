@@ -63,8 +63,16 @@ export class FollowService {
         throw new BadRequest("You have already followed this user.");
     }
 
-    const authenticatedUser = await userService.getUserBy(authenticatedId);
-    const actionMediaId = authenticatedUser?.avatar?.id ?? null;
+    let mediaId = null;
+
+    const authenticatedUser = await userService.getUserBy(authenticatedId, [
+      "avatar",
+    ]);
+    if (authenticatedUser !== null) {
+      if (authenticatedUser.avatar !== undefined) {
+        mediaId = authenticatedUser.avatar.id;
+      }
+    }
 
     if (following.isPrivate) {
       const followCreated = await this.flwRepo.create({
@@ -78,7 +86,7 @@ export class FollowService {
         type: "requestFollow",
         entityId: followCreated.id,
         actionDate: followCreated.createdAt,
-        mediaId: actionMediaId,
+        mediaId: mediaId,
       };
 
       await actionNotificationService.createActionWithNotifications(
@@ -97,7 +105,7 @@ export class FollowService {
         type: "follow",
         entityId: followCreated.id,
         actionDate: followCreated.createdAt,
-        mediaId: actionMediaId,
+        mediaId: mediaId,
       };
 
       await actionNotificationService.createActionWithNotifications(
@@ -228,15 +236,23 @@ export class FollowService {
       followingStatus: FOLLOWING,
     });
 
-    const authenticatedUser = await userService.getUserBy(authenticatedId);
-    const actionMediaId = authenticatedUser?.avatar?.id ?? null;
+    let mediaId = null;
+
+    const authenticatedUser = await userService.getUserBy(authenticatedId, [
+      "avatar",
+    ]);
+    if (authenticatedUser !== null) {
+      if (authenticatedUser.avatar !== undefined) {
+        mediaId = authenticatedUser.avatar.id;
+      }
+    }
 
     const actionDto: CreateActionDto = {
       actorId: followUpdated.followerId,
       type: "acceptFollow",
       entityId: followUpdated.id,
       actionDate: followUpdated.updatedAt,
-      mediaId: actionMediaId,
+      mediaId: mediaId,
     };
 
     await actionNotificationService.createActionWithNotifications(

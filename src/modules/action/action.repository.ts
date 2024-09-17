@@ -16,6 +16,11 @@ export class ActionRepository implements IActionRepository {
   }
 
   async create(dto: CreateActionDto): Promise<Action> {
-    return await this.repo.save({ id: v4(), ...dto });
+    const { mediaId, ...rest } = dto;
+    return await this.repo.save({
+      id: v4(),
+      ...rest,
+      ...(mediaId !== null && { mediaId }),
+    });
   }
 }

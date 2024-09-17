@@ -58,6 +58,7 @@ export class NotificationRepository implements INotificationRepository {
         "action.mediaId",
         "action.type",
         "action.actorId",
+        "action.actionDate",
         "action.entityId",
         "notification.receiverId",
         "notification.isSeen",

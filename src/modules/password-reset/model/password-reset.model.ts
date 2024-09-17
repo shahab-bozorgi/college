@@ -1,5 +1,5 @@
-import { User } from "../user/model/user.model";
-import { PasswordResetToken } from "./model/token";
+import { User } from "../../user/model/user.model";
+import { PasswordResetToken } from "./token";
 
 export interface PasswordReset {
   token: PasswordResetToken;

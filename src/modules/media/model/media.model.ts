@@ -1,6 +1,6 @@
-import { NoneEmptyString } from "../../data/non-empty-string";
-import { MediaId } from "./field-types/media-id";
-import { MIME } from "./field-types/mime";
+import { NoneEmptyString } from "../../../data/non-empty-string";
+import { MediaId } from "./media-id";
+import { MIME } from "./mime";
 
 export interface Media {
   id: MediaId;

@@ -1,8 +1,8 @@
 import { Email } from "../../../data/email";
 import { UserId } from "./user-user-id";
 import { Username } from "./user-username";
-import { Media } from "../../media/media.model";
 import { FollowingStatus } from "../follow/model/follow.model";
+import { Media } from "../../media/model/media.model";
 
 export interface User {
   id: UserId;

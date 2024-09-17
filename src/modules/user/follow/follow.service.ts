@@ -230,7 +230,13 @@ export class FollowService {
     if (followingStatus !== PENDING)
       throw new BadRequest("Follow request not found.");
 
+    const followRow = await this.getFollow(followerId, authenticatedId);
+    if (followRow === null) {
+      throw new NotFound("Follow Record is not found");
+    }
+
     const followUpdated = await this.flwRepo.update({
+      id: followRow.id,
       followerId,
       followingId: authenticatedId,
       followingStatus: FOLLOWING,
@@ -309,6 +315,11 @@ export class FollowService {
     if (blockedUserStatus === BLOCKED)
       throw new BadRequest("User is already blocked.");
 
+    const followRow = await this.getFollow(dto.userId, authenticatedId);
+    if (followRow === null) {
+      throw new NotFound("Follow Record is not found");
+    }
+
     if (blockedUserStatus === NOT_FOLLOWING) {
       await this.flwRepo.create({
         followingId: authenticatedId,
@@ -317,6 +328,7 @@ export class FollowService {
       });
     } else {
       await this.flwRepo.update({
+        id: followRow.id,
         followingId: authenticatedId,
         followerId: dto.userId,
         followingStatus: BLOCKED,
@@ -387,7 +399,13 @@ export class FollowService {
     if (followingStatus.isCloseFriend)
       throw new BadRequest("User is already in your close friends.");
 
+    const followRow = await this.getFollow(followerId, authenticatedId);
+    if (followRow === null) {
+      throw new NotFound("Follow Record is not found");
+    }
+
     await this.flwRepo.update({
+      id: followRow.id,
       followingId: authenticatedId,
       followerId,
       isCloseFriend: true,
@@ -409,7 +427,13 @@ export class FollowService {
     )
       throw new BadRequest("User is not in your close frineds.");
 
+    const followRow = await this.getFollow(followerId, authenticatedId);
+    if (followRow === null) {
+      throw new NotFound("Follow Record is not found");
+    }
+
     await this.flwRepo.update({
+      id: followRow.id,
       followerId,
       followingId: authenticatedId,
       isCloseFriend: false,

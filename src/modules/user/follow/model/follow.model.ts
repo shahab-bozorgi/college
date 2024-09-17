@@ -38,6 +38,7 @@ export interface DeleteFollow {
 }
 
 export interface UpdateFollow {
+  id: FollowId
   followerId: UserId;
   followingId: UserId;
   followingStatus?: DbFollowingStatus;

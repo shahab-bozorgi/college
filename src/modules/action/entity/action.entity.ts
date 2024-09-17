@@ -13,10 +13,10 @@ import { User } from "../../user/model/user.model";
 import { ActionId } from "../model/action-id";
 import { NotificationEntity } from "../notification/entity/notification.entity";
 import { Notification } from "../notification/model/notification.model";
-import { MediaEntity } from "../../media/entity/media.entity";
 import { UUID } from "../../../data/uuid";
-import { MediaId } from "../../media/model/media-id";
 import { Media } from "../../media/model/media.model";
+import { MediaId } from "../../media/model/media-id";
+import { MediaEntity } from "../../media/entity/media.entity";
 
 @Entity("actions")
 export class ActionEntity {

@@ -69,6 +69,7 @@ export class NotificationRepository implements INotificationRepository {
       .andWhere("notification.notificationType = :notificationType", {
         notificationType: dto.notificationType,
       })
+      .orderBy("action.actionDate", "DESC")
       .take(dto.limit)
       .skip(paginationSkip({ limit: dto.limit, page: dto.page }))
       .getManyAndCount();

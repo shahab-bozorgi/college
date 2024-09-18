@@ -58,6 +58,7 @@ export class CommentRepository implements ICommentRepository {
         description: true,
         createdAt: true,
         parentId: true,
+        likeCommentsCount: true,
         user: {
           id: true,
           username: true,

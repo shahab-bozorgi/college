@@ -20,5 +20,6 @@ export interface Explore {
     bookmarksCount: number;
     isBookmarked: boolean;
     commentsCount: number;
+    isCloseFriend: boolean; 
   }>;
 }

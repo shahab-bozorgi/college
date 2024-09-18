@@ -1,4 +1,4 @@
-import { DataSource, In, Repository } from "typeorm";
+import { Brackets, DataSource, Repository } from "typeorm";
 import { UserId } from "../../user/model/user-user-id";
 import { PostEntity } from "../../post/entity/post.entity";
 import {
@@ -39,16 +39,33 @@ export class ExploreRepository
       .leftJoinAndSelect("post.comments", "comments")
       .leftJoinAndSelect("author.avatar", "avatar")
       .leftJoinAndSelect("author.followers", "followers")
-      .where("followers.followingStatus=:FOLLOWING", { FOLLOWING })
-      .andWhere("post.authorId IN (:...followingIds)", {
-        followingIds: followingIds.length ? followingIds : [-1],
-      })
+      .where(
+        new Brackets((qb) => {
+          qb.where(
+            new Brackets((qb) => {
+              qb.where("post.closeFriendsOnly = false").orWhere(
+                new Brackets((qb) => {
+                  qb.where("post.closeFriendsOnly = true")
+                    .andWhere("followers.followerId = :followerId", {
+                      followerId,
+                    })
+                    .andWhere("followers.isCloseFriend = true");
+                })
+              );
+            })
+          ).andWhere("post.authorId IN (:...followingIds)", {
+            followingIds: followingIds.length ? followingIds : [-1],
+          });
+        })
+      )
       .orderBy("post.createdAt", "DESC")
       .skip(paginationSkip(pagination))
       .take(pagination.limit)
       .getManyAndCount();
 
+
     const { nextPage, totalPages } = paginationInfo(result[1], pagination);
+
     return {
       posts: result[0].map((post) => ({
         id: post.id,
@@ -66,6 +83,10 @@ export class ExploreRepository
         bookmarksCount: post.bookmarks.length,
         isBookmarked: post.bookmarks.some((bk) => bk.userId === followerId),
         commentsCount: post.comments.length,
+        isCloseFriend: post.author.followers.some(
+          (follower) =>
+            follower.followerId === followerId && post.closeFriendsOnly
+        ),
       })),
       nextPage,
       totalPages,

@@ -7,7 +7,12 @@ export const PENDING = "Pending";
 export const BLOCKED = "Blocked";
 export const FOLLOWING = "Following";
 export const NOT_FOLLOWING = "NotFollowing";
-const FOLLOWING_STATUS = [PENDING, BLOCKED, FOLLOWING, NOT_FOLLOWING] as const;
+export const FOLLOWING_STATUS = [
+  PENDING,
+  BLOCKED,
+  FOLLOWING,
+  NOT_FOLLOWING,
+] as const;
 export type FollowingStatus = {
   status: (typeof FOLLOWING_STATUS)[number];
   isCloseFriend: boolean;
@@ -55,11 +60,19 @@ export interface UserInFollowList {
 }
 
 export interface FollowingsList {
-  followings: UserInFollowList[];
+  followings: Array<
+    UserInFollowList & {
+      isCloseFriend: boolean;
+    }
+  >;
 }
 
 export interface FollowersList {
-  followers: UserInFollowList[];
+  followers: Array<
+    UserInFollowList & {
+      isCloseFriend: boolean;
+    }
+  >;
 }
 
 export interface FollowNotification {

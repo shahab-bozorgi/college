@@ -21,6 +21,11 @@ import { LikePostSchema } from "../modules/post/like-post/dto/like-post-dto";
 import { LikePostService } from "../modules/post/like-post/like-post.service";
 import { ActionNotificationService } from "../modules/common/service/action-notification.service";
 import { expressHandler } from "../utilities/handle-express";
+import {
+  searchSchema,
+  SearchService,
+  searchSuggestionSchema,
+} from "../modules/common/service/search.service";
 
 export const makePostRouter = (
   postService: PostService,
@@ -30,7 +35,8 @@ export const makePostRouter = (
   likeCommentService: LikeCommentService,
   likePostService: LikePostService,
   bookmarkService: BookmarkService,
-  actionNotificationService: ActionNotificationService
+  actionNotificationService: ActionNotificationService,
+  searchService: SearchService
 ) => {
   const app = Router();
   const uploadPath = "/posts";
@@ -54,6 +60,23 @@ export const makePostRouter = (
     } catch (e) {
       next(e);
     }
+  });
+
+  app.get("/search", (req, res) => {
+    const dto = parseDtoWithSchema(req.query, searchSchema);
+    expressHandler(req, res, () =>
+      searchService.searchTagPosts(req.user, dto.query, {
+        page: dto.page,
+        limit: dto.limit,
+      })
+    );
+  });
+
+  app.get("/search/suggestion", (req, res) => {
+    const dto = parseDtoWithSchema(req.query, searchSuggestionSchema);
+    expressHandler(req, res, () =>
+      searchService.suggestTags(dto.query, dto.count)
+    );
   });
 
   app.post(
@@ -235,6 +258,23 @@ export const makePostRouter = (
     } catch (e) {
       next(e);
     }
+  });
+
+  app.get("/search", (req, res) => {
+    const dto = parseDtoWithSchema(req.query, searchSchema);
+    expressHandler(req, res, () =>
+      searchService.searchTagPosts(req.user, dto.query, {
+        page: dto.page,
+        limit: dto.limit,
+      })
+    );
+  });
+
+  app.get("/search/suggestion", (req, res) => {
+    const dto = parseDtoWithSchema(req.query, searchSuggestionSchema);
+    expressHandler(req, res, () =>
+      searchService.suggestTags(dto.query, dto.count)
+    );
   });
 
   return app;

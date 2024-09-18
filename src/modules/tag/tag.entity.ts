@@ -22,6 +22,6 @@ export class TagEntity {
   @CreateDateColumn()
   createdAt!: Date;
 
-  @ManyToMany(() => PostEntity)
+  @ManyToMany(() => PostEntity, (post) => post.tags)
   posts!: PostEntity[];
 }

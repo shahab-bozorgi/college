@@ -24,6 +24,11 @@ import { addAndRemveCloseFriendSchema } from "../modules/user/follow/dto/add-clo
 import { MentionService } from "../modules/post/mention/mention.service";
 import { BookmarkService } from "../modules/post/bookmark/bookmark.service";
 import { ActionNotificationService } from "../modules/common/service/action-notification.service";
+import {
+  searchSchema,
+  SearchService,
+  searchSuggestionSchema,
+} from "../modules/common/service/search.service";
 
 export const makeUserRouter = (
   userService: UserService,
@@ -33,9 +38,27 @@ export const makeUserRouter = (
   exploreService: ExploreService,
   mentionService: MentionService,
   bookmarkService: BookmarkService,
-  actionNotificationService: ActionNotificationService
+  actionNotificationService: ActionNotificationService,
+  searchService: SearchService
 ) => {
   const app = Router();
+
+  app.get("/search", (req, res) => {
+    const dto = parseDtoWithSchema(req.query, searchSchema);
+    expressHandler(req, res, () =>
+      searchService.searchUsers(req.user, dto.query, {
+        page: dto.page,
+        limit: dto.limit,
+      })
+    );
+  });
+
+  app.get("/search/suggestion", (req, res) => {
+    const dto = parseDtoWithSchema(req.query, searchSuggestionSchema);
+    expressHandler(req, res, () =>
+      searchService.suggestUsers(req.user, dto.query, dto.count)
+    );
+  });
 
   app.patch(
     "/profile",

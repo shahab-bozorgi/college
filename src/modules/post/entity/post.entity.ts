@@ -48,7 +48,7 @@ export class PostEntity {
   @JoinTable()
   media!: MediaEntity[];
 
-  @ManyToMany(() => TagEntity)
+  @ManyToMany(() => TagEntity, (tag) => tag.posts)
   @JoinTable()
   tags!: TagEntity[];
 

@@ -77,7 +77,7 @@ export class UserEntity {
   updatedAt!: Date;
 
   @OneToMany(() => FollowEntity, (follow) => follow.follower)
-  following!: FollowEntity[];
+  followings!: FollowEntity[];
 
   @OneToMany(() => FollowEntity, (follow) => follow.following)
   followers!: FollowEntity[];

@@ -40,6 +40,8 @@ import { NotificationService } from "./modules/action/notification/notification.
 import { NotificationRepository } from "./modules/action/notification/notification.repository";
 import { MentionRepository } from "./modules/post/mention/mention.repository";
 import { MentionService } from "./modules/post/mention/mention.service";
+import { SearchRepository } from "./modules/common/repository/search.repository";
+import { SearchService } from "./modules/common/service/search.service";
 
 export const makeApp = (dataSource: DataSource) => {
   const app = express();
@@ -114,6 +116,8 @@ export const makeApp = (dataSource: DataSource) => {
     postService,
     commentService
   );
+  const searchRepository = new SearchRepository(dataSource);
+  const searchService = new SearchService(searchRepository);
 
   app.use("/auth", makeAuthRouter(userService, passwordResetService));
   app.use(
@@ -128,7 +132,8 @@ export const makeApp = (dataSource: DataSource) => {
       exploreService,
       mentionService,
       bookmarkService,
-      actionNotificationService
+      actionNotificationService,
+      searchService
     )
   );
   app.use(
@@ -142,7 +147,8 @@ export const makeApp = (dataSource: DataSource) => {
       likeCommentService,
       likePostService,
       bookmarkService,
-      actionNotificationService
+      actionNotificationService,
+      searchService
     )
   );
 

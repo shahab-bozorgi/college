@@ -32,7 +32,7 @@ export class FollowEntity {
   @Column({ default: false })
   isCloseFriend!: boolean;
 
-  @ManyToOne(() => UserEntity, (user) => user.following)
+  @ManyToOne(() => UserEntity, (user) => user.followings)
   @JoinColumn()
   follower!: UserEntity;
 

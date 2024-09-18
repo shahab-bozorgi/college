@@ -148,6 +148,7 @@ export class FollowRepository implements IFollowRepository {
           followersCount: rs.follower.followers.filter(
             (follower) => follower.followingStatus === FOLLOWING
           ).length,
+          isCloseFriend: rs.isCloseFriend,
         };
       }),
       nextPage,
@@ -178,6 +179,10 @@ export class FollowRepository implements IFollowRepository {
           followersCount: rs.following.followers.filter(
             (follower) => follower.followingStatus === FOLLOWING
           ).length,
+          isCloseFriend: rs.following.followers.some(
+            (follower) =>
+              follower.followerId === followerId && follower.isCloseFriend
+          ),
         };
       }),
       nextPage,

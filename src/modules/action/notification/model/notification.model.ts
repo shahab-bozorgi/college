@@ -40,6 +40,8 @@ export interface ShowNotification {
     username: Username;
     firstName: string;
     lastName: string;
+    followingStatus: "Pending" | "Blocked" | "Following" | "NotFollowing";
+    followedStatus: "Pending" | "Blocked" | "Following" | "NotFollowing";
   };
   isSeen: boolean;
   content?: {

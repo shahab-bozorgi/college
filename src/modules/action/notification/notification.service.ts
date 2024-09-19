@@ -82,6 +82,8 @@ export class NotificationService {
           username: receiver.username,
           firstName: receiver.firstName ?? "",
           lastName: receiver.lastName ?? "",
+          followingStatus: followedStatus.status,
+          followedStatus: followingStatus.status,
         };
       }
 

@@ -1,6 +1,7 @@
 import { PaginatedResult, PaginationDto } from "../../../data/pagination";
 import { BadRequest, NotFound } from "../../../utilities/http-error";
 import { CreateActionDto } from "../../action/dto/create-action.dto";
+import { UpdateActionDto } from "../../action/dto/update-action.dto";
 import { ActionNotificationService } from "../../common/service/action-notification.service";
 import { MediaId } from "../../media/model/media-id";
 import { UserId } from "../model/user-user-id";
@@ -247,29 +248,11 @@ export class FollowService {
       followingStatus: FOLLOWING,
     });
 
-    let mediaId = null;
-
-    const authenticatedUser = await userService.getUserBy(authenticatedId, [
-      "avatar",
-    ]);
-    if (authenticatedUser !== null) {
-      if (authenticatedUser.avatar !== undefined) {
-        mediaId = authenticatedUser.avatar.id;
-      }
-    }
-
-    const actionDto: CreateActionDto = {
+    await actionNotificationService.updateFollowToAcceptFollow({
       actorId: followUpdated.followerId,
-      type: "acceptFollow",
       entityId: followUpdated.id,
       actionDate: followUpdated.updatedAt,
-      mediaId: mediaId,
-    };
-
-    await actionNotificationService.createActionWithNotifications(
-      actionDto,
-      followUpdated.followingId
-    );
+    });
   }
 
   async rejectFollowUser(

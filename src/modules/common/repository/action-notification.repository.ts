@@ -5,6 +5,11 @@ import { ActionEntity } from "../../action/entity/action.entity";
 import { v4 } from "uuid";
 import { NotificationEntity } from "../../action/notification/entity/notification.entity";
 import { CreateNotification } from "../../action/notification/model/notification.model";
+import { GetActionByTypeDto } from "../../action/dto/get-action-by-type.dto";
+import { Action } from "../../action/model/action.model";
+import { UpdateActionDto } from "../../action/dto/update-action.dto";
+import { ActionId } from "../../action/model/action-id";
+import { ActionType } from "../../action/model/action-type";
 
 export interface IActionNotificationRepository {
   create(
@@ -12,12 +17,25 @@ export interface IActionNotificationRepository {
     personalReceiverId: UserId,
     friendReceiverIds: UserId[]
   ): Promise<boolean>;
+  findLastByType(dto: GetActionByTypeDto): Promise<Action | null>;
+  updateLastByType(
+    id: ActionId,
+    dto: UpdateActionDto,
+    type: ActionType
+  ): Promise<boolean>;
+  unSeenNotificationsByActionId(actionId: ActionId): Promise<boolean>;
 }
 
 export class ActionNotificationRepository
   implements IActionNotificationRepository
 {
-  constructor(private readonly dataSource: DataSource) {}
+  private actionRepo;
+  private notificationRepo;
+
+  constructor(private readonly dataSource: DataSource) {
+    this.actionRepo = dataSource.getRepository(ActionEntity);
+    this.notificationRepo = dataSource.getRepository(NotificationEntity);
+  }
 
   async create(
     createActionDto: CreateActionDto,
@@ -68,5 +86,38 @@ export class ActionNotificationRepository
     } catch (error) {
       return false;
     }
+  }
+
+  async findLastByType(dto: GetActionByTypeDto): Promise<Action | null> {
+    return await this.actionRepo.findOne({
+      where: {
+        entityId: dto.entityId,
+        type: dto.type,
+        actorId: dto.actorId,
+      },
+      order: { actionDate: "DESC" },
+    });
+  }
+
+  async updateLastByType(
+    id: ActionId,
+    dto: UpdateActionDto,
+    type: ActionType
+  ): Promise<boolean> {
+    return Boolean(
+      (
+        await this.actionRepo.update(
+          { id },
+          { actionDate: dto.actionDate, type }
+        )
+      ).affected
+    );
+  }
+
+  async unSeenNotificationsByActionId(actionId: ActionId): Promise<boolean> {
+    return Boolean(
+      (await this.notificationRepo.update({ actionId }, { isSeen: false }))
+        .affected
+    );
   }
 }

@@ -6,7 +6,7 @@ import { ActionType } from "./action-type";
 
 export interface Action {
   id: ActionId;
-  mediaId: MediaId;
+  mediaId: MediaId | null;
   actorId: UserId;
   type: ActionType;
   entityId: UUID;

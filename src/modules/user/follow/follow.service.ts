@@ -2,6 +2,7 @@ import { PaginatedResult, PaginationDto } from "../../../data/pagination";
 import { BadRequest, NotFound } from "../../../utilities/http-error";
 import { CreateActionDto } from "../../action/dto/create-action.dto";
 import { ActionNotificationService } from "../../common/service/action-notification.service";
+import { MediaId } from "../../media/model/media-id";
 import { UserId } from "../model/user-user-id";
 import { UserService } from "../user.service";
 import { BlockUserDto } from "./dto/block-user.dto";
@@ -63,13 +64,17 @@ export class FollowService {
         throw new BadRequest("You have already followed this user.");
     }
 
-    let mediaId = null;
+    let mediaId: MediaId | null = null;
 
     const authenticatedUser = await userService.getUserBy(authenticatedId, [
       "avatar",
     ]);
+
     if (authenticatedUser !== null) {
-      if (authenticatedUser.avatar !== undefined) {
+      if (
+        authenticatedUser.avatar !== null &&
+        authenticatedUser.avatar !== undefined
+      ) {
         mediaId = authenticatedUser.avatar.id;
       }
     }

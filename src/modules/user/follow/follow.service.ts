@@ -1,7 +1,6 @@
 import { PaginatedResult, PaginationDto } from "../../../data/pagination";
 import { BadRequest, NotFound } from "../../../utilities/http-error";
 import { CreateActionDto } from "../../action/dto/create-action.dto";
-import { UpdateActionDto } from "../../action/dto/update-action.dto";
 import { ActionNotificationService } from "../../common/service/action-notification.service";
 import { MediaId } from "../../media/model/media-id";
 import { UserId } from "../model/user-user-id";
@@ -248,7 +247,7 @@ export class FollowService {
       followingStatus: FOLLOWING,
     });
 
-    await actionNotificationService.updateFollowToAcceptFollow({
+    await actionNotificationService.updateRequestFollowToAcceptFollow({
       actorId: followUpdated.followerId,
       entityId: followUpdated.id,
       actionDate: followUpdated.updatedAt,

@@ -64,18 +64,18 @@ export class ActionNotificationService {
     return await this.actionNotificationRepo.findLastByType(dto);
   }
 
-  async updateFollowToAcceptFollow(dto: UpdateActionDto) {
+  async updateRequestFollowToAcceptFollow(dto: UpdateActionDto) {
     const lastAction = await this.getLastFollowActionByActorAndEntityId({
       actorId: dto.actorId,
       entityId: dto.entityId,
-      type: "follow",
+      type: "requestFollow",
     });
 
     if (lastAction === null) {
       throw new NotFound("Action for update accept follow is not found");
     }
 
-    const updateFollowToAcceptActionStatus =
+    const updateRequestFollowToAcceptActionStatus =
       await this.actionNotificationRepo.updateLastByType(
         lastAction.id,
         {
@@ -86,7 +86,7 @@ export class ActionNotificationService {
         "acceptFollow"
       );
 
-    if (updateFollowToAcceptActionStatus !== true) {
+    if (updateRequestFollowToAcceptActionStatus !== true) {
       throw new Error(
         `Update to acceptFollow for action ${lastAction.id} is failed`
       );

@@ -253,7 +253,7 @@ export class PostService {
       await this.mentionService.insert(post.id, mentionedUsers);
     }
 
-    // post.closeFriendsOnly = dto.closeFriendsOnly;
+    post.closeFriendsOnly = dto.closeFriendsOnly;
 
     await this.postRepo.update({
       id: post.id,

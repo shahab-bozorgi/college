@@ -93,33 +93,11 @@ export class CommentService {
             ? true
             : false;
 
-        if (comment.parentId === null) {
-          parentComments.push({
-            ...comment,
-            isLiked,
-            replies: this.buildCommentTree(comment, comments),
-          });
-        }
-      }
-
-      const orphans = comments.filter(
-        (child) => !comments.some((parent) => parent.id === child.parentId)
-      );
-
-      for (const orphan of orphans) {
-        if (orphan.parentId !== null) {
-          parentComments.push({
-            ...orphan,
-            isLiked:
-              (await likeCommentService.getLikeComment({
-                userId: dto.authenticatedUserId,
-                commentId: orphan.id,
-              })) !== null
-                ? true
-                : false,
-            replies: this.buildCommentTree(orphan, comments),
-          });
-        }
+        parentComments.push({
+          ...comment,
+          isLiked,
+          replies: this.buildCommentTree(comment, comments),
+        });
       }
     }
 
@@ -145,7 +123,7 @@ export class CommentService {
     const children = allComments.filter(
       (child) => child.parentId === parentComment.id
     );
-
+    
     const replies = children.map((child) => ({
       ...child,
       replies: this.buildCommentTree(child, allComments),

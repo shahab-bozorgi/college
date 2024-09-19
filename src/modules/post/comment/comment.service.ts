@@ -117,7 +117,7 @@ export class CommentService {
               })) !== null
                 ? true
                 : false,
-            replies: this.buildCommentTree(orphan, orphans),
+            replies: this.buildCommentTree(orphan, comments),
           });
         }
       }

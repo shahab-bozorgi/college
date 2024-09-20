@@ -2,7 +2,6 @@ import { PaginatedResult, paginationInfo } from "../../../data/pagination";
 import { NotFound } from "../../../utilities/http-error";
 import { CreateActionDto } from "../../action/dto/create-action.dto";
 import { ActionNotificationService } from "../../common/service/action-notification.service";
-import { UserId } from "../../user/model/user-user-id";
 import { UserService } from "../../user/user.service";
 import { PostService } from "../post.service";
 import { ICommentRepository } from "./comment.repository";
@@ -33,7 +32,7 @@ export class CommentService {
 
     let rootParentId = null;
 
-    if (dto.parentId !== null) {
+    if (dto.parentId !== null && dto.parentId !== undefined) {
       const parentOfComment = await this.commentRepo.findById(dto.parentId);
       if (parentOfComment === null) {
         throw new NotFound("Parent Comment is not found");
@@ -42,7 +41,7 @@ export class CommentService {
       if (parentOfComment.rootParentId !== null) {
         rootParentId = parentOfComment.rootParentId;
       } else {
-        rootParentId = dto.parentId;
+        rootParentId = dto.parentId === undefined ? null : dto.parentId;
       }
     }
 

@@ -26,11 +26,11 @@ export class CommentEntity {
   @Column()
   postId!: PostId;
 
-  @Column({ nullable: true, type: "text" })
-  parentId!: CommentId | null;
+  @Column({ nullable: true, default: null })
+  parentId!: CommentId;
 
-  @Column({ nullable: true, type: "text" })
-  rootParentId!: CommentId | null;
+  @Column({ nullable: true, default: null })
+  rootParentId!: CommentId;
 
   @ManyToOne(() => UserEntity, (user) => user.comments, {
     nullable: false,
@@ -48,9 +48,15 @@ export class CommentEntity {
     nullable: true,
     onDelete: "CASCADE",
   })
-  parentComment!: CommentEntity | null;
+  parent!: CommentEntity | null;
 
-  @OneToMany(() => CommentEntity, (comment) => comment.parentComment)
+  @ManyToOne(() => CommentEntity, (comment) => comment.replies, {
+    nullable: true,
+    onDelete: "CASCADE",
+  })
+  rootParent!: CommentEntity | null;
+
+  @OneToMany(() => CommentEntity, (comment) => comment.rootParent)
   replies!: CommentEntity[];
 
   @Column()

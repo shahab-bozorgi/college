@@ -7,7 +7,7 @@ import { zodCommentId } from "../model/comment-id";
 export const CreateCommentSchema = z.object({
   postId: zodPostId,
   userId: zodUserId,
-  parentId: zodCommentId.nullable(),
+  parentId: zodCommentId.nullable().optional(),
   description: zodNoneEmptyString,
 });
 

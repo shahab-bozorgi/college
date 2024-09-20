@@ -34,7 +34,7 @@ export interface ShowComment {
     lastName: string;
   };
   parentId: CommentId | null;
-  rootParentId: CommentId | null;
+  rootParentId: CommentId | null | string;
   description: NoneEmptyString;
   createdAt: Date;
   replies: ShowComment[];

@@ -35,7 +35,33 @@ export class CommentRepository implements ICommentRepository {
     comment: CreateCommentDto,
     rootParentId: CommentId | null
   ): Promise<Comment> {
-    return await this.repo.save({ id: v4(), rootParentId, ...comment });
+    if (rootParentId !== null) {
+      if (comment.parentId === undefined || comment.parentId === null) {
+        delete comment.parentId;
+        return await this.repo.save({
+          id: v4(),
+          rootParentId,
+          postId: comment.postId,
+          userId: comment.userId,
+          description: comment.description,
+        });
+      }
+      return await this.repo.save({
+        id: v4(),
+        rootParentId,
+        postId: comment.postId,
+        userId: comment.userId,
+        description: comment.description,
+        parentId: comment.parentId,
+      });
+    } else {
+      return await this.repo.save({
+        id: v4(),
+        postId: comment.postId,
+        userId: comment.userId,
+        description: comment.description,
+      });
+    }
   }
 
   async findById(id: CommentId): Promise<Comment | null> {

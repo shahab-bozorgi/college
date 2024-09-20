@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { Brand } from "../../../../utilities/brand";
-import { isUUID } from "../../../../data/uuid";
-import { UUID } from "crypto";
+import { isUUID, UUID } from "../../../../data/uuid";
 
 export type NotificationId = Brand<UUID, "NotificationId">;
 

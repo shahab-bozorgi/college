@@ -32,7 +32,6 @@ export interface IPostRepository {
     closeFriendsOnly: boolean,
     pagination: PaginationDto
   ): Promise<PaginatedResult<ShowPosts>>;
-  create(fields: CreatePost): Promise<Post | null>;
   postsCount(author: User): Promise<number>;
 }
 

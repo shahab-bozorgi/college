@@ -2,6 +2,7 @@ import { PaginatedResult, paginationInfo } from "../../../data/pagination";
 import { NotFound } from "../../../utilities/http-error";
 import { CreateActionDto } from "../../action/dto/create-action.dto";
 import { ActionNotificationService } from "../../common/service/action-notification.service";
+import { MediaId } from "../../media/model/media-id";
 import { UserService } from "../../user/user.service";
 import { PostService } from "../post.service";
 import { ICommentRepository } from "./comment.repository";
@@ -55,7 +56,7 @@ export class CommentService {
       rootParentId
     );
 
-    let mediaId = null;
+    let mediaId: MediaId | null = null;
     if (postOfComment.media.length > 0) {
       mediaId = postOfComment.media[0].id;
     }

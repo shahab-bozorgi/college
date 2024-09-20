@@ -90,7 +90,13 @@ export const makePostRouter = (
     async (req, res, next) => {
       try {
         const dto = CreatePostSchema.parse(req.body);
-        await postService.create(req.user, req.files, dto, tagService);
+        await postService.create(
+          req.user,
+          req.files,
+          dto,
+          tagService,
+          actionNotificationService
+        );
         res.status(201).json({ ok: true, data: {} });
       } catch (e) {
         next(e);
@@ -120,6 +126,7 @@ export const makePostRouter = (
           req.user.id,
           dto,
           tagService,
+          actionNotificationService,
           Array.isArray(req.files) ? req.files : undefined
         );
         res.status(200).json({ ok: true, data: {} });

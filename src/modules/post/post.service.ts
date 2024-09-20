@@ -23,6 +23,9 @@ import { PaginatedResult, PaginationDto } from "../../data/pagination";
 import { FollowService } from "../user/follow/follow.service";
 import { BLOCKED, FOLLOWING } from "../user/follow/model/follow.model";
 import { MentionService } from "./mention/mention.service";
+import { MediaId } from "../media/model/media-id";
+import { CreateActionDto } from "../action/dto/create-action.dto";
+import { ActionNotificationService } from "../common/service/action-notification.service";
 
 export class PostService {
   constructor(
@@ -69,7 +72,8 @@ export class PostService {
     author: User,
     files: any,
     dto: CreatePostDto,
-    tagService: TagService
+    tagService: TagService,
+    actionNotificationService: ActionNotificationService
   ): Promise<void> {
     if (!Array.isArray(files) || (Array.isArray(files) && !files.length))
       throw new HttpError(400, "Post must include at least one picture");
@@ -109,8 +113,30 @@ export class PostService {
       closeFriendsOnly: dto.closeFriendsOnly,
     });
 
-    if (mentionedUsers.length)
+    if (mentionedUsers.length) {
       await this.mentionService.insert(post.id, mentionedUsers);
+
+      for (const mentionedUser of mentionedUsers) {
+        let mediaId: MediaId | null = null;
+        if (media.length > 0) {
+          mediaId = media[0].id;
+        }
+
+        const actionDto: CreateActionDto = {
+          actorId: post.authorId,
+          type: "mention",
+          entityId: mentionedUser.id,
+          actionDate: post.createdAt,
+          mediaId: mediaId,
+        };
+
+        await actionNotificationService.createActionWithNotifications(
+          actionDto,
+          post.authorId,
+          post.closeFriendsOnly
+        );
+      }
+    }
   }
 
   async getPost(
@@ -177,6 +203,7 @@ export class PostService {
     authenticatedId: UserId,
     dto: UpdatePostDto,
     tagService: TagService,
+    actionNotificationService: ActionNotificationService,
     files?: Express.Multer.File[]
   ): Promise<void> {
     const post = await this.postRepo.findById(postId, [
@@ -251,6 +278,27 @@ export class PostService {
 
     if (mentionedUsers.length) {
       await this.mentionService.insert(post.id, mentionedUsers);
+
+      for (const mentionedUser of mentionedUsers) {
+        let mediaId: MediaId | null = null;
+        if (post.media.length > 0) {
+          mediaId = post.media[0].id;
+        }
+
+        const actionDto: CreateActionDto = {
+          actorId: post.authorId,
+          type: "mention",
+          entityId: mentionedUser.id,
+          actionDate: post.createdAt,
+          mediaId: mediaId,
+        };
+
+        await actionNotificationService.createActionWithNotifications(
+          actionDto,
+          post.authorId,
+          post.closeFriendsOnly
+        );
+      }
     }
 
     post.closeFriendsOnly = dto.closeFriendsOnly;

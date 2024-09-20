@@ -258,14 +258,13 @@ export class FollowService {
       followingStatus: FOLLOWING,
     });
 
-    await actionNotificationService.updateRequestFollowToAcceptFollow({
+    await actionNotificationService.updateRequestFollowToFollow({
       actorId: followUpdated.followerId,
       entityId: followUpdated.id,
       actionDate: followUpdated.updatedAt,
     });
 
-    let mediaId = null;
-
+    let mediaId: MediaId | null = null;
     const authenticatedUser = await userService.getUserBy(authenticatedId, [
       "avatar",
     ]);
@@ -276,7 +275,7 @@ export class FollowService {
     }
 
     const actionDto: CreateActionDto = {
-      actorId: followUpdated.followerId,
+      actorId: followUpdated.followingId,
       type: "acceptFollow",
       entityId: followUpdated.id,
       actionDate: followUpdated.updatedAt,

@@ -61,7 +61,7 @@ export class ActionNotificationService {
     return await this.actionNotificationRepo.findLastByType(dto);
   }
 
-  async updateRequestFollowToAcceptFollow(dto: UpdateActionDto) {
+  async updateRequestFollowToFollow(dto: UpdateActionDto) {
     const lastAction = await this.getLastFollowActionByActorAndEntityId({
       actorId: dto.actorId,
       entityId: dto.entityId,
@@ -80,7 +80,7 @@ export class ActionNotificationService {
           actorId: dto.actorId,
           entityId: dto.entityId,
         },
-        "acceptFollow"
+        "follow"
       );
 
     if (updateRequestFollowToAcceptActionStatus !== true) {

@@ -9,6 +9,7 @@ export interface Comment {
   postId: PostId;
   userId: UserId;
   parentId: CommentId | null;
+  rootParentId: CommentId | null;
   description: NoneEmptyString;
   createdAt: Date;
   replies: Comment[];
@@ -33,6 +34,7 @@ export interface ShowComment {
     lastName: string;
   };
   parentId: CommentId | null;
+  rootParentId: CommentId | null;
   description: NoneEmptyString;
   createdAt: Date;
   replies: ShowComment[];

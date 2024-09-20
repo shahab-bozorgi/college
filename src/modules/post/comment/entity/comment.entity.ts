@@ -29,6 +29,9 @@ export class CommentEntity {
   @Column({ nullable: true, type: "text" })
   parentId!: CommentId | null;
 
+  @Column({ nullable: true, type: "text" })
+  rootParentId!: CommentId | null;
+
   @ManyToOne(() => UserEntity, (user) => user.comments, {
     nullable: false,
     onDelete: "CASCADE",

@@ -2,6 +2,7 @@ import { PaginatedResult, paginationInfo } from "../../../data/pagination";
 import { NotFound } from "../../../utilities/http-error";
 import { CreateActionDto } from "../../action/dto/create-action.dto";
 import { ActionNotificationService } from "../../common/service/action-notification.service";
+import { UserId } from "../../user/model/user-user-id";
 import { UserService } from "../../user/user.service";
 import { PostService } from "../post.service";
 import { ICommentRepository } from "./comment.repository";
@@ -30,18 +31,30 @@ export class CommentService {
       throw new NotFound("User is not found");
     }
 
+    let rootParentId = null;
+
     if (dto.parentId !== null) {
-      if ((await this.commentRepo.findById(dto.parentId)) === null) {
+      const parentOfComment = await this.commentRepo.findById(dto.parentId);
+      if (parentOfComment === null) {
         throw new NotFound("Parent Comment is not found");
+      }
+
+      if (parentOfComment.rootParentId !== null) {
+        rootParentId = parentOfComment.rootParentId;
+      } else {
+        rootParentId = dto.parentId;
       }
     }
 
-    const commentCreated = await this.commentRepo.create({
-      userId: dto.userId,
-      postId: dto.postId,
-      parentId: dto.parentId,
-      description: dto.description,
-    });
+    const commentCreated = await this.commentRepo.create(
+      {
+        userId: dto.userId,
+        postId: dto.postId,
+        parentId: dto.parentId,
+        description: dto.description,
+      },
+      rootParentId
+    );
 
     let mediaId = null;
     if (postOfComment.media.length > 0) {
@@ -93,12 +106,48 @@ export class CommentService {
             ? true
             : false;
 
-        parentComments.push({
-          ...comment,
-          isLiked,
-          replies: this.buildCommentTree(comment, comments),
-        });
+        if (comment.rootParentId === null) {
+          parentComments.push({ ...comment, isLiked });
+        }
       }
+
+      for (const comment of comments) {
+        const isLiked =
+          (await likeCommentService.getLikeComment({
+            userId: dto.authenticatedUserId,
+            commentId: comment.id,
+          })) !== null
+            ? true
+            : false;
+
+        if (comment.rootParentId !== null) {
+          childComments.push({ ...comment, isLiked });
+        }
+      }
+
+      parentComments.forEach((parent) => {
+        parent.replies = childComments.filter(
+          (child) => child.rootParentId === parent.id
+        );
+      });
+
+      const orphans = childComments.filter(
+        (child) => !comments.some((parent) => parent.id === child.rootParentId)
+      );
+
+      orphans.forEach(async (orph) => {
+        parentComments.push({
+          ...orph,
+          isLiked:
+            (await likeCommentService.getLikeComment({
+              userId: dto.authenticatedUserId,
+              commentId: orph.id,
+            })) !== null
+              ? true
+              : false,
+          replies: [],
+        });
+      });
     }
 
     const { nextPage, totalPages } = paginationInfo(
@@ -114,21 +163,5 @@ export class CommentService {
       nextPage,
       totalPages,
     };
-  }
-
-  private buildCommentTree(
-    parentComment: ShowComment,
-    allComments: ShowComment[]
-  ): ShowComment[] {
-    const children = allComments.filter(
-      (child) => child.parentId === parentComment.id
-    );
-    
-    const replies = children.map((child) => ({
-      ...child,
-      replies: this.buildCommentTree(child, allComments),
-    }));
-
-    return replies;
   }
 }

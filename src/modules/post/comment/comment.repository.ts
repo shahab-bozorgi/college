@@ -12,7 +12,10 @@ import { CommentId } from "./model/comment-id";
 import { PostId } from "../model/post-id";
 
 export interface ICommentRepository {
-  create(comment: CreateCommentDto): Promise<Comment>;
+  create(
+    comment: CreateCommentDto,
+    rootParentId: CommentId | null
+  ): Promise<Comment>;
   findById(id: CommentId): Promise<Comment | null>;
   getCommentForNotificationById(
     id: CommentId
@@ -28,8 +31,11 @@ export class CommentRepository implements ICommentRepository {
     this.repo = dataSource.getRepository(CommentEntity);
   }
 
-  async create(comment: CreateCommentDto): Promise<Comment> {
-    return await this.repo.save({ id: v4(), ...comment });
+  async create(
+    comment: CreateCommentDto,
+    rootParentId: CommentId | null
+  ): Promise<Comment> {
+    return await this.repo.save({ id: v4(), rootParentId, ...comment });
   }
 
   async findById(id: CommentId): Promise<Comment | null> {
@@ -58,6 +64,7 @@ export class CommentRepository implements ICommentRepository {
         description: true,
         createdAt: true,
         parentId: true,
+        rootParentId: true,
         likeCommentsCount: true,
         user: {
           id: true,

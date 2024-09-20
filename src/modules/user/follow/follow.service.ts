@@ -4,6 +4,7 @@ import { CreateActionDto } from "../../action/dto/create-action.dto";
 import { ActionNotificationService } from "../../common/service/action-notification.service";
 import { MediaId } from "../../media/model/media-id";
 import { UserId } from "../model/user-user-id";
+import { User } from "../model/user.model";
 import { UserService } from "../user.service";
 import { BlockUserDto } from "./dto/block-user.dto";
 import { GetFollowerListsDto } from "./dto/get-followers.dto";
@@ -181,21 +182,31 @@ export class FollowService {
   }
 
   async getFollowers(
+    authenticatedUser: User,
     dto: GetFollowerListsDto
   ): Promise<PaginatedResult<FollowersList>> {
-    return await this.flwRepo.userFollowers(dto.followingId, {
-      page: dto.page,
-      limit: dto.limit,
-    });
+    return await this.flwRepo.userFollowers(
+      authenticatedUser,
+      dto.followingId,
+      {
+        page: dto.page,
+        limit: dto.limit,
+      }
+    );
   }
 
   async getFollowings(
+    authenticatedUser: User,
     dto: GetFollowingListsDto
   ): Promise<PaginatedResult<FollowingsList>> {
-    return await this.flwRepo.userFollowings(dto.followerId, {
-      page: dto.page,
-      limit: dto.limit,
-    });
+    return await this.flwRepo.userFollowings(
+      authenticatedUser,
+      dto.followerId,
+      {
+        page: dto.page,
+        limit: dto.limit,
+      }
+    );
   }
 
   async getcountFollowers(followerId: UserId): Promise<number> {

@@ -22,13 +22,16 @@ import {
 import { Blacklist } from "./model/blacklist.model";
 import { CloseFriends } from "./model/close-friend.model";
 import { FollowId } from "./model/follow-id.model";
+import { User } from "../model/user.model";
 
 export interface IFollowRepository {
   userFollowings(
+    authenticatedUser: User,
     followerId: UserId,
     pagination: PaginationDto
   ): Promise<PaginatedResult<FollowingsList>>;
   userFollowers(
+    authenticatedUser: User,
     followingId: UserId,
     pagination: PaginationDto
   ): Promise<PaginatedResult<FollowersList>>;
@@ -124,13 +127,14 @@ export class FollowRepository implements IFollowRepository {
     });
   }
   async userFollowers(
+    authenticatedUser: User,
     followingId: UserId,
     pagination: PaginationDto
   ): Promise<PaginatedResult<FollowersList>> {
     const result = await this.flwrepo.findAndCount({
       where: { followingId, followingStatus: FOLLOWING },
       relations: {
-        follower: { avatar: true, followers: true },
+        follower: { avatar: true, followers: true, followings: true },
       },
       skip: paginationSkip(pagination),
       take: pagination.limit,
@@ -148,7 +152,11 @@ export class FollowRepository implements IFollowRepository {
           followersCount: rs.follower.followers.filter(
             (follower) => follower.followingStatus === FOLLOWING
           ).length,
-          isCloseFriend: rs.isCloseFriend,
+          isCloseFriend: rs.follower.followings.some(
+            (following) =>
+              following.followingId === authenticatedUser.id &&
+              following.isCloseFriend
+          ),
         };
       }),
       nextPage,
@@ -157,12 +165,15 @@ export class FollowRepository implements IFollowRepository {
   }
 
   async userFollowings(
+    authenticatedUser: User,
     followerId: UserId,
     pagination: PaginationDto
   ): Promise<PaginatedResult<FollowingsList>> {
     const result = await this.flwrepo.findAndCount({
       where: { followerId, followingStatus: FOLLOWING },
-      relations: { following: { avatar: true, followers: true } },
+      relations: {
+        following: { avatar: true, followers: true, followings: true },
+      },
       skip: paginationSkip(pagination),
       take: pagination.limit,
     });
@@ -179,9 +190,10 @@ export class FollowRepository implements IFollowRepository {
           followersCount: rs.following.followers.filter(
             (follower) => follower.followingStatus === FOLLOWING
           ).length,
-          isCloseFriend: rs.following.followers.some(
-            (follower) =>
-              follower.followerId === followerId && follower.isCloseFriend
+          isCloseFriend: rs.following.followings.some(
+            (following) =>
+              following.followingId === authenticatedUser.id &&
+              following.isCloseFriend
           ),
         };
       }),

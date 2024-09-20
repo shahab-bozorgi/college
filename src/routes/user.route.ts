@@ -130,7 +130,7 @@ export const makeUserRouter = (
       },
       GetFollowerListsSchema
     );
-    expressHandler(req, res, () => followService.getFollowers(dto));
+    expressHandler(req, res, () => followService.getFollowers(req.user, dto));
   });
 
   app.get("/:userId/followings", async (req, res) => {
@@ -142,7 +142,7 @@ export const makeUserRouter = (
       },
       GetFollowingListsSchema
     );
-    expressHandler(req, res, () => followService.getFollowings(dto));
+    expressHandler(req, res, () => followService.getFollowings(req.user, dto));
   });
 
   app.patch("/follow/:followerId/request/accept", async (req, res) => {

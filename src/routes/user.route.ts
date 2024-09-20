@@ -29,6 +29,7 @@ import {
   SearchService,
   searchSuggestionSchema,
 } from "../modules/common/service/search.service";
+import { deleteFollowerSchema } from "../modules/user/follow/dto/delete-follower.dto";
 
 export const makeUserRouter = (
   userService: UserService,
@@ -115,7 +116,7 @@ export const makeUserRouter = (
   });
 
   app.delete("/followers/:followerId/delete", (req, res) => {
-    const dto = parseDtoWithSchema(req.params, unfollowSchema);
+    const dto = parseDtoWithSchema(req.params, deleteFollowerSchema);
     expressHandler(req, res, () =>
       followService.deleteFollower(req.user.id, dto.followerId, userService)
     );

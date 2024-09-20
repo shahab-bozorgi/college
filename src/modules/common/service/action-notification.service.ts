@@ -24,10 +24,6 @@ export class ActionNotificationService {
       personalReceiverId
     );
 
-    if (typeof closeFriendStatus !== "boolean") {
-      closeFriendStatus = false;
-    }
-
     if (personalReceiver === null) {
       throw new NotFound("Personal receiver not found!");
     }
@@ -45,7 +41,8 @@ export class ActionNotificationService {
         friendStatus.status === "Blocked" ||
         (friendStatus.status !== "Following" &&
           personalReceiver.isPrivate === true) ||
-        friendStatus.isCloseFriend !== closeFriendStatus
+        (closeFriendStatus === true &&
+          friendStatus.isCloseFriend !== closeFriendStatus)
       ) {
         continue;
       }
@@ -102,5 +99,30 @@ export class ActionNotificationService {
         `UnSeen notifications of action ${lastAction.id} is failed`
       );
     }
+  }
+
+  async deleteRequestFollow(dto: UpdateActionDto): Promise<boolean> {
+    const lastAction = await this.getLastFollowActionByActorAndEntityId({
+      actorId: dto.actorId,
+      entityId: dto.entityId,
+      type: "requestFollow",
+    });
+
+    if (lastAction === null) {
+      throw new NotFound("Action for update accept follow is not found");
+    }
+
+    const deleteNotifStatus =
+      await this.actionNotificationRepo.deleteNotificationsByActionId(
+        lastAction.id
+      );
+
+    if (deleteNotifStatus !== true) {
+      throw new Error(
+        `Delete notifications of action ${lastAction.id} is failed`
+      );
+    }
+
+    return await this.actionNotificationRepo.deleteActionById(lastAction.id);
   }
 }

@@ -163,7 +163,8 @@ export const makeUserRouter = (
       return followService.rejectFollowUser(
         req.user.id,
         dto.followerId,
-        userService
+        userService,
+        actionNotificationService
       );
     });
   });

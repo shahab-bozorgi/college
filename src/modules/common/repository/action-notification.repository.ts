@@ -24,6 +24,8 @@ export interface IActionNotificationRepository {
     type: ActionType
   ): Promise<boolean>;
   unSeenNotificationsByActionId(actionId: ActionId): Promise<boolean>;
+  deleteNotificationsByActionId(actionId: ActionId): Promise<boolean>;
+  deleteActionById(id: ActionId): Promise<boolean>;
 }
 
 export class ActionNotificationRepository
@@ -119,5 +121,13 @@ export class ActionNotificationRepository
       (await this.notificationRepo.update({ actionId }, { isSeen: false }))
         .affected
     );
+  }
+
+  async deleteNotificationsByActionId(actionId: ActionId): Promise<boolean> {
+    return Boolean((await this.notificationRepo.delete({ actionId })).affected);
+  }
+
+  async deleteActionById(id: ActionId): Promise<boolean> {
+    return Boolean((await this.actionRepo.delete({ id })).affected);
   }
 }

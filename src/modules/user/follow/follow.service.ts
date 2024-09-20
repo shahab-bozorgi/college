@@ -263,12 +263,37 @@ export class FollowService {
       entityId: followUpdated.id,
       actionDate: followUpdated.updatedAt,
     });
+
+    let mediaId = null;
+
+    const authenticatedUser = await userService.getUserBy(authenticatedId, [
+      "avatar",
+    ]);
+    if (authenticatedUser !== null) {
+      if (authenticatedUser.avatar !== undefined) {
+        mediaId = authenticatedUser.avatar.id;
+      }
+    }
+
+    const actionDto: CreateActionDto = {
+      actorId: followUpdated.followerId,
+      type: "acceptFollow",
+      entityId: followUpdated.id,
+      actionDate: followUpdated.updatedAt,
+      mediaId: mediaId,
+    };
+
+    await actionNotificationService.createActionWithNotifications(
+      actionDto,
+      followUpdated.followingId
+    );
   }
 
   async rejectFollowUser(
     authenticatedId: UserId,
     followerId: UserId,
-    userService: UserService
+    userService: UserService,
+    actionNotificationService: ActionNotificationService
   ): Promise<void> {
     const follower = await userService.getUserBy(followerId);
     if (!follower) {
@@ -281,9 +306,20 @@ export class FollowService {
     if (followingStatus !== PENDING)
       throw new NotFound("Follow request not found.");
 
+    const followRow = await this.getFollow(followerId, authenticatedId);
+    if (followRow === null) {
+      throw new NotFound("Follow Record is not found");
+    }
+
     await this.flwRepo.delete({
       followerId,
       followingId: authenticatedId,
+    });
+
+    await actionNotificationService.deleteRequestFollow({
+      actorId: followRow.followerId,
+      entityId: followRow.id,
+      actionDate: followRow.updatedAt,
     });
   }
 

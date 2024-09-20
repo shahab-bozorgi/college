@@ -22,6 +22,7 @@ import { NoneEmptyString } from "../../../data/non-empty-string";
 import { PositiveInt } from "../../../data/int";
 import { TagEntity } from "../../tag/tag.entity";
 import { FollowEntity } from "../../user/follow/entity/follow.entity";
+import { PostEntity } from "../../post/entity/post.entity";
 
 export interface ISearchRepository {
   suggestUsers(
@@ -241,46 +242,72 @@ export class SearchRepository implements ISearchRepository {
     pagination: PaginationDto
   ): Promise<PaginatedResult<{ posts: SearchTagPost[] }>> {
     const result = await this.dataSource
-      .getRepository(TagEntity)
-      .createQueryBuilder("tag")
-      .where("tag.title LIKE :query", { query: `%${searchQuery}%` })
-      .leftJoinAndSelect("tag.posts", "post")
+      .getRepository(PostEntity)
+      .createQueryBuilder("post")
+      .innerJoin("post.tags", "tag")
       .leftJoinAndSelect("post.media", "media")
       .leftJoin("post.author", "author")
-      .leftJoin("author.followings", "following")
-      .leftJoin("author.followers", "follower")
-      .andWhere((qb) =>
-        qb
-          .where("follower.followerId != :userId", {
-            userId: authenticatedUser.id,
-          })
-          .orWhere(
-            "follower.followerId = :userId AND follower.followingStatus != :blocked",
-            { userId: authenticatedUser.id, blocked: BLOCKED }
-          )
+      .leftJoin(
+        "follows",
+        "followingRecord",
+        "followingRecord.followingId = post.authorId AND followingRecord.followerId = :userId",
+        {
+          userId: authenticatedUser.id,
+        }
       )
-      // .andWhere((qb) =>
-      //   qb
-      //     .where("following.followingId != :userId", {
-      //       userId: authenticatedUser.id,
-      //     })
-      //     .orWhere(
-      //       "following.followingId = :userId AND following.followingStatus != :blocked",
-      //       { userId: authenticatedUser.id, status: BLOCKED }
-      //     )
-      // )
-      // .andWhere((qb) =>
-      //   qb
-      //     .where("post.closeFriendsOnly = 0")
-      //     .orWhere("post.closeFriendsOnly = 1 AND post.authorId = :userId", {
-      //       userId: authenticatedUser.id,
-      //     })
-      //     .orWhere(
-      //       `post.closeFriendsOnly = 1 AND\
-      //        EXISTS(SELECT * FROM follower WHERE follower.followerId = :userId\
-      //         AND isCloseFriend = 1)`
-      //     )
-      // )
+      .leftJoin(
+        "follows",
+        "followedRecord",
+        "followedRecord.followerId = post.authorId AND followedRecord.followingId = :userId",
+        {
+          userId: authenticatedUser.id,
+        }
+      )
+      .where("tag.title LIKE :query", { query: `%${searchQuery}%` })
+      .andWhere(
+        new Brackets((qb) =>
+          qb
+            .where("post.authorId = :userId", {
+              userId: authenticatedUser.id,
+            })
+            .orWhere(
+              new Brackets((qb) =>
+                qb
+                  .andWhere(
+                    "(followingRecord.followingStatus IS NULL OR followingRecord.followingStatus != :blocked)",
+                    {
+                      blocked: BLOCKED,
+                    }
+                  )
+                  .andWhere(
+                    "(followedRecord.followingStatus IS NULL OR followedRecord.followingStatus != :blocked)",
+                    {
+                      blocked: BLOCKED,
+                    }
+                  )
+                  .andWhere(
+                    new Brackets((qb) =>
+                      qb
+                        .where(
+                          "(author.isPrivate = 1 AND followingRecord.followingStatus = :following)",
+                          { following: FOLLOWING }
+                        )
+                        .orWhere("author.isPrivate = 0")
+                    )
+                  )
+                  .andWhere(
+                    new Brackets((qb) =>
+                      qb
+                        .where("post.closeFriendsOnly = 0")
+                        .orWhere(
+                          "post.closeFriendsOnly = followingRecord.isCloseFriend"
+                        )
+                    )
+                  )
+              )
+            )
+        )
+      )
       .addSelect((subQuery) => {
         return subQuery
           .select("COUNT(like.postId)")
@@ -294,17 +321,13 @@ export class SearchRepository implements ISearchRepository {
 
     const { nextPage, totalPages } = paginationInfo(result[1], pagination);
     return {
-      posts: result[0].reduce((posts: SearchTagPost[], tag) => {
-        return posts.concat(
-          tag.posts.map((post) => {
-            return {
-              id: post.id,
-              media: post.media,
-              closeFriendsOnly: post.closeFriendsOnly,
-            };
-          })
-        );
-      }, []),
+      posts: result[0].map((post) => {
+        return {
+          id: post.id,
+          media: post.media,
+          closeFriendsOnly: post.closeFriendsOnly,
+        };
+      }),
       nextPage,
       totalPages,
     };

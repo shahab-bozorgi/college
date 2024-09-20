@@ -1,5 +1,10 @@
 import { DataSource, Repository } from "typeorm";
-import { CreateMention, DeleteMention, Mention } from "./model/mention.model";
+import {
+  CreateMention,
+  DeleteMention,
+  Mention,
+  MentionNotification,
+} from "./model/mention.model";
 import { MentionEntity } from "./entity/mention.entity";
 import { UserId } from "../../user/model/user-user-id";
 import {
@@ -9,6 +14,7 @@ import {
   paginationSkip,
 } from "../../../data/pagination";
 import { ShowPosts } from "../model/post.model";
+import { MentionId } from "./model/mention-id";
 
 export interface IMentionRepository {
   insert(mentino: CreateMention[]): Promise<Mention[]>;
@@ -17,6 +23,9 @@ export interface IMentionRepository {
     userId: UserId,
     pagination: PaginationDto
   ): Promise<PaginatedResult<ShowPosts>>;
+  getMentionForNotificationById(
+    id: MentionId
+  ): Promise<MentionNotification | null>;
 }
 
 export class MentionRepository implements IMentionRepository {
@@ -67,5 +76,26 @@ export class MentionRepository implements IMentionRepository {
       nextPage,
       totalPages,
     };
+  }
+
+  async getMentionForNotificationById(
+    id: MentionId
+  ): Promise<MentionNotification | null> {
+    const mentionRow: MentionNotification | null = await this.repo.findOne({
+      where: { id },
+      relations: ["user"],
+      select: {
+        user: {
+          id: true,
+          username: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+    });
+
+    if (mentionRow !== null) return { user: mentionRow.user };
+
+    return mentionRow;
   }
 }

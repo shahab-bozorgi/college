@@ -30,24 +30,26 @@ export class ActionNotificationService {
 
     const friendReceiverIds: UserId[] = [];
 
-    for (const friend of friendReceivers) {
-      const friendStatus = await this.followService.getFollowingStatus(
-        friend.followerId,
-        personalReceiverId
-      );
+    if (dto.type === "acceptFollow" || dto.type === "requestFollow") {
+      for (const friend of friendReceivers) {
+        const friendStatus = await this.followService.getFollowingStatus(
+          friend.followerId,
+          personalReceiverId
+        );
 
-      if (
-        friend.followerId === personalReceiverId ||
-        friendStatus.status === "Blocked" ||
-        (friendStatus.status !== "Following" &&
-          personalReceiver.isPrivate === true) ||
-        (closeFriendStatus === true &&
-          friendStatus.isCloseFriend !== closeFriendStatus)
-      ) {
-        continue;
+        if (
+          friend.followerId === personalReceiverId ||
+          friendStatus.status === "Blocked" ||
+          (friendStatus.status !== "Following" &&
+            personalReceiver.isPrivate === true) ||
+          (closeFriendStatus === true &&
+            friendStatus.isCloseFriend !== closeFriendStatus)
+        ) {
+          continue;
+        }
+
+        friendReceiverIds.push(friend.followerId);
       }
-
-      friendReceiverIds.push(friend.followerId);
     }
 
     return this.actionNotificationRepo.create(

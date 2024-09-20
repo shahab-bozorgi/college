@@ -19,3 +19,12 @@ export interface DeleteMention {
   userId: UserId;
   postId: PostId;
 }
+
+export interface MentionNotification {
+  user: {
+    id: UserId;
+    username: Username;
+    firstName: string;
+    lastName: string;
+  };
+}

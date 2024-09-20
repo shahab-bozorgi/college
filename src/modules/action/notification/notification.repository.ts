@@ -16,6 +16,8 @@ import { UserId } from "../../user/model/user-user-id";
 import { NotificationType } from "./model/notification-type";
 import { FollowRepository } from "../../user/follow/follow.repository";
 import { FollowId } from "../../user/follow/model/follow-id.model";
+import { MentionRepository } from "../../post/mention/mention.repository";
+import { MentionId } from "../../post/mention/model/mention-id";
 
 export interface INotificationRepository {
   getAllWithAction(
@@ -88,6 +90,7 @@ export class NotificationRepository implements INotificationRepository {
   ): Promise<unknown | null> {
     const commentRepo = new CommentRepository(this.dataSource);
     const followRepo = new FollowRepository(this.dataSource);
+    const mentionRepo = new MentionRepository(this.dataSource);
 
     switch (actionType) {
       case "comment":
@@ -109,7 +112,12 @@ export class NotificationRepository implements INotificationRepository {
         return await followRepo.getFollowForNotificationById(
           entityId as FollowId
         );
-
+      
+      case "mention":
+        return await mentionRepo.getMentionForNotificationById(
+          entityId as MentionId
+        );
+        
       default:
         return null;
     }

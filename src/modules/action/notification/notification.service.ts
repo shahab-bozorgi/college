@@ -76,16 +76,16 @@ export class NotificationService {
         isSeen: notif.isSeen,
       };
 
-      if (dto.notificationType === "friends") {
-        showNotif.receiver = {
-          id: receiver.id,
-          username: receiver.username,
-          firstName: receiver.firstName ?? "",
-          lastName: receiver.lastName ?? "",
-          followingStatus: followedStatus.status,
-          followedStatus: followingStatus.status,
-        };
-      }
+      // if (dto.notificationType === "friends") {
+      //   showNotif.receiver = {
+      //     id: receiver.id,
+      //     username: receiver.username,
+      //     firstName: receiver.firstName ?? "",
+      //     lastName: receiver.lastName ?? "",
+      //     followingStatus: followedStatus.status,
+      //     followedStatus: followingStatus.status,
+      //   };
+      // }
 
       if (!showNotif.content) {
         showNotif.content = { [notif.action.type]: {} };

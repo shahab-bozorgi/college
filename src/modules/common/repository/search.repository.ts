@@ -201,7 +201,9 @@ export class SearchRepository implements ISearchRepository {
           lastName: rs.lastName,
           username: rs.username,
           avatar: rs.avatar,
-          followersCount: rs.followers.length,
+          followersCount: rs.followers.filter(
+            (follower) => follower.followingStatus === FOLLOWING
+          ).length,
           followingStatus: status ? status.followingStatus : NOT_FOLLOWING,
           isCloseFriend: rs.followings.some(
             (following) =>

@@ -180,8 +180,10 @@ export class ActionNotificationService {
       type: "mention",
     });
 
+    console.log(lastAction);
+
     if (lastAction === null) {
-      throw new NotFound("Action for update accept follow is not found");
+      throw new NotFound("Action for delete mention is not found");
     }
 
     const deleteNotifStatus =

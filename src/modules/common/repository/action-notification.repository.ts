@@ -110,7 +110,7 @@ export class ActionNotificationRepository
       (
         await this.actionRepo.update(
           { id },
-          { actionDate: dto.actionDate, type }
+          { actionDate: dto.actionDate, mediaId: dto.mediaId, type }
         )
       ).affected
     );

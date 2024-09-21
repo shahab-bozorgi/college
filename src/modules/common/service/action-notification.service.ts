@@ -91,6 +91,7 @@ export class ActionNotificationService {
           actionDate: dto.actionDate,
           actorId: dto.actorId,
           entityId: dto.entityId,
+          mediaId: dto.mediaId,
         },
         "follow"
       );
@@ -131,6 +132,7 @@ export class ActionNotificationService {
           actionDate: dto.actionDate,
           actorId: dto.actorId,
           entityId: dto.entityId,
+          mediaId: dto.mediaId,
         },
         "mention"
       );

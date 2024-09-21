@@ -307,10 +307,15 @@ export class PostService {
       );
 
       for (const unDeletedMention of unDeletedMentions) {
+        let mediaId: MediaId | null = null;
+        if (post.media.length > 0) {
+          mediaId = post.media[0].id;
+        }
         await actionNotificationService.updateActionOfMention({
           actorId: post.authorId,
           entityId: unDeletedMention.id,
           actionDate: new Date(),
+          mediaId,
         });
       }
 

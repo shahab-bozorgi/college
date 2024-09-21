@@ -238,9 +238,14 @@ export class FollowService {
         "I'm sure you couldn't have requested to follow yourself."
       );
 
-    const follower = await userService.getUserBy(followerId);
+    const follower = await userService.getUserBy(followerId, ["avatar"]);
     if (!follower) {
-      throw new NotFound("User not found!");
+      throw new NotFound("Follower User not found!");
+    }
+
+    let followerMediaId: MediaId | null = null;
+    if (follower.avatar) {
+      followerMediaId = follower.avatar.id;
     }
 
     const followRow = await this.getFollow(followerId, authenticatedId);
@@ -259,6 +264,7 @@ export class FollowService {
       actorId: followUpdated.followerId,
       entityId: followUpdated.id,
       actionDate: followUpdated.updatedAt,
+      mediaId: followerMediaId,
     });
 
     let mediaId: MediaId | null = null;

@@ -119,8 +119,6 @@ export class PostService {
         mentionedUsers
       );
 
-      console.log(mentions);
-
       for (const mention of mentions) {
         let mediaId: MediaId | null = null;
         if (media.length > 0) {
@@ -135,11 +133,9 @@ export class PostService {
           mediaId: mediaId,
         };
 
-        console.log(actionDto);
-
         await actionNotificationService.createActionWithNotifications(
           actionDto,
-          post.authorId,
+          mention.userId,
           post.closeFriendsOnly
         );
       }
@@ -316,7 +312,13 @@ export class PostService {
         });
       }
 
-      for (const mention of mentions) {
+      const newMentions = mentions.filter((mention) =>
+        unDeletedMentions.find(
+          (unDeleted) => mention.userId !== unDeleted.userId
+        )
+      );
+
+      for (const newMention of newMentions) {
         let mediaId: MediaId | null = null;
         if (post.media.length > 0) {
           mediaId = post.media[0].id;
@@ -325,14 +327,14 @@ export class PostService {
         const actionDto: CreateActionDto = {
           actorId: post.authorId,
           type: "mention",
-          entityId: mention.id,
+          entityId: newMention.id,
           actionDate: post.updatedAt,
           mediaId: mediaId,
         };
 
         await actionNotificationService.createActionWithNotifications(
           actionDto,
-          post.authorId,
+          newMention.userId,
           post.closeFriendsOnly
         );
       }

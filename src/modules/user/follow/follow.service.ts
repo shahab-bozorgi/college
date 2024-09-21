@@ -318,7 +318,6 @@ export class FollowService {
     await actionNotificationService.deleteRequestFollow({
       actorId: followRow.followerId,
       entityId: followRow.id,
-      actionDate: followRow.updatedAt,
     });
   }
 

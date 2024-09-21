@@ -380,6 +380,28 @@ export class FollowRepository implements IFollowRepository {
         });
       }
 
+      await notificationRepo
+        .createQueryBuilder("notif")
+        .leftJoin("notif.action", "action")
+        .where("notif.receiverId = :receiverId", {
+          receiverId: authenticatedUser.id,
+        })
+        .andWhere("action.actorId = :actorId", { actorId: blockedUser.id })
+        .delete()
+        .execute();
+
+      await notificationRepo
+        .createQueryBuilder("notif")
+        .leftJoin("notif.action", "action")
+        .where("notif.receiverId = :receiverId", {
+          receiverId: blockedUser.id,
+        })
+        .andWhere("action.actorId = :actorId", {
+          actorId: authenticatedUser.id,
+        })
+        .delete()
+        .execute();
+
       await followRepo.upsert(
         {
           ...authenticatedStatus,

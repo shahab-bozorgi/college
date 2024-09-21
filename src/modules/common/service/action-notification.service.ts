@@ -31,7 +31,7 @@ export class ActionNotificationService {
 
     const friendReceiverIds: UserId[] = [];
 
-    if (dto.type === "acceptFollow" || dto.type === "requestFollow") {
+    if (dto.type !== "acceptFollow" && dto.type !== "requestFollow") {
       for (const friend of friendReceivers) {
         const friendStatus = await this.followService.getFollowingStatus(
           friend.followerId,

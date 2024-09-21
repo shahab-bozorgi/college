@@ -119,6 +119,8 @@ export class PostService {
         mentionedUsers
       );
 
+      console.log(mentions);
+
       for (const mention of mentions) {
         let mediaId: MediaId | null = null;
         if (media.length > 0) {
@@ -132,6 +134,8 @@ export class PostService {
           actionDate: post.createdAt,
           mediaId: mediaId,
         };
+
+        console.log(actionDto);
 
         await actionNotificationService.createActionWithNotifications(
           actionDto,

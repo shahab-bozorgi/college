@@ -31,7 +31,11 @@ export class ActionNotificationService {
 
     const friendReceiverIds: UserId[] = [];
 
-    if (dto.type !== "acceptFollow" && dto.type !== "requestFollow") {
+    if (
+      dto.type !== "acceptFollow" &&
+      dto.type !== "requestFollow" &&
+      dto.type !== "mention"
+    ) {
       for (const friend of friendReceivers) {
         const friendStatus = await this.followService.getFollowingStatus(
           friend.followerId,
@@ -42,7 +46,8 @@ export class ActionNotificationService {
           friend.followerId === personalReceiverId ||
           friendStatus.status === "Blocked" ||
           (friendStatus.status !== "Following" &&
-            personalReceiver.isPrivate === true) ||
+            personalReceiver.isPrivate === true &&
+            dto.type !== "follow") ||
           (closeFriendStatus === true &&
             friendStatus.isCloseFriend !== closeFriendStatus)
         ) {

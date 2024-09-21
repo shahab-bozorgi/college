@@ -299,7 +299,7 @@ export class FollowRepository implements IFollowRepository {
     });
 
     if (followRow === null) {
-      throw new NotFound("Follow Record of Notification not found");
+      return null;
     }
 
     const followedRecord = await this.findByFollowerAndFollowing(

@@ -380,26 +380,40 @@ export class FollowRepository implements IFollowRepository {
         });
       }
 
+      console.log(
+        notificationRepo
+          .createQueryBuilder("notif")
+          .leftJoin("notif.action", "action")
+          .delete()
+          .where("notif.receiverId = :receiverId", {
+            receiverId: blockedUser.id,
+          })
+          .andWhere("action.actorId = :actorId", {
+            actorId: authenticatedUser.id,
+          })
+          .getSql()
+      );
+
       await notificationRepo
         .createQueryBuilder("notif")
         .leftJoin("notif.action", "action")
+        .delete()
         .where("notif.receiverId = :receiverId", {
           receiverId: authenticatedUser.id,
         })
         .andWhere("action.actorId = :actorId", { actorId: blockedUser.id })
-        .delete()
         .execute();
 
       await notificationRepo
         .createQueryBuilder("notif")
         .leftJoin("notif.action", "action")
+        .delete()
         .where("notif.receiverId = :receiverId", {
           receiverId: blockedUser.id,
         })
         .andWhere("action.actorId = :actorId", {
           actorId: authenticatedUser.id,
         })
-        .delete()
         .execute();
 
       await followRepo.upsert(

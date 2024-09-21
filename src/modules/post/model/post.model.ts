@@ -15,6 +15,7 @@ export interface Post {
   caption: string;
   authorId: UserId;
   createdAt: Date;
+  updatedAt: Date;
   closeFriendsOnly: boolean;
   media: Media[];
 }

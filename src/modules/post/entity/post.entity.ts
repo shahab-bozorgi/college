@@ -7,6 +7,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryColumn,
+  UpdateDateColumn,
 } from "typeorm";
 import { PostId } from "../model/post-id";
 import { UserEntity } from "../../user/entity/user.entity";
@@ -37,6 +38,9 @@ export class PostEntity {
 
   @CreateDateColumn()
   createdAt!: Date;
+
+  @UpdateDateColumn()
+  updatedAt!: Date;
 
   @OneToMany(() => MentionEntity, (mention) => mention.post)
   mentions!: MentionEntity[];

@@ -1,5 +1,6 @@
 import { NotFound } from "../../../utilities/http-error";
 import { CreateActionDto } from "../../action/dto/create-action.dto";
+import { DeleteActionDto } from "../../action/dto/delete-action.dto";
 import { GetActionByTypeDto } from "../../action/dto/get-action-by-type.dto";
 import { UpdateActionDto } from "../../action/dto/update-action.dto";
 import { FollowService } from "../../user/follow/follow.service";
@@ -63,6 +64,10 @@ export class ActionNotificationService {
     return await this.actionNotificationRepo.findLastByType(dto);
   }
 
+  async getMentionActionByActorAndEntityId(dto: GetActionByTypeDto) {
+    return await this.actionNotificationRepo.findLastByType(dto);
+  }
+
   async updateRequestFollowToFollow(dto: UpdateActionDto) {
     const lastAction = await this.getLastFollowActionByActorAndEntityId({
       actorId: dto.actorId,
@@ -103,7 +108,47 @@ export class ActionNotificationService {
     }
   }
 
-  async deleteRequestFollow(dto: UpdateActionDto): Promise<boolean> {
+  async updateActionOfMention(dto: UpdateActionDto) {
+    const lastAction = await this.getMentionActionByActorAndEntityId({
+      actorId: dto.actorId,
+      entityId: dto.entityId,
+      type: "mention",
+    });
+
+    if (lastAction === null) {
+      throw new NotFound("Action for update mention is not found");
+    }
+
+    const updateMentionActionStatus =
+      await this.actionNotificationRepo.updateLastByType(
+        lastAction.id,
+        {
+          actionDate: dto.actionDate,
+          actorId: dto.actorId,
+          entityId: dto.entityId,
+        },
+        "follow"
+      );
+
+    if (updateMentionActionStatus !== true) {
+      throw new Error(
+        `Update to acceptFollow for action ${lastAction.id} is failed`
+      );
+    }
+
+    const unSeenNotifStatus =
+      await this.actionNotificationRepo.unSeenNotificationsByActionId(
+        lastAction.id
+      );
+
+    if (unSeenNotifStatus !== true) {
+      throw new Error(
+        `UnSeen notifications of action ${lastAction.id} is failed`
+      );
+    }
+  }
+
+  async deleteRequestFollow(dto: DeleteActionDto): Promise<boolean> {
     const lastAction = await this.getLastFollowActionByActorAndEntityId({
       actorId: dto.actorId,
       entityId: dto.entityId,
@@ -121,7 +166,32 @@ export class ActionNotificationService {
 
     if (deleteNotifStatus !== true) {
       throw new Error(
-        `Delete notifications of action ${lastAction.id} is failed`
+        `Delete notifications of action requestFollow ${lastAction.id} is failed`
+      );
+    }
+
+    return await this.actionNotificationRepo.deleteActionById(lastAction.id);
+  }
+
+  async deleteActionOfMention(dto: DeleteActionDto): Promise<boolean> {
+    const lastAction = await this.getMentionActionByActorAndEntityId({
+      actorId: dto.actorId,
+      entityId: dto.entityId,
+      type: "mention",
+    });
+
+    if (lastAction === null) {
+      throw new NotFound("Action for update accept follow is not found");
+    }
+
+    const deleteNotifStatus =
+      await this.actionNotificationRepo.deleteNotificationsByActionId(
+        lastAction.id
+      );
+
+    if (deleteNotifStatus !== true) {
+      throw new Error(
+        `Delete notifications of action mention ${lastAction.id} is failed`
       );
     }
 

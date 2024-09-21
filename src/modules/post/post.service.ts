@@ -114,9 +114,12 @@ export class PostService {
     });
 
     if (mentionedUsers.length) {
-      await this.mentionService.insert(post.id, mentionedUsers);
+      const mentions = await this.mentionService.insert(
+        post.id,
+        mentionedUsers
+      );
 
-      for (const mentionedUser of mentionedUsers) {
+      for (const mention of mentions) {
         let mediaId: MediaId | null = null;
         if (media.length > 0) {
           mediaId = media[0].id;
@@ -125,7 +128,7 @@ export class PostService {
         const actionDto: CreateActionDto = {
           actorId: post.authorId,
           type: "mention",
-          entityId: mentionedUser.id,
+          entityId: mention.id,
           actionDate: post.createdAt,
           mediaId: mediaId,
         };
@@ -218,8 +221,19 @@ export class PostService {
     if (post.author.id !== authenticatedId)
       throw new Forbidden("Access Forbidden");
 
+    const unDeletedMentions = post.mentions.filter((mention) =>
+      mentionedUsers.find((user) => mention.userId === user.id)
+    );
+
     let mentionedUsers: User[] = [];
     if (!dto.mentions) {
+      for (const deletedMention of post.mentions) {
+        actionNotificationService.deleteActionOfMention({
+          actorId: deletedMention.userId,
+          entityId: deletedMention.id,
+        });
+      }
+
       await this.mentionService.deleteMentions(post.mentions);
     } else {
       mentionedUsers = await this.mentionService.validateMentions(
@@ -229,6 +243,14 @@ export class PostService {
       const deletedMentions = post.mentions.filter(
         (mention) => !mentionedUsers.find((user) => mention.userId === user.id)
       );
+
+      for (const deletedMention of deletedMentions) {
+        actionNotificationService.deleteActionOfMention({
+          actorId: deletedMention.userId,
+          entityId: deletedMention.id,
+        });
+      }
+
       if (deletedMentions.length)
         await this.mentionService.deleteMentions(deletedMentions);
     }
@@ -277,9 +299,20 @@ export class PostService {
     }
 
     if (mentionedUsers.length) {
-      await this.mentionService.insert(post.id, mentionedUsers);
+      const mentions = await this.mentionService.insert(
+        post.id,
+        mentionedUsers
+      );
 
-      for (const mentionedUser of mentionedUsers) {
+      for (const unDeletedMention of unDeletedMentions) {
+        await actionNotificationService.updateActionOfMention({
+          actorId: post.authorId,
+          entityId: unDeletedMention.id,
+          actionDate: post.updatedAt,
+        });
+      }
+
+      for (const mention of mentions) {
         let mediaId: MediaId | null = null;
         if (post.media.length > 0) {
           mediaId = post.media[0].id;
@@ -288,8 +321,8 @@ export class PostService {
         const actionDto: CreateActionDto = {
           actorId: post.authorId,
           type: "mention",
-          entityId: mentionedUser.id,
-          actionDate: post.createdAt,
+          entityId: mention.id,
+          actionDate: post.updatedAt,
           mediaId: mediaId,
         };
 

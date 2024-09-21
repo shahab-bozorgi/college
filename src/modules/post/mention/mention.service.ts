@@ -9,7 +9,7 @@ import { MentionString } from "./dto/mention.dto";
 import { PostId } from "../model/post-id";
 import { ShowPosts } from "../model/post.model";
 import { IMentionRepository } from "./mention.repository";
-import { DeleteMention } from "./model/mention.model";
+import { DeleteMention, Mention } from "./model/mention.model";
 
 export class MentionService {
   constructor(
@@ -18,8 +18,8 @@ export class MentionService {
     private followService: FollowService
   ) {}
 
-  async insert(postId: PostId, mentionedUsers: User[]): Promise<void> {
-    await this.mentionRepo.insert(
+  async insert(postId: PostId, mentionedUsers: User[]): Promise<Mention[]> {
+    return await this.mentionRepo.insert(
       mentionedUsers.map((user) => {
         return { userId: user.id, username: user.username, postId: postId };
       })

@@ -311,7 +311,7 @@ export class FollowService {
 
     await actionNotificationService.createActionWithNotifications(
       actionDto,
-      followUpdated.followingId
+      followUpdated.followerId
     );
   }
 

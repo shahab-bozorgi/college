@@ -310,7 +310,7 @@ export class PostService {
         await actionNotificationService.updateActionOfMention({
           actorId: post.authorId,
           entityId: unDeletedMention.id,
-          actionDate: post.updatedAt,
+          actionDate: new Date(),
         });
       }
 
@@ -324,7 +324,7 @@ export class PostService {
           actorId: post.authorId,
           type: "mention",
           entityId: newMention.id,
-          actionDate: post.updatedAt,
+          actionDate: new Date(),
           mediaId: mediaId,
         };
 

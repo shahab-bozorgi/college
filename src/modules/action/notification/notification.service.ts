@@ -76,24 +76,14 @@ export class NotificationService {
         isSeen: notif.isSeen,
       };
 
-      // if (dto.notificationType === "friends") {
-      //   showNotif.receiver = {
-      //     id: receiver.id,
-      //     username: receiver.username,
-      //     firstName: receiver.firstName ?? "",
-      //     lastName: receiver.lastName ?? "",
-      //     followingStatus: followedStatus.status,
-      //     followedStatus: followingStatus.status,
-      //   };
-      // }
-
       if (!showNotif.content) {
         showNotif.content = { [notif.action.type]: {} };
       }
 
       showNotif.content[notif.action.type] = await this.getActionEntity(
         notif.action.type,
-        notif.action.entityId
+        notif.action.entityId,
+        receiver.id
       );
 
       showNotifications.push(showNotif);
@@ -102,10 +92,15 @@ export class NotificationService {
     return { notifications: showNotifications, nextPage, totalPages };
   }
 
-  private async getActionEntity(actionType: ActionType, entityId: UUID) {
+  private async getActionEntity(
+    actionType: ActionType,
+    entityId: UUID,
+    receiverId: UserId
+  ) {
     return await this.notificationRepo.getRelatedEntityByType(
       actionType,
-      entityId
+      entityId,
+      receiverId
     );
   }
 

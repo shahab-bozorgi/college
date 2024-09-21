@@ -11,6 +11,7 @@ import {
   FOLLOWING,
   FollowingsList,
   FollowNotification,
+  NOT_FOLLOWING,
   UpdateFollow,
 } from "./model/follow.model";
 import {
@@ -23,6 +24,7 @@ import { Blacklist } from "./model/blacklist.model";
 import { CloseFriends } from "./model/close-friend.model";
 import { FollowId } from "./model/follow-id.model";
 import { User } from "../model/user.model";
+import { NotFound } from "../../../utilities/http-error";
 
 export interface IFollowRepository {
   userFollowings(
@@ -64,7 +66,8 @@ export interface IFollowRepository {
   ): Promise<Follow | null>;
   findById(id: FollowId): Promise<Follow | null>;
   getFollowForNotificationById(
-    id: FollowId
+    id: FollowId,
+    followerId: UserId
   ): Promise<FollowNotification | null>;
 }
 
@@ -279,9 +282,10 @@ export class FollowRepository implements IFollowRepository {
   }
 
   async getFollowForNotificationById(
-    id: FollowId
+    id: FollowId,
+    followerId: UserId
   ): Promise<FollowNotification | null> {
-    const followRow: FollowNotification | null = await this.flwrepo.findOne({
+    const followRow = await this.flwrepo.findOne({
       where: { id },
       relations: ["following"],
       select: {
@@ -294,8 +298,38 @@ export class FollowRepository implements IFollowRepository {
       },
     });
 
-    if (followRow !== null) return { following: followRow.following };
+    if (followRow === null) {
+      throw new NotFound("Follow Record of Notification not found");
+    }
 
-    return followRow;
+    const followedRecord = await this.findByFollowerAndFollowing(
+      followRow.following.id,
+      followerId
+    );
+
+    if (followedRecord === null) {
+      throw new NotFound("Follow Record of Notification not found");
+    }
+
+    const followedStatus = followedRecord.followingStatus;
+
+    const followingRecord = await this.findByFollowerAndFollowing(
+      followerId,
+      followRow.following.id
+    );
+
+    if (followingRecord === null) {
+      throw new NotFound("Follow Record of Notification not found");
+    }
+
+    const followingStatus = followingRecord.followingStatus;
+
+    return {
+      following: {
+        ...followRow.following,
+        followingStatus: followingStatus,
+        followedStatus: followedStatus,
+      },
+    };
   }
 }

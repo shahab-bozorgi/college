@@ -43,7 +43,7 @@ export interface DeleteFollow {
 }
 
 export interface UpdateFollow {
-  id: FollowId
+  id: FollowId;
   followerId: UserId;
   followingId: UserId;
   followingStatus?: DbFollowingStatus;
@@ -81,5 +81,7 @@ export interface FollowNotification {
     username: Username;
     firstName: string;
     lastName: string;
+    followingStatus: "Pending" | "Blocked" | "Following" | "NotFollowing";
+    followedStatus: "Pending" | "Blocked" | "Following" | "NotFollowing";
   };
 }

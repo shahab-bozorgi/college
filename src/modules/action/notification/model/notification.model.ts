@@ -35,14 +35,6 @@ export interface ShowNotification {
     followingStatus: "Pending" | "Blocked" | "Following" | "NotFollowing";
     followedStatus: "Pending" | "Blocked" | "Following" | "NotFollowing";
   };
-  receiver?: {
-    id: UserId;
-    username: Username;
-    firstName: string;
-    lastName: string;
-    followingStatus: "Pending" | "Blocked" | "Following" | "NotFollowing";
-    followedStatus: "Pending" | "Blocked" | "Following" | "NotFollowing";
-  };
   isSeen: boolean;
   content?: {
     [key in ActionType]?: unknown;

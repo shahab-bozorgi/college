@@ -18,6 +18,9 @@ import { FollowRepository } from "../../user/follow/follow.repository";
 import { FollowId } from "../../user/follow/model/follow-id.model";
 import { MentionRepository } from "../../post/mention/mention.repository";
 import { MentionId } from "../../post/mention/model/mention-id";
+import { CommentNotification } from "../../post/comment/model/comment.model";
+import { FollowNotification } from "../../user/follow/model/follow.model";
+import { MentionNotification } from "../../post/mention/model/mention.model";
 
 export interface INotificationRepository {
   getAllWithAction(
@@ -25,8 +28,11 @@ export interface INotificationRepository {
   ): Promise<PaginatedResult<{ notifications: NotificationEntity[] }>>;
   getRelatedEntityByType(
     actionType: ActionType,
-    entityId: UUID
-  ): Promise<unknown | null>;
+    entityId: UUID,
+    receiverId: UserId
+  ): Promise<
+    CommentNotification | FollowNotification | MentionNotification | null
+  >;
   seen(
     dto: SeenNotificationsDto
   ): Promise<{ seenNotificationsStatus: boolean }>;
@@ -86,8 +92,11 @@ export class NotificationRepository implements INotificationRepository {
 
   async getRelatedEntityByType(
     actionType: ActionType,
-    entityId: UUID
-  ): Promise<unknown | null> {
+    entityId: UUID,
+    receiverId: UserId
+  ): Promise<
+    CommentNotification | FollowNotification | MentionNotification | null
+  > {
     const commentRepo = new CommentRepository(this.dataSource);
     const followRepo = new FollowRepository(this.dataSource);
     const mentionRepo = new MentionRepository(this.dataSource);
@@ -100,27 +109,32 @@ export class NotificationRepository implements INotificationRepository {
 
       case "acceptFollow":
         return await followRepo.getFollowForNotificationById(
-          entityId as FollowId
+          entityId as FollowId,
+          receiverId
         );
 
       case "requestFollow":
         return await followRepo.getFollowForNotificationById(
-          entityId as FollowId
+          entityId as FollowId,
+          receiverId
         );
 
       case "follow":
         return await followRepo.getFollowForNotificationById(
-          entityId as FollowId
+          entityId as FollowId,
+          receiverId
         );
-      
+
       case "mention":
         return await mentionRepo.getMentionForNotificationById(
           entityId as MentionId
         );
-        
-      default:
+
+      case "likePost":
         return null;
     }
+
+    return null;
   }
 
   async seen(

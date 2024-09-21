@@ -1,4 +1,10 @@
-import { CreateDateColumn, Entity, ManyToOne, PrimaryColumn } from "typeorm";
+import {
+  CreateDateColumn,
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryColumn,
+} from "typeorm";
 import { PostId } from "../../model/post-id";
 import { UserId } from "../../../user/model/user-user-id";
 import { UserEntity } from "../../../user/entity/user.entity";
@@ -6,9 +12,11 @@ import { PostEntity } from "../../entity/post.entity";
 
 @Entity("bookmarks")
 export class BookmarkEntity {
+  @Index()
   @PrimaryColumn()
   userId!: UserId;
 
+  @Index()
   @PrimaryColumn()
   postId!: PostId;
 

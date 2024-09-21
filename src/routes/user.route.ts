@@ -172,7 +172,9 @@ export const makeUserRouter = (
 
   app.post("/:userId/block", (req, res) => {
     const dto = parseDtoWithSchema(req.params, blockUserSchema);
-    expressHandler(req, res, () => followService.blockUser(req.user.id, dto));
+    expressHandler(req, res, () =>
+      followService.blockUser(req.user, dto.userId)
+    );
   });
 
   app.delete("/:userId/unblock", (req, res) => {

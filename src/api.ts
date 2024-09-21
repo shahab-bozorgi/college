@@ -73,7 +73,7 @@ export const makeApp = (dataSource: DataSource) => {
   const userRepository = new UserRepository(dataSource);
   const userService = new UserService(userRepository);
   const followRepository = new FollowRepository(dataSource);
-  const followService = new FollowService(followRepository);
+  const followService = new FollowService(followRepository, userService);
   const mentionRepository = new MentionRepository(dataSource);
   const mentionService = new MentionService(
     mentionRepository,

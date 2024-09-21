@@ -1,4 +1,4 @@
-import { DataSource, Repository } from "typeorm";
+import { Brackets, DataSource, Not, Repository } from "typeorm";
 import { UserId } from "../model/user-user-id";
 import { FollowEntity } from "./entity/follow.entity";
 import {
@@ -25,6 +25,8 @@ import { CloseFriends } from "./model/close-friend.model";
 import { FollowId } from "./model/follow-id.model";
 import { User } from "../model/user.model";
 import { NotFound } from "../../../utilities/http-error";
+import { BookmarkEntity } from "../../post/bookmark/entity/bookmark.entity";
+import { MentionEntity } from "../../post/mention/entity/mention.entity";
 
 export interface IFollowRepository {
   userFollowings(
@@ -69,13 +71,14 @@ export interface IFollowRepository {
     id: FollowId,
     followerId: UserId
   ): Promise<FollowNotification | null>;
+  blockUser(authenticatedUser: User, blockedUser: User): Promise<void>;
 }
 
 export class FollowRepository implements IFollowRepository {
   private flwrepo: Repository<FollowEntity>;
 
   constructor(private dataSource: DataSource) {
-    this.flwrepo = dataSource.getRepository(FollowEntity);
+    this.flwrepo = this.dataSource.getRepository(FollowEntity);
   }
 
   async findFollowers(
@@ -323,5 +326,86 @@ export class FollowRepository implements IFollowRepository {
         followedStatus: followedStatus,
       },
     };
+  }
+
+  async blockUser(authenticatedUser: User, blockedUser: User): Promise<void> {
+    await this.dataSource.manager.transaction(async (manager) => {
+      const followRepo = manager.getRepository(FollowEntity);
+      const authenticatedStatus = await followRepo.findOne({
+        where: {
+          followingId: authenticatedUser.id,
+          followerId: blockedUser.id,
+        },
+      });
+      await followRepo.upsert(
+        {
+          ...authenticatedStatus,
+          followingId: authenticatedUser.id,
+          followerId: blockedUser.id,
+          followingStatus: BLOCKED,
+          isCloseFriend: false,
+        },
+        { conflictPaths: { id: true } }
+      );
+      await followRepo.delete({
+        followingId: blockedUser.id,
+        followerId: authenticatedUser.id,
+        followingStatus: Not(BLOCKED),
+      });
+      await manager
+        .getRepository(BookmarkEntity)
+        .createQueryBuilder()
+        .delete()
+        .where(
+          new Brackets((qb) =>
+            qb
+              .where("userId = :authenticatedId")
+              .andWhere(
+                "postId IN (SELECT id FROM posts WHERE authorId = :blockedId)"
+              )
+          )
+        )
+        .orWhere(
+          new Brackets((qb) =>
+            qb
+              .where("userId = :blockedId")
+              .andWhere(
+                "postId IN (SELECT id FROM posts WHERE authorId = :authenticatedId)"
+              )
+          )
+        )
+        .setParameters({
+          authenticatedId: authenticatedUser.id,
+          blockedId: blockedUser.id,
+        })
+        .execute();
+      await manager
+        .getRepository(MentionEntity)
+        .createQueryBuilder()
+        .delete()
+        .where(
+          new Brackets((qb) =>
+            qb
+              .where("userId = :authenticatedId")
+              .andWhere(
+                "postId IN (SELECT id FROM posts WHERE authorId = :blockedId)"
+              )
+          )
+        )
+        .orWhere(
+          new Brackets((qb) =>
+            qb
+              .where("userId = :blockedId")
+              .andWhere(
+                "postId IN (SELECT id FROM posts WHERE authorId = :authenticatedId)"
+              )
+          )
+        )
+        .setParameters({
+          authenticatedId: authenticatedUser.id,
+          blockedId: blockedUser.id,
+        })
+        .execute();
+    });
   }
 }

@@ -6,7 +6,6 @@ import { MediaId } from "../../media/model/media-id";
 import { UserId } from "../model/user-user-id";
 import { User } from "../model/user.model";
 import { UserService } from "../user.service";
-import { BlockUserDto } from "./dto/block-user.dto";
 import { GetFollowerListsDto } from "./dto/get-followers.dto";
 import { GetFollowingListsDto } from "./dto/get-followings.dto";
 import { UnblockUserDto } from "./dto/unblock-user.dto";
@@ -25,7 +24,10 @@ import {
 } from "./model/follow.model";
 
 export class FollowService {
-  constructor(private flwRepo: IFollowRepository) {}
+  constructor(
+    private flwRepo: IFollowRepository,
+    private userService: UserService
+  ) {}
 
   async followUser(
     authenticatedId: UserId,
@@ -240,17 +242,12 @@ export class FollowService {
     if (!follower) {
       throw new NotFound("User not found!");
     }
-    const followingStatus = (
-      await this.getFollowingStatus(authenticatedId, followerId)
-    ).status;
-    if (followingStatus !== PENDING)
-      throw new BadRequest("Follow request not found.");
 
     const followRow = await this.getFollow(followerId, authenticatedId);
-    if (followRow === null) {
-      throw new NotFound("Follow Record is not found");
-    }
 
+    if (followRow === null || followRow.followingStatus !== PENDING) {
+      throw new NotFound("No Pending request was found");
+    }
     const followUpdated = await this.flwRepo.update({
       id: followRow.id,
       followerId,
@@ -268,8 +265,8 @@ export class FollowService {
     const authenticatedUser = await userService.getUserBy(authenticatedId, [
       "avatar",
     ]);
-    if (authenticatedUser !== null) {
-      if (authenticatedUser.avatar !== undefined) {
+    if (authenticatedUser) {
+      if (authenticatedUser.avatar) {
         mediaId = authenticatedUser.avatar.id;
       }
     }
@@ -336,46 +333,21 @@ export class FollowService {
     };
   }
 
-  async blockUser(authenticatedId: UserId, dto: BlockUserDto): Promise<void> {
-    if (authenticatedId === dto.userId)
+  async blockUser(authenticatedUser: User, blockedId: UserId): Promise<void> {
+    if (authenticatedUser.id === blockedId)
       throw new BadRequest("Please don't block yourself, will you?");
 
+    const blockedUser = await this.userService.getUserBy(blockedId);
+    if (!blockedUser) throw new BadRequest("No user was found by that ID.");
+
     const blockedUserStatus = (
-      await this.getFollowingStatus(authenticatedId, dto.userId)
+      await this.getFollowingStatus(authenticatedUser.id, blockedUser.id)
     ).status;
 
     if (blockedUserStatus === BLOCKED)
       throw new BadRequest("User is already blocked.");
 
-    const followRow = await this.getFollow(dto.userId, authenticatedId);
-    if (followRow === null) {
-      throw new NotFound("Follow Record is not found");
-    }
-
-    if (blockedUserStatus === NOT_FOLLOWING) {
-      await this.flwRepo.create({
-        followingId: authenticatedId,
-        followerId: dto.userId,
-        followingStatus: BLOCKED,
-      });
-    } else {
-      await this.flwRepo.update({
-        id: followRow.id,
-        followingId: authenticatedId,
-        followerId: dto.userId,
-        followingStatus: BLOCKED,
-      });
-    }
-
-    const authenticatedStatus = (
-      await this.getFollowingStatus(dto.userId, authenticatedId)
-    ).status;
-    if (authenticatedStatus !== BLOCKED) {
-      await this.flwRepo.delete({
-        followingId: dto.userId,
-        followerId: authenticatedId,
-      });
-    }
+    await this.flwRepo.blockUser(authenticatedUser, blockedUser);
   }
 
   async unblockUser(
@@ -419,22 +391,15 @@ export class FollowService {
     if (followerId === authenticatedId)
       throw new BadRequest("You cannot add your self to your close friends.");
 
-    const followingStatus = await this.getFollowingStatus(
-      authenticatedId,
-      followerId
-    );
-    if (followingStatus.status !== FOLLOWING)
+    const followRow = await this.getFollow(followerId, authenticatedId);
+    if (followRow === null || followRow.followingStatus !== FOLLOWING) {
       throw new BadRequest(
         "Users must be following you in order to add them to your close friends."
       );
-
-    if (followingStatus.isCloseFriend)
-      throw new BadRequest("User is already in your close friends.");
-
-    const followRow = await this.getFollow(followerId, authenticatedId);
-    if (followRow === null) {
-      throw new NotFound("Follow Record is not found");
     }
+
+    if (followRow.isCloseFriend)
+      throw new BadRequest("User is already in your close friends.");
 
     await this.flwRepo.update({
       id: followRow.id,
@@ -453,15 +418,9 @@ export class FollowService {
         "Follower id and authenticated user id can't be the same."
       );
 
-    if (
-      !(await this.getFollowingStatus(authenticatedId, followerId))
-        .isCloseFriend
-    )
-      throw new BadRequest("User is not in your close frineds.");
-
     const followRow = await this.getFollow(followerId, authenticatedId);
-    if (followRow === null) {
-      throw new NotFound("Follow Record is not found");
+    if (followRow === null || !followRow.isCloseFriend) {
+      throw new BadRequest("User is not in your close frineds.");
     }
 
     await this.flwRepo.update({

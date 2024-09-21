@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinTable,
   ManyToMany,
   ManyToOne,
@@ -24,6 +25,7 @@ export class PostEntity {
   @PrimaryColumn("uuid")
   id!: PostId;
 
+  @Index()
   @Column()
   authorId!: UserId;
 

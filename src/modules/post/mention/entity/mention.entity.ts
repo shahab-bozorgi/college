@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ManyToOne,
   PrimaryColumn,
   PrimaryGeneratedColumn,
@@ -20,9 +21,11 @@ export class MentionEntity {
   @PrimaryGeneratedColumn("uuid")
   id!: MentionId;
 
+  @Index()
   @PrimaryColumn()
   userId!: UserId;
 
+  @Index()
   @PrimaryColumn()
   postId!: PostId;
 

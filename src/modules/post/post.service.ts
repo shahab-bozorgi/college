@@ -221,10 +221,6 @@ export class PostService {
     if (post.author.id !== authenticatedId)
       throw new Forbidden("Access Forbidden");
 
-    const unDeletedMentions = post.mentions.filter((mention) =>
-      mentionedUsers.find((user) => mention.userId === user.id)
-    );
-
     let mentionedUsers: User[] = [];
     if (!dto.mentions) {
       for (const deletedMention of post.mentions) {
@@ -254,6 +250,10 @@ export class PostService {
       if (deletedMentions.length)
         await this.mentionService.deleteMentions(deletedMentions);
     }
+
+    const unDeletedMentions = post.mentions.filter((mention) =>
+      mentionedUsers.find((user) => mention.userId === user.id)
+    );
 
     const deletedMedia = dto.deletedMedia;
     if (deletedMedia && deletedMedia.length) {

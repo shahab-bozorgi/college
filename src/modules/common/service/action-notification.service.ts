@@ -132,7 +132,7 @@ export class ActionNotificationService {
           actorId: dto.actorId,
           entityId: dto.entityId,
         },
-        "follow"
+        "mention"
       );
 
     if (updateMentionActionStatus !== true) {

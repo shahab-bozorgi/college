@@ -225,7 +225,7 @@ export class PostService {
     if (!dto.mentions) {
       for (const deletedMention of post.mentions) {
         actionNotificationService.deleteActionOfMention({
-          actorId: deletedMention.userId,
+          actorId: post.authorId,
           entityId: deletedMention.id,
         });
       }
@@ -242,7 +242,7 @@ export class PostService {
 
       for (const deletedMention of deletedMentions) {
         actionNotificationService.deleteActionOfMention({
-          actorId: deletedMention.userId,
+          actorId: post.authorId,
           entityId: deletedMention.id,
         });
       }
@@ -250,10 +250,6 @@ export class PostService {
       if (deletedMentions.length)
         await this.mentionService.deleteMentions(deletedMentions);
     }
-
-    const unDeletedMentions = post.mentions.filter((mention) =>
-      mentionedUsers.find((user) => mention.userId === user.id)
-    );
 
     const deletedMedia = dto.deletedMedia;
     if (deletedMedia && deletedMedia.length) {
@@ -299,9 +295,15 @@ export class PostService {
     }
 
     if (mentionedUsers.length) {
-      const mentions = await this.mentionService.insert(
+      const newMentions = await this.mentionService.insert(
         post.id,
-        mentionedUsers
+        mentionedUsers.filter(
+          (user) => !post.mentions.find((mention) => mention.userId === user.id)
+        )
+      );
+
+      const unDeletedMentions = post.mentions.filter((mention) =>
+        mentionedUsers.find((user) => mention.userId === user.id)
       );
 
       for (const unDeletedMention of unDeletedMentions) {
@@ -311,12 +313,6 @@ export class PostService {
           actionDate: post.updatedAt,
         });
       }
-
-      const newMentions = mentions.filter((mention) =>
-        unDeletedMentions.find(
-          (unDeleted) => mention.userId !== unDeleted.userId
-        )
-      );
 
       for (const newMention of newMentions) {
         let mediaId: MediaId | null = null;

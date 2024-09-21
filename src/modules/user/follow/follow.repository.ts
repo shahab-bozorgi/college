@@ -1,4 +1,4 @@
-import { Brackets, DataSource, Not, Repository } from "typeorm";
+import { Brackets, DataSource, In, Not, Repository } from "typeorm";
 import { UserId } from "../model/user-user-id";
 import { FollowEntity } from "./entity/follow.entity";
 import {
@@ -27,6 +27,8 @@ import { User } from "../model/user.model";
 import { NotFound } from "../../../utilities/http-error";
 import { BookmarkEntity } from "../../post/bookmark/entity/bookmark.entity";
 import { MentionEntity } from "../../post/mention/entity/mention.entity";
+import { ActionEntity } from "../../action/entity/action.entity";
+import { NotificationEntity } from "../../action/notification/entity/notification.entity";
 
 export interface IFollowRepository {
   userFollowings(
@@ -331,12 +333,53 @@ export class FollowRepository implements IFollowRepository {
   async blockUser(authenticatedUser: User, blockedUser: User): Promise<void> {
     await this.dataSource.manager.transaction(async (manager) => {
       const followRepo = manager.getRepository(FollowEntity);
+      const actionRepo = manager.getRepository(ActionEntity);
+      const notificationRepo = manager.getRepository(NotificationEntity);
+
       const authenticatedStatus = await followRepo.findOne({
         where: {
-          followingId: authenticatedUser.id,
           followerId: blockedUser.id,
+          followingId: authenticatedUser.id,
         },
       });
+
+      if (authenticatedStatus !== null) {
+        const actions = await actionRepo.find({
+          select: { id: true },
+          where: {
+            entityId: authenticatedStatus.id,
+            actorId: blockedUser.id,
+            type: In(["requestFollow", "follow", "acceptFollow"]),
+          },
+        });
+
+        actions.forEach((action) => {
+          notificationRepo.delete({ actionId: action.id });
+        });
+      }
+
+      const blockedUserStatus = await followRepo.findOne({
+        where: {
+          followerId: authenticatedUser.id,
+          followingId: blockedUser.id,
+        },
+      });
+
+      if (blockedUserStatus !== null) {
+        const actions = await actionRepo.find({
+          select: { id: true },
+          where: {
+            entityId: blockedUserStatus.id,
+            actorId: authenticatedUser.id,
+            type: In(["requestFollow", "follow", "acceptFollow"]),
+          },
+        });
+
+        actions.forEach((action) => {
+          notificationRepo.delete({ actionId: action.id });
+        });
+      }
+
       await followRepo.upsert(
         {
           ...authenticatedStatus,

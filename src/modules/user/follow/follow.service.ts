@@ -126,7 +126,8 @@ export class FollowService {
   async unfollowUser(
     authenticatedId: UserId,
     followingId: UserId,
-    userService: UserService
+    userService: UserService,
+    actionNotificationService: ActionNotificationService
   ): Promise<void> {
     if (authenticatedId === followingId)
       throw new BadRequest("I'm sure you couldn't have followed yourself.");
@@ -145,10 +146,33 @@ export class FollowService {
         throw new BadRequest("You haven't followed this user.");
     }
 
+    const followRow = await this.flwRepo.findByFollowerAndFollowing(
+      authenticatedId,
+      followingId
+    );
+
+    if (followRow === null) {
+      throw new NotFound("Follow Row is not found");
+    }
+
     await this.flwRepo.delete({
-      followerId: authenticatedId,
-      followingId,
+      followerId: followRow.followerId,
+      followingId: followRow.followingId,
     });
+
+    switch (followRow.followingStatus) {
+      case "Following":
+        await actionNotificationService.deleteFollow({
+          actorId: followRow.followerId,
+          entityId: followRow.id,
+        });
+
+      case "Pending":
+        await actionNotificationService.deleteRequestFollow({
+          actorId: followRow.followerId,
+          entityId: followRow.id,
+        });
+    }
   }
 
   async deleteFollower(

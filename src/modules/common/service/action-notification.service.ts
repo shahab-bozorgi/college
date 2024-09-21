@@ -155,6 +155,31 @@ export class ActionNotificationService {
     }
   }
 
+  async deleteFollow(dto: DeleteActionDto): Promise<boolean> {
+    const lastAction = await this.getLastFollowActionByActorAndEntityId({
+      actorId: dto.actorId,
+      entityId: dto.entityId,
+      type: "follow",
+    });
+
+    if (lastAction === null) {
+      throw new NotFound("Action for delete follow is not found");
+    }
+
+    const deleteNotifStatus =
+      await this.actionNotificationRepo.deleteNotificationsByActionId(
+        lastAction.id
+      );
+
+    if (deleteNotifStatus !== true) {
+      throw new Error(
+        `Delete notifications of action follow ${lastAction.id} is failed`
+      );
+    }
+
+    return await this.actionNotificationRepo.deleteActionById(lastAction.id);
+  }
+
   async deleteRequestFollow(dto: DeleteActionDto): Promise<boolean> {
     const lastAction = await this.getLastFollowActionByActorAndEntityId({
       actorId: dto.actorId,
@@ -163,7 +188,7 @@ export class ActionNotificationService {
     });
 
     if (lastAction === null) {
-      throw new NotFound("Action for update accept follow is not found");
+      throw new NotFound("Action for delete request follow is not found");
     }
 
     const deleteNotifStatus =

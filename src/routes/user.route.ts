@@ -110,7 +110,8 @@ export const makeUserRouter = (
       return followService.unfollowUser(
         req.user.id,
         dto.followingId,
-        userService
+        userService,
+        actionNotificationService
       );
     });
   });

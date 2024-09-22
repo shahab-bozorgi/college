@@ -1,22 +1,12 @@
-import { FollowService } from "../../user/follow/follow.service";
-import { UserId } from "../../user/model/user-user-id";
 import { IExploreRepository } from "./explore-repository";
 import { ExploreDto } from "./dto/explore-dto";
+import { User } from "../model/user.model";
 
 export class ExploreService {
-  constructor(
-    private exploreRepo: IExploreRepository,
-    private flwService: FollowService
-  ) {}
+  constructor(private exploreRepo: IExploreRepository) {}
 
-  async explore(followerId: UserId, dto: ExploreDto) {
-    const followings = await this.flwService.findFollowings(followerId);
-
-    const followingIds: UserId[] = followings.map(
-      (following) => following.followingId
-    );
-
-    return await this.exploreRepo.findPostsByUserIds(followingIds, followerId, {
+  async explore(authenticatedUser: User, dto: ExploreDto) {
+    return await this.exploreRepo.findPostsByUserIds(authenticatedUser, {
       page: dto.page,
       limit: dto.limit,
     });

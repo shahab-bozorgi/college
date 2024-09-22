@@ -4,22 +4,21 @@ import { UserId } from "../../../user/model/user-user-id";
 import { Username } from "../../../user/model/user-username";
 
 export interface Explore {
-  posts: Array<{
-    id: PostId;
-    author: {
-      id: UserId;
-      firstName: string;
-      lastName: string;
-      username: Username;
-      avatar: Media;
-      followersCount: number;
-    };
-    media: string[];
-    likesCount: number;
-    isLiked: boolean;
-    bookmarksCount: number;
-    isBookmarked: boolean;
-    commentsCount: number;
-    isCloseFriend: boolean; 
-  }>;
+  id: PostId;
+  author: {
+    id: UserId;
+    firstName: string;
+    lastName: string;
+    username: Username;
+    avatar: Media;
+    followersCount: number;
+    isCloseFriend: boolean;
+  };
+  media: string[];
+  isLiked: boolean;
+  likesCount: number;
+  isBookmarked: boolean;
+  bookmarksCount: number;
+  commentsCount: number;
+  closeFriendsOnly: boolean;
 }

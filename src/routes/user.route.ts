@@ -89,7 +89,7 @@ export const makeUserRouter = (
 
   app.get("/explore", (req, res) => {
     const dto = parseDtoWithSchema(req.query, exploreSchema);
-    expressHandler(req, res, () => exploreService.explore(req.user.id, dto));
+    expressHandler(req, res, () => exploreService.explore(req.user, dto));
   });
 
   app.post("/follow/:followingId", (req, res) => {

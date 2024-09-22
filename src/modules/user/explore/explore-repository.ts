@@ -1,93 +1,154 @@
-import { Brackets, DataSource, Repository } from "typeorm";
-import { UserId } from "../../user/model/user-user-id";
-import { PostEntity } from "../../post/entity/post.entity";
+import { Brackets, DataSource } from "typeorm";
 import {
   PaginatedResult,
   PaginationDto,
   paginationInfo,
   paginationSkip,
 } from "../../../data/pagination";
+import { User } from "../model/user.model";
+import { PostEntity } from "../../post/entity/post.entity";
+import { BLOCKED, FOLLOWING } from "../follow/model/follow.model";
 import { Explore } from "./model/explore-model";
-import { FOLLOWING } from "../follow/model/follow.model";
 
 export interface IExploreRepository {
   findPostsByUserIds(
-    followingIds: UserId[],
-    followerId: UserId,
+    authenticatedUser: User,
     pagination: PaginationDto
-  ): Promise<PaginatedResult<Explore>>;
+  ): Promise<PaginatedResult<{ posts: Explore[] }>>;
 }
 
-export class ExploreRepository
-  extends Repository<PostEntity>
-  implements IExploreRepository
-{
-  constructor(private dataSource: DataSource) {
-    super(PostEntity, dataSource.manager);
-  }
+export class ExploreRepository implements IExploreRepository {
+  constructor(private dataSource: DataSource) {}
 
   async findPostsByUserIds(
-    followingIds: UserId[],
-    followerId: UserId,
+    authenticatedUser: User,
     pagination: PaginationDto
-  ): Promise<PaginatedResult<Explore>> {
-    const result = await this.createQueryBuilder("post")
+  ): Promise<PaginatedResult<{ posts: Explore[] }>> {
+    console.log(
+      this.dataSource.manager
+        .getRepository(PostEntity)
+        .createQueryBuilder("post")
+        .select([
+          "post.id",
+          "post.authorId",
+          "post.createdAt",
+          "post.closeFriendsOnly",
+        ])
+        .leftJoinAndSelect("post.author", "author")
+        .leftJoinAndSelect("post.media", "media")
+        .leftJoinAndSelect("post.comments", "comment")
+        .leftJoinAndSelect("post.bookmarks", "bookmark")
+        .leftJoinAndSelect("post.likes", "like")
+        .innerJoinAndSelect(
+          "author.followers",
+          "follower",
+          "follower.followingStatus = :following"
+        )
+        .leftJoinAndSelect(
+          "author.followings",
+          "following",
+          "following.followingId = :authenticatedId"
+        )
+        .where(
+          "following.followingStatus IS NULL OR following.followingStatus != :blocked"
+        )
+        .andWhere("(follower.followerId = :authenticatedId)")
+        .andWhere(
+          new Brackets((qb) =>
+            qb
+              .where("post.closeFriendsOnly = 0")
+              .orWhere(
+                `EXISTS(SELECT 1 FROM follows WHERE follows.followingId = post.authorId AND follows.followerId = :authenticatedId AND follows.isCloseFriend = 1 AND follows.followingStatus = :following)`
+              )
+          )
+        )
+        .setParameters({
+          authenticatedId: authenticatedUser.id,
+          following: FOLLOWING,
+          blocked: BLOCKED,
+        })
+        .orderBy("post.createdAt", "DESC")
+        .skip(paginationSkip(pagination))
+        .take(pagination.limit)
+        .getQueryAndParameters()
+    );
+    const [posts, count] = await this.dataSource.manager
+      .getRepository(PostEntity)
+      .createQueryBuilder("post")
+      .select([
+        "post.id",
+        "post.authorId",
+        "post.createdAt",
+        "post.closeFriendsOnly",
+      ])
       .leftJoinAndSelect("post.author", "author")
       .leftJoinAndSelect("post.media", "media")
-      .leftJoinAndSelect("post.likes", "likes")
-      .leftJoinAndSelect("post.bookmarks", "bookmarks")
-      .leftJoinAndSelect("post.comments", "comments")
-      .leftJoinAndSelect("author.avatar", "avatar")
-      .leftJoinAndSelect("author.followers", "followers")
-      .where(
-        new Brackets((qb) => {
-          qb.where(
-            new Brackets((qb) => {
-              qb.where("post.closeFriendsOnly = false").orWhere(
-                new Brackets((qb) => {
-                  qb.where("post.closeFriendsOnly = true")
-                    .andWhere("followers.followerId = :followerId", {
-                      followerId,
-                    })
-                    .andWhere("followers.isCloseFriend = true");
-                })
-              );
-            })
-          ).andWhere("post.authorId IN (:...followingIds)", {
-            followingIds: followingIds.length ? followingIds : [-1],
-          });
-        })
+      .leftJoinAndSelect("post.comments", "comment")
+      .leftJoinAndSelect("post.bookmarks", "bookmark")
+      .leftJoinAndSelect("post.likes", "like")
+      .innerJoinAndSelect(
+        "author.followers",
+        "follower",
+        "follower.followingStatus = :following"
       )
+      .leftJoinAndSelect(
+        "author.followings",
+        "following",
+        "following.followingId = :authenticatedId"
+      )
+      .where(
+        "following.followingStatus IS NULL OR following.followingStatus != :blocked"
+      )
+      .andWhere("(follower.followerId = :authenticatedId)")
+      .andWhere(
+        new Brackets((qb) =>
+          qb
+            .where("post.closeFriendsOnly = 0")
+            .orWhere(
+              `EXISTS(SELECT 1 FROM follows WHERE follows.followingId = post.authorId AND follows.followerId = :authenticatedId AND follows.isCloseFriend = 1 AND follows.followingStatus = :following)`
+            )
+        )
+      )
+      .setParameters({
+        authenticatedId: authenticatedUser.id,
+        following: FOLLOWING,
+        blocked: BLOCKED,
+      })
       .orderBy("post.createdAt", "DESC")
       .skip(paginationSkip(pagination))
       .take(pagination.limit)
       .getManyAndCount();
-
-
-    const { nextPage, totalPages } = paginationInfo(result[1], pagination);
-
+    const { nextPage, totalPages } = paginationInfo(count, pagination);
     return {
-      posts: result[0].map((post) => ({
-        id: post.id,
-        author: {
-          id: post.author.id,
-          firstName: post.author.firstName,
-          lastName: post.author.lastName,
-          username: post.author.username,
-          avatar: post.author.avatar,
-          followersCount: post.author.followers.length,
-        },
-        media: post.media.map((media) => media.url),
-        likesCount: post.likes.length,
-        isLiked: post.likes.some((like) => like.userId === followerId),
-        bookmarksCount: post.bookmarks.length,
-        isBookmarked: post.bookmarks.some((bk) => bk.userId === followerId),
-        commentsCount: post.comments.length,
-        isCloseFriend: post.author.followers.some(
-          (follower) =>
-            follower.followerId === followerId && post.closeFriendsOnly
-        ),
-      })),
+      posts: posts.map((post) => {
+        return {
+          id: post.id,
+          author: {
+            id: post.author.id,
+            firstName: post.author.firstName,
+            lastName: post.author.lastName,
+            username: post.author.username,
+            avatar: post.author.avatar,
+            followersCount: post.author.followers.length,
+            isCloseFriend: post.author.followings.some(
+              (following) =>
+                following.followingId === authenticatedUser.id &&
+                following.isCloseFriend
+            ),
+          },
+          media: post.media.map((media) => media.url),
+          likesCount: post.likes.length,
+          isLiked: post.likes.some(
+            (like) => like.userId === authenticatedUser.id
+          ),
+          bookmarksCount: post.bookmarks.length,
+          isBookmarked: post.bookmarks.some(
+            (bookmark) => bookmark.userId === authenticatedUser.id
+          ),
+          commentsCount: post.comments.length,
+          closeFriendsOnly: post.closeFriendsOnly,
+        };
+      }),
       nextPage,
       totalPages,
     };

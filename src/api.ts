@@ -98,7 +98,7 @@ export const makeApp = (dataSource: DataSource) => {
   const bookmarkRepository = new BookmarkRepository(dataSource);
   const bookmarkService = new BookmarkService(bookmarkRepository);
   const exploreRepository = new ExploreRepository(dataSource);
-  const exploreService = new ExploreService(exploreRepository, followService);
+  const exploreService = new ExploreService(exploreRepository);
   const actionNotificationRepository = new ActionNotificationRepository(
     dataSource
   );

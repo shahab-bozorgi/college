@@ -155,17 +155,12 @@ export class FollowService {
       throw new NotFound("Follow Row is not found");
     }
 
-    await this.flwRepo.delete({
-      followerId: followRow.followerId,
-      followingId: followRow.followingId,
-    });
-
     switch (followRow.followingStatus) {
-      case "Following":
-        await actionNotificationService.deleteFollow({
-          actorId: followRow.followerId,
-          entityId: followRow.id,
-        });
+      // case "Following":
+      //   await actionNotificationService.deleteFollow({
+      //     actorId: followRow.followerId,
+      //     entityId: followRow.id,
+      //   });
 
       case "Pending":
         await actionNotificationService.deleteRequestFollow({
@@ -173,6 +168,11 @@ export class FollowService {
           entityId: followRow.id,
         });
     }
+
+    await this.flwRepo.delete({
+      followerId: followRow.followerId,
+      followingId: followRow.followingId,
+    });
   }
 
   async deleteFollower(

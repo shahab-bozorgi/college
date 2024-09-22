@@ -360,14 +360,14 @@ export class FollowRepository implements IFollowRepository {
       const actions2 = await actionRepo.find({
         select: { id: true },
         where: {
-          actorId: authenticatedUser.id,
+          actorId: blockedUser.id,
         },
       });
 
       actions2.forEach((action) => {
         notificationRepo.delete({
           actionId: action.id,
-          receiverId: blockedUser.id,
+          receiverId: authenticatedUser.id,
         });
       });
 

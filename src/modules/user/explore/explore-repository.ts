@@ -82,6 +82,7 @@ export class ExploreRepository implements IExploreRepository {
         "post.closeFriendsOnly",
       ])
       .leftJoinAndSelect("post.author", "author")
+      .leftJoinAndSelect("author.avatar", "avatar")
       .leftJoinAndSelect("post.media", "media")
       .leftJoinAndSelect("post.comments", "comment")
       .leftJoinAndSelect("post.bookmarks", "bookmark")
@@ -121,6 +122,7 @@ export class ExploreRepository implements IExploreRepository {
     const { nextPage, totalPages } = paginationInfo(count, pagination);
     return {
       posts: posts.map((post) => {
+
         return {
           id: post.id,
           author: {
@@ -129,6 +131,7 @@ export class ExploreRepository implements IExploreRepository {
             lastName: post.author.lastName,
             username: post.author.username,
             avatar: post.author.avatar,
+            
             followersCount: post.author.followers.length,
             isCloseFriend: post.author.followings.some(
               (following) =>

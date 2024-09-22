@@ -33,13 +33,18 @@ export class ExploreRepository implements IExploreRepository {
         "post.createdAt",
         "post.closeFriendsOnly",
       ])
-      .leftJoinAndSelect("post.author", "author")
+      .innerJoinAndSelect("post.author", "author")
       .leftJoinAndSelect("author.avatar", "avatar")
       .leftJoinAndSelect("post.media", "media")
       .leftJoinAndSelect("post.comments", "comment")
       .leftJoinAndSelect("post.bookmarks", "bookmark")
       .leftJoinAndSelect("post.likes", "like")
-      .innerJoinAndSelect(
+      .innerJoin(
+        "author.followers",
+        "followingRecord",
+        "followingRecord.followingStatus = :following AND followingRecord.followerId = :authenticatedId"
+      )
+      .leftJoinAndSelect(
         "author.followers",
         "follower",
         "follower.followingStatus = :following"
@@ -49,16 +54,10 @@ export class ExploreRepository implements IExploreRepository {
         "following",
         "following.followingId = :authenticatedId"
       )
-      .leftJoin(
-        "author.followers",
-        "followingRecord",
-        "followingRecord.followerId = :authenticatedId"
-      )
-      .where("post.authorId != :authenticatedId")
+      .where("(post.authorId != :authenticatedId)")
       .andWhere(
         "(following.followingStatus IS NULL OR following.followingStatus != :blocked)"
       )
-      .andWhere("follower.followerId = :authenticatedId")
       .andWhere(
         new Brackets((qb) =>
           qb

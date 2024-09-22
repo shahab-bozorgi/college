@@ -350,8 +350,8 @@ export class FollowRepository implements IFollowRepository {
         },
       });
 
-      actions.forEach((action) => {
-        notificationRepo.delete({
+      actions.forEach(async (action) => {
+        await notificationRepo.delete({
           actionId: action.id,
           receiverId: blockedUser.id,
         });
@@ -364,8 +364,8 @@ export class FollowRepository implements IFollowRepository {
         },
       });
 
-      actions2.forEach((action) => {
-        notificationRepo.delete({
+      actions2.forEach(async (action) => {
+        await notificationRepo.delete({
           actionId: action.id,
           receiverId: authenticatedUser.id,
         });

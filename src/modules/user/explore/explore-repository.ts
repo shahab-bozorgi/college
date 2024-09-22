@@ -97,7 +97,8 @@ export class ExploreRepository implements IExploreRepository {
         "following",
         "following.followingId = :authenticatedId"
       )
-      .where(
+      .where("post.authorId != :authenticatedId")
+      .andWhere(
         "following.followingStatus IS NULL OR following.followingStatus != :blocked"
       )
       .andWhere("(follower.followerId = :authenticatedId)")

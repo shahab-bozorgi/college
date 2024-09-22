@@ -1,3 +1,4 @@
+import { UUID } from "../../../data/uuid";
 import { NotFound } from "../../../utilities/http-error";
 import { CreateActionDto } from "../../action/dto/create-action.dto";
 import { DeleteActionDto } from "../../action/dto/delete-action.dto";
@@ -67,6 +68,25 @@ export class ActionNotificationService {
 
   async getLastFollowActionByActorAndEntityId(dto: GetActionByTypeDto) {
     return await this.actionNotificationRepo.findLastByType(dto);
+  }
+
+  async deleteFollowActionByActorAndEntityId(entityId: UUID, actorId: UserId) {
+    return await this.actionNotificationRepo.deleteActionFollow(
+      entityId,
+      actorId,
+      "follow"
+    );
+  }
+  
+  async deleteAcceptFollowActionByActorAndEntityId(
+    entityId: UUID,
+    actorId: UserId
+  ) {
+    return await this.actionNotificationRepo.deleteActionFollow(
+      entityId,
+      actorId,
+      "acceptFollow"
+    );
   }
 
   async getMentionActionByActorAndEntityId(dto: GetActionByTypeDto) {

@@ -1,4 +1,4 @@
-import { DataSource } from "typeorm";
+import { DataSource, In } from "typeorm";
 import { CreateActionDto } from "../../action/dto/create-action.dto";
 import { UserId } from "../../user/model/user-user-id";
 import { ActionEntity } from "../../action/entity/action.entity";
@@ -10,6 +10,7 @@ import { Action } from "../../action/model/action.model";
 import { UpdateActionDto } from "../../action/dto/update-action.dto";
 import { ActionId } from "../../action/model/action-id";
 import { ActionType } from "../../action/model/action-type";
+import { UUID } from "../../../data/uuid";
 
 export interface IActionNotificationRepository {
   create(
@@ -18,6 +19,11 @@ export interface IActionNotificationRepository {
     friendReceiverIds: UserId[]
   ): Promise<boolean>;
   findLastByType(dto: GetActionByTypeDto): Promise<Action | null>;
+  deleteActionFollow(
+    entityId: UUID,
+    actorId: UserId,
+    type: "follow" | "acceptFollow"
+  ): Promise<boolean>;
   updateLastByType(
     id: ActionId,
     dto: UpdateActionDto,
@@ -129,5 +135,34 @@ export class ActionNotificationRepository
 
   async deleteActionById(id: ActionId): Promise<boolean> {
     return Boolean((await this.actionRepo.delete({ id })).affected);
+  }
+
+  async deleteActionFollow(
+    entityId: UUID,
+    actorId: UserId,
+    type: "follow" | "acceptFollow"
+  ): Promise<boolean> {
+    const actions = await this.actionRepo.find({
+      select: {
+        id: true,
+      },
+      where: {
+        actorId: actorId,
+        entityId: entityId,
+        type: type,
+      },
+    });
+
+    console.log(actions);
+
+    for (const action of actions) {
+      await this.notificationRepo.delete({
+        actionId: action.id,
+      });
+
+      await this.actionRepo.delete({ id: action.id });
+    }
+
+    return true;
   }
 }

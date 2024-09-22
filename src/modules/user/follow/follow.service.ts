@@ -156,17 +156,26 @@ export class FollowService {
     }
 
     switch (followRow.followingStatus) {
-      // case "Following":
-      //   await actionNotificationService.deleteFollow({
-      //     actorId: followRow.followerId,
-      //     entityId: followRow.id,
-      //   });
+      case "Following":
+        await actionNotificationService.deleteFollowActionByActorAndEntityId(
+          followRow.id,
+          followRow.followerId
+        );
+
+        await actionNotificationService.deleteAcceptFollowActionByActorAndEntityId(
+          followRow.id,
+          followRow.followingId
+        );
+
+        break;
 
       case "Pending":
         await actionNotificationService.deleteRequestFollow({
           actorId: followRow.followerId,
           entityId: followRow.id,
         });
+
+        break;
     }
 
     await this.flwRepo.delete({

@@ -343,71 +343,32 @@ export class FollowRepository implements IFollowRepository {
         },
       });
 
-      if (authenticatedStatus !== null) {
-        const actions = await actionRepo.find({
-          select: { id: true },
-          where: {
-            entityId: authenticatedStatus.id,
-            actorId: blockedUser.id,
-            type: In(["requestFollow", "follow", "acceptFollow"]),
-          },
-        });
-
-        actions.forEach((action) => {
-          notificationRepo.delete({ actionId: action.id });
-        });
-      }
-
-      const blockedUserStatus = await followRepo.findOne({
+      const actions = await actionRepo.find({
+        select: { id: true },
         where: {
-          followerId: authenticatedUser.id,
-          followingId: blockedUser.id,
+          actorId: authenticatedUser.id,
         },
       });
 
-      if (blockedUserStatus !== null) {
-        const actions = await actionRepo.find({
-          select: { id: true },
-          where: {
-            entityId: blockedUserStatus.id,
-            actorId: authenticatedUser.id,
-            type: In(["requestFollow", "follow", "acceptFollow"]),
-          },
+      actions.forEach((action) => {
+        notificationRepo.delete({
+          actionId: action.id,
+          receiverId: blockedUser.id,
         });
-
-        actions.forEach((action) => {
-          notificationRepo.delete({ actionId: action.id });
-        });
-      }
-
-      const result = await notificationRepo
-        .createQueryBuilder("notif")
-        .select("notif.id")
-        .leftJoin("notif.action", "action")
-        .where("notif.receiverId = :receiverId", {
-          receiverId: authenticatedUser.id,
-        })
-        .andWhere("action.actorId = :actorId", { actorId: blockedUser.id })
-        .getRawMany();
-
-      await notificationRepo.delete({
-        id: In([result]),
       });
 
-      const result2 = await notificationRepo
-        .createQueryBuilder("notif")
-        .select("notif.id")
-        .leftJoin("notif.action", "action")
-        .where("notif.receiverId = :receiverId", {
-          receiverId: `${blockedUser.id}`,
-        })
-        .andWhere("action.actorId = :actorId", {
-          actorId: `${authenticatedUser.id}`,
-        })
-        .getRawMany();
+      const actions2 = await actionRepo.find({
+        select: { id: true },
+        where: {
+          actorId: authenticatedUser.id,
+        },
+      });
 
-      await notificationRepo.delete({
-        id: In([result2]),
+      actions2.forEach((action) => {
+        notificationRepo.delete({
+          actionId: action.id,
+          receiverId: blockedUser.id,
+        });
       });
 
       await followRepo.upsert(

@@ -153,8 +153,6 @@ export class ActionNotificationRepository
       },
     });
 
-    console.log(actions);
-
     for (const action of actions) {
       await this.notificationRepo.delete({
         actionId: action.id,

@@ -382,27 +382,33 @@ export class FollowRepository implements IFollowRepository {
 
       const result = await notificationRepo
         .createQueryBuilder("notif")
-        .select("id")
+        .select("notif.id")
         .leftJoin("notif.action", "action")
         .where("notif.receiverId = :receiverId", {
           receiverId: authenticatedUser.id,
         })
         .andWhere("action.actorId = :actorId", { actorId: blockedUser.id })
-        .getMany();
+        .getRawMany();
 
-      console.log(result);
+      await notificationRepo.delete({
+        id: In([...result]),
+      });
 
-      await notificationRepo
+      const result2 = await notificationRepo
         .createQueryBuilder("notif")
+        .select("notif.id")
         .leftJoin("notif.action", "action")
         .where("notif.receiverId = :receiverId", {
-          receiverId: blockedUser.id,
+          receiverId: `${blockedUser.id}`,
         })
         .andWhere("action.actorId = :actorId", {
-          actorId: authenticatedUser.id,
+          actorId: `${authenticatedUser.id}`,
         })
-        .delete()
-        .execute();
+        .getRawMany();
+
+      await notificationRepo.delete({
+        id: In([...result2]),
+      });
 
       await followRepo.upsert(
         {

@@ -391,7 +391,7 @@ export class FollowRepository implements IFollowRepository {
         .getRawMany();
 
       await notificationRepo.delete({
-        id: In([...result]),
+        id: In([result]),
       });
 
       const result2 = await notificationRepo
@@ -407,7 +407,7 @@ export class FollowRepository implements IFollowRepository {
         .getRawMany();
 
       await notificationRepo.delete({
-        id: In([...result2]),
+        id: In([result2]),
       });
 
       await followRepo.upsert(

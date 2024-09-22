@@ -14,8 +14,8 @@ services:
       - DB_USER=college_admin
       - DB_PASS=eAA<4v|15iX
       - SECRET_KEY=fBB>5w&26jY
-      - CLIENT_URL=http://5.34.194.155
-      - API_URL=http://5.34.194.155
+      - CLIENT_URL=https://cherry-ring.dev1403.rahnemacollege.ir
+      - API_URL=https://cherry-ring.dev1403.rahnemacollege.ir
       - PORT=4000
       - MAIL_HOST=smtp.gmail.com
       - MAIL_USERNAME=collegegram.cherryring@gmail.com

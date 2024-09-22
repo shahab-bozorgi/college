@@ -11,7 +11,7 @@ export const swaggerOptions = {
     },
     servers: [
       {
-        url: "http://5.34.194.155:" + process.env.PORT,
+        url: "https://cherry-ring.dev1403.rahnemacollege.ir/api",
       },
       {
         url: "http://localhost:" + process.env.PORT,

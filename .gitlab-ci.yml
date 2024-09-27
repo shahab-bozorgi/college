@@ -1,11 +1,11 @@
 stages:
-  salam
+  - syncing
   # - build
   # - test
   # - deploy
 
 sync-with-github:
-  stage: build
+  stage: syncing
   before_script:
     - git config --global user.name "${GITLAB_USER_NAME}"
     - git config --global user.email "${GITLAB_USER_EMAIL}"

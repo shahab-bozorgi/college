@@ -1,5 +1,6 @@
 stages:
-  - build
+  salam
+  # - build
   # - test
   # - deploy
 
@@ -14,7 +15,7 @@ sync-with-github:
     - git pull origin main
     - git pull github main
     - git status
-    - git push https://root:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:main
+    - git push github main
 
 # build:
 #   stage: build

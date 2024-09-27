@@ -15,8 +15,8 @@ import { NotificationEntity } from "../notification/entity/notification.entity";
 import { Notification } from "../notification/model/notification.model";
 import { UUID } from "../../../data/uuid";
 import { Media } from "../../media/model/media.model";
-import { MediaId } from "../../media/model/media-id";
 import { MediaEntity } from "../../media/entity/media.entity";
+import { MediaId } from "../../media/model/media-id";
 
 @Entity("actions")
 export class ActionEntity {
